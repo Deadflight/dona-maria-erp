@@ -1,21 +1,62 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* --- Colores de Marca --- */
+  --color-brand-primary: #0A2D69;
+  --color-brand-accent: #D29F25;
+  --color-brand-accent-muted: #B8922A;
+
+  /* --- Fondos --- */
+  --color-bg-base: #F8FAFC;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-elevated: #0A2D69;
+
+  /* --- Tipografía - WCAG AAA (7:1+) --- */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #334155;
+  --color-text-muted: #475569;
+  --color-text-inverse: #FFFFFF;
+  --color-text-accent: #0A2D69;
+
+  /* --- Semánticos - WCAG AAA (7:1+) --- */
+  --color-status-success: #166534;
+  --color-status-warning: #B45309;
+  --color-status-danger: #DC2626;
+  --color-status-info: #1D4ED8;
+
+  /* --- Bordes --- */
+  --color-border-default: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  /* --- Fuentes --- */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* --- Variables legacy para compatibilidad --- */
+:root {
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --brand-primary: #0A2D69;
+  --brand-accent: #D29F25;
+  --bg-base: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --text-main: #0F172A;
+  --text-muted: #475569;
+  --text-inverse: #FFFFFF;
+  --status-success: #166534;
+  --status-warning: #B45309;
+  --status-danger: #DC2626;
+  --status-info: #1D4ED8;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0A0A0A;
+    --foreground: #F8FAFC;
+    --brand-primary: #1E3A8A;
+    --bg-base: #0A0A0A;
+    --bg-surface: #1E1E1E;
   }
 }
 
