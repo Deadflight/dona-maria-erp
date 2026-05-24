@@ -1,7 +1,3 @@
-// Database types for Supabase
-// These will be generated automatically when we connect to Supabase
-// For now, this is a placeholder that matches our schema design
-
 export type Json =
   | string
   | number
@@ -10,288 +6,427 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      usuarios: {
+      abonos_creditos: {
         Row: {
+          created_at: string | null
+          credito_id: string
+          fecha_abono: string
           id: string
-          email: string
-          password_hash: string
-          nombre_completo: string
-          rol: "admin" | "operador"
-          activo: boolean
-          created_at: string
+          metodo_pago: string
+          monto: number
+          referencia: string | null
         }
         Insert: {
+          created_at?: string | null
+          credito_id: string
+          fecha_abono?: string
           id?: string
-          email: string
-          password_hash: string
-          nombre_completo: string
-          rol?: "admin" | "operador"
-          activo?: boolean
-          created_at?: string
+          metodo_pago: string
+          monto: number
+          referencia?: string | null
         }
         Update: {
+          created_at?: string | null
+          credito_id?: string
+          fecha_abono?: string
           id?: string
-          email?: string
-          password_hash?: string
-          nombre_completo?: string
-          rol?: "admin" | "operador"
-          activo?: boolean
-          created_at?: string
+          metodo_pago?: string
+          monto?: number
+          referencia?: string | null
         }
-      }
-      productos: {
-        Row: {
-          id: string
-          codigo_barra: string | null
-          descripcion: string
-          tipo_unidad: "unidad" | "peso" | "longitud" | "mixto"
-          unidad_base: "kg" | "m" | "cm" | "und"
-          factor_conversion: number
-          precio_venta_usd: number
-          stock_actual: number
-          stock_minimo: number
-          activo: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          codigo_barra?: string | null
-          descripcion: string
-          tipo_unidad: "unidad" | "peso" | "longitud" | "mixto"
-          unidad_base: "kg" | "m" | "cm" | "und"
-          factor_conversion?: number
-          precio_venta_usd: number
-          stock_actual?: number
-          stock_minimo?: number
-          activo?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          codigo_barra?: string | null
-          descripcion?: string
-          tipo_unidad?: "unidad" | "peso" | "longitud" | "mixto"
-          unidad_base?: "kg" | "m" | "cm" | "und"
-          factor_conversion?: number
-          precio_venta_usd?: number
-          stock_actual?: number
-          stock_minimo?: number
-          activo?: boolean
-          created_at?: string
-          updated_at?: string
-        }
+        Relationships: [
+          {
+            foreignKeyName: "abonos_creditos_credito_id_fkey"
+            columns: ["credito_id"]
+            isOneToOne: false
+            referencedRelation: "creditos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       clientes: {
         Row: {
-          id: string
-          nombre: string
-          telefono: string | null
+          activo: boolean | null
+          created_at: string | null
           direccion: string | null
-          limite_credito_usd: number | null
-          activo: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
+          email: string | null
+          id: string
+          limite_credito: number | null
           nombre: string
-          telefono?: string | null
+          rif_cedula: string | null
+          saldo_actual: number | null
+          telefono: string | null
+          tipo: string
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          created_at?: string | null
           direccion?: string | null
-          limite_credito_usd?: number | null
-          activo?: boolean
-          created_at?: string
+          email?: string | null
+          id?: string
+          limite_credito?: number | null
+          nombre: string
+          rif_cedula?: string | null
+          saldo_actual?: number | null
+          telefono?: string | null
+          tipo?: string
+          updated_at?: string | null
         }
         Update: {
+          activo?: boolean | null
+          created_at?: string | null
+          direccion?: string | null
+          email?: string | null
           id?: string
+          limite_credito?: number | null
           nombre?: string
+          rif_cedula?: string | null
+          saldo_actual?: number | null
           telefono?: string | null
-          direccion?: string | null
-          limite_credito_usd?: number | null
-          activo?: boolean
-          created_at?: string
+          tipo?: string
+          updated_at?: string | null
         }
-      }
-      ventas: {
-        Row: {
-          id: string
-          fecha_hora: string
-          id_usuario: string
-          id_cliente: string | null
-          tipo_venta: "contado" | "credito"
-          estado: "completada" | "anulada"
-          total_usd: number
-          tasa_cambio_usd_a_ves: number
-          total_ves: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          fecha_hora?: string
-          id_usuario: string
-          id_cliente?: string | null
-          tipo_venta: "contado" | "credito"
-          estado?: "completada" | "anulada"
-          total_usd: number
-          tasa_cambio_usd_a_ves: number
-          total_ves: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          fecha_hora?: string
-          id_usuario?: string
-          id_cliente?: string | null
-          tipo_venta?: "contado" | "credito"
-          estado?: "completada" | "anulada"
-          total_usd?: number
-          tasa_cambio_usd_a_ves?: number
-          total_ves?: number
-          created_at?: string
-        }
-      }
-      detalles_venta: {
-        Row: {
-          id: string
-          id_venta: string
-          id_producto: string
-          cantidad: number
-          precio_unitario_usd: number
-          unidad_usada: string
-        }
-        Insert: {
-          id?: string
-          id_venta: string
-          id_producto: string
-          cantidad: number
-          precio_unitario_usd: number
-          unidad_usada: string
-        }
-        Update: {
-          id?: string
-          id_venta?: string
-          id_producto?: string
-          cantidad?: number
-          precio_unitario_usd?: number
-          unidad_usada?: string
-        }
-      }
-      pagos_venta: {
-        Row: {
-          id: string
-          id_venta: string
-          metodo_pago: "efectivo" | "pagomovil" | "debito"
-          banco: "banesco" | "mercantil" | "venezuela"
-          monto_ves: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          id_venta: string
-          metodo_pago: "efectivo" | "pagomovil" | "debito"
-          banco: "banesco" | "mercantil" | "venezuela"
-          monto_ves: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          id_venta?: string
-          metodo_pago?: "efectivo" | "pagomovil" | "debito"
-          banco?: "banesco" | "mercantil" | "venezuela"
-          monto_ves?: number
-          created_at?: string
-        }
+        Relationships: []
       }
       creditos: {
         Row: {
-          id: string
-          id_venta: string
-          id_cliente: string
-          monto_total_usd: number
-          monto_pagado_usd: number
-          saldo_pendiente_usd: number
-          fecha_venta: string
+          cliente_id: string
+          created_at: string | null
+          cuotas: number | null
+          estado: string
+          fecha_otorgamiento: string
           fecha_vencimiento: string
-          estado: "pendiente" | "saldado" | "mora"
-          created_at: string
+          id: string
+          monto_original: number
+          saldo_pendiente: number
+          tasa_interes: number | null
+          venta_id: string | null
         }
         Insert: {
-          id?: string
-          id_venta: string
-          id_cliente: string
-          monto_total_usd: number
-          monto_pagado_usd?: number
-          fecha_venta?: string
+          cliente_id: string
+          created_at?: string | null
+          cuotas?: number | null
+          estado?: string
+          fecha_otorgamiento?: string
           fecha_vencimiento: string
-          estado?: "pendiente" | "saldado" | "mora"
-          created_at?: string
+          id?: string
+          monto_original: number
+          saldo_pendiente: number
+          tasa_interes?: number | null
+          venta_id?: string | null
         }
         Update: {
-          id?: string
-          id_venta?: string
-          id_cliente?: string
-          monto_total_usd?: number
-          monto_pagado_usd?: number
-          fecha_venta?: string
+          cliente_id?: string
+          created_at?: string | null
+          cuotas?: number | null
+          estado?: string
+          fecha_otorgamiento?: string
           fecha_vencimiento?: string
-          estado?: "pendiente" | "saldado" | "mora"
-          created_at?: string
+          id?: string
+          monto_original?: number
+          saldo_pendiente?: number
+          tasa_interes?: number | null
+          venta_id?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "creditos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creditos_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: false
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      abonos_creditos: {
+      detalles_venta: {
         Row: {
+          cantidad: number
+          created_at: string | null
+          descuento: number | null
           id: string
-          id_credito: string
-          monto_usd: number
-          monto_ves: number
-          metodo_pago: string
-          banco: string
-          fecha_hora: string
+          precio_unitario: number
+          producto_id: string
+          subtotal: number
+          venta_id: string
         }
         Insert: {
+          cantidad: number
+          created_at?: string | null
+          descuento?: number | null
           id?: string
-          id_credito: string
-          monto_usd: number
-          monto_ves: number
-          metodo_pago: string
-          banco: string
-          fecha_hora?: string
+          precio_unitario: number
+          producto_id: string
+          subtotal: number
+          venta_id: string
         }
         Update: {
+          cantidad?: number
+          created_at?: string | null
+          descuento?: number | null
           id?: string
-          id_credito?: string
-          monto_usd?: number
-          monto_ves?: number
-          metodo_pago?: string
-          banco?: string
-          fecha_hora?: string
+          precio_unitario?: number
+          producto_id?: string
+          subtotal?: number
+          venta_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "detalles_venta_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalles_venta_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: false
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pagos_venta: {
+        Row: {
+          banco: string | null
+          created_at: string | null
+          id: string
+          metodo_pago: string
+          monto: number
+          referencia: string | null
+          venta_id: string
+        }
+        Insert: {
+          banco?: string | null
+          created_at?: string | null
+          id?: string
+          metodo_pago: string
+          monto: number
+          referencia?: string | null
+          venta_id: string
+        }
+        Update: {
+          banco?: string | null
+          created_at?: string | null
+          id?: string
+          metodo_pago?: string
+          monto?: number
+          referencia?: string | null
+          venta_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_venta_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: false
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      perfiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          nombre: string | null
+          rol: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          nombre?: string | null
+          rol?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          nombre?: string | null
+          rol?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      productos: {
+        Row: {
+          activo: boolean | null
+          categoria: string
+          codigo_barras: string | null
+          created_at: string | null
+          descripcion: string | null
+          id: string
+          nombre: string
+          precio_compra: number | null
+          precio_venta: number
+          sku: string
+          stock_actual: number
+          stock_minimo: number
+          unidad_medida: string
+          updated_at: string | null
+        }
+        Insert: {
+          activo?: boolean | null
+          categoria: string
+          codigo_barras?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre: string
+          precio_compra?: number | null
+          precio_venta: number
+          sku: string
+          stock_actual?: number
+          stock_minimo?: number
+          unidad_medida?: string
+          updated_at?: string | null
+        }
+        Update: {
+          activo?: boolean | null
+          categoria?: string
+          codigo_barras?: string | null
+          created_at?: string | null
+          descripcion?: string | null
+          id?: string
+          nombre?: string
+          precio_compra?: number | null
+          precio_venta?: number
+          sku?: string
+          stock_actual?: number
+          stock_minimo?: number
+          unidad_medida?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       tasas_cambio: {
         Row: {
-          id: string
-          tasa: number
-          fuente: "api_bcv" | "manual" | "fallida"
+          activa: boolean | null
+          created_at: string | null
           fecha: string
-          created_at: string
+          fuente: string
+          id: string
+          moneda_destino: string
+          moneda_origen: string
+          tasa: number
         }
         Insert: {
+          activa?: boolean | null
+          created_at?: string | null
+          fecha?: string
+          fuente?: string
           id?: string
+          moneda_destino?: string
+          moneda_origen?: string
           tasa: number
-          fuente?: "api_bcv" | "manual" | "fallida"
-          fecha: string
-          created_at?: string
         }
         Update: {
-          id?: string
-          tasa?: number
-          fuente?: "api_bcv" | "manual" | "fallida"
+          activa?: boolean | null
+          created_at?: string | null
           fecha?: string
-          created_at?: string
+          fuente?: string
+          id?: string
+          moneda_destino?: string
+          moneda_origen?: string
+          tasa?: number
         }
+        Relationships: []
+      }
+      ventas: {
+        Row: {
+          cliente_id: string | null
+          created_at: string | null
+          estado: string
+          id: string
+          impuesto: number
+          metodo_pago: string
+          numero_factura: string
+          observaciones: string | null
+          subtotal: number
+          total: number
+          vendedor_id: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string | null
+          estado?: string
+          id?: string
+          impuesto?: number
+          metodo_pago: string
+          numero_factura: string
+          observaciones?: string | null
+          subtotal?: number
+          total: number
+          vendedor_id?: string | null
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string | null
+          estado?: string
+          id?: string
+          impuesto?: number
+          metodo_pago?: string
+          numero_factura?: string
+          observaciones?: string | null
+          subtotal?: number
+          total?: number
+          vendedor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ventas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ventas_vendedor_id_fkey"
+            columns: ["vendedor_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -303,26 +438,134 @@ export interface Database {
     Enums: {
       [_ in never]: never
     }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
 }
 
-// Convenient types for common queries
-export type Usuario = Database["public"]["Tables"]["usuarios"]["Row"]
-export type Producto = Database["public"]["Tables"]["productos"]["Row"]
-export type Cliente = Database["public"]["Tables"]["clientes"]["Row"]
-export type Venta = Database["public"]["Tables"]["ventas"]["Row"]
-export type DetalleVenta = Database["public"]["Tables"]["detalles_venta"]["Row"]
-export type PagoVenta = Database["public"]["Tables"]["pagos_venta"]["Row"]
-export type Credito = Database["public"]["Tables"]["creditos"]["Row"]
-export type AbonoCredito = Database["public"]["Tables"]["abonos_creditos"]["Row"]
-export type TasaCambio = Database["public"]["Tables"]["tasas_cambio"]["Row"]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-export type RolUsuario = "admin" | "operador"
-export type TipoUnidad = "unidad" | "peso" | "longitud" | "mixto"
-export type UnidadBase = "kg" | "m" | "cm" | "und"
-export type TipoVenta = "contado" | "credito"
-export type EstadoVenta = "completada" | "anulada"
-export type MetodoPago = "efectivo" | "pagomovil" | "debito"
-export type Banco = "banesco" | "mercantil" | "venezuela"
-export type EstadoCredito = "pendiente" | "saldado" | "mora"
-export type FuenteTasa = "api_bcv" | "manual" | "fallida"
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {},
+  },
+} as const
