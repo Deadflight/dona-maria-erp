@@ -1,40 +1,32 @@
-/** @type {import('semantic-release').GlobalConfig} */
-export default {
-  branches: ["main"],
-  plugins: [
+{
+  "branches": ["main"],
+  "plugins": [
     [
       "@semantic-release/commit-analyzer",
       {
-        preset: "conventionalcommits",
-        releaseRules: [
-          { type: "feat", release: "minor" },
-          { type: "fix", release: "patch" },
-          { type: "refactor", release: "patch" },
-          { type: "perf", release: "patch" },
-          { type: "docs", release: "patch" },
-          { type: "chore", release: false },
-        ],
-      },
+        "preset": "conventionalcommits"
+      }
     ],
     [
       "@semantic-release/release-notes-generator",
       {
-        preset: "conventionalcommits",
-      },
+        "preset": "conventionalcommits"
+      }
     ],
+    "@semantic-release/changelog",
     [
-      "@semantic-release/github",
+      "@semantic-release/npm",
       {
-        assets: [],
-      },
+        "npmPublish": false
+      }
     ],
     [
       "@semantic-release/git",
       {
-        assets: ["CHANGELOG.md"],
-        message:
-          "chore(release): set ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
-      },
+        "assets": ["CHANGELOG.md", "package.json", "pnpm-lock.yaml"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
     ],
-  ],
+    "@semantic-release/github"
+  ]
 }
