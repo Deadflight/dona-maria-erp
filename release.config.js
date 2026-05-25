@@ -20,17 +20,6 @@ export default {
       "@semantic-release/release-notes-generator",
       {
         preset: "conventionalcommits",
-        presetConfig: {
-          types: {
-            feat: { section: "Features", emoji: "✨" },
-            fix: { section: "Bug Fixes", emoji: "🐛" },
-            refactor: { section: "Code Refactoring", emoji: "♻️" },
-            perf: { section: "Performance", emoji: "⚡" },
-            docs: { section: "Documentation", emoji: "📝" },
-            chore: { section: "Maintenance", emoji: "🔧" },
-            test: { section: "Tests", emoji: "🧪" },
-          },
-        },
       },
     ],
     [
