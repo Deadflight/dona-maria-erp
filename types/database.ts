@@ -34,396 +34,389 @@ export type Database = {
   }
   public: {
     Tables: {
-      abonos_creditos: {
+      clients: {
         Row: {
+          address: string | null
+          business_name: string | null
+          city: string | null
           created_at: string | null
-          credito_id: string
-          fecha_abono: string
-          id: string
-          metodo_pago: string
-          monto: number
-          referencia: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          credito_id: string
-          fecha_abono?: string
-          id?: string
-          metodo_pago: string
-          monto: number
-          referencia?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          credito_id?: string
-          fecha_abono?: string
-          id?: string
-          metodo_pago?: string
-          monto?: number
-          referencia?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "abonos_creditos_credito_id_fkey"
-            columns: ["credito_id"]
-            isOneToOne: false
-            referencedRelation: "creditos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      clientes: {
-        Row: {
-          activo: boolean | null
-          created_at: string | null
-          direccion: string | null
           email: string | null
           id: string
-          limite_credito: number | null
-          nombre: string
-          rif_cedula: string | null
-          saldo_actual: number | null
-          telefono: string | null
-          tipo: string
+          is_active: boolean | null
+          name: string
+          notes: string | null
+          phone: string | null
+          rut: string | null
           updated_at: string | null
         }
         Insert: {
-          activo?: boolean | null
+          address?: string | null
+          business_name?: string | null
+          city?: string | null
           created_at?: string | null
-          direccion?: string | null
           email?: string | null
           id?: string
-          limite_credito?: number | null
-          nombre: string
-          rif_cedula?: string | null
-          saldo_actual?: number | null
-          telefono?: string | null
-          tipo?: string
+          is_active?: boolean | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          rut?: string | null
           updated_at?: string | null
         }
         Update: {
-          activo?: boolean | null
+          address?: string | null
+          business_name?: string | null
+          city?: string | null
           created_at?: string | null
-          direccion?: string | null
           email?: string | null
           id?: string
-          limite_credito?: number | null
-          nombre?: string
-          rif_cedula?: string | null
-          saldo_actual?: number | null
-          telefono?: string | null
-          tipo?: string
+          is_active?: boolean | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          rut?: string | null
           updated_at?: string | null
         }
         Relationships: []
       }
-      creditos: {
+      credit_payments: {
         Row: {
-          cliente_id: string
+          amount_usd: number
           created_at: string | null
-          cuotas: number | null
-          estado: string
-          fecha_otorgamiento: string
-          fecha_vencimiento: string
+          credit_id: string
           id: string
-          monto_original: number
-          saldo_pendiente: number
-          tasa_interes: number | null
-          venta_id: string | null
+          is_active: boolean | null
+          payment_date: string | null
+          updated_at: string | null
         }
         Insert: {
-          cliente_id: string
+          amount_usd: number
           created_at?: string | null
-          cuotas?: number | null
-          estado?: string
-          fecha_otorgamiento?: string
-          fecha_vencimiento: string
+          credit_id: string
           id?: string
-          monto_original: number
-          saldo_pendiente: number
-          tasa_interes?: number | null
-          venta_id?: string | null
+          is_active?: boolean | null
+          payment_date?: string | null
+          updated_at?: string | null
         }
         Update: {
-          cliente_id?: string
+          amount_usd?: number
           created_at?: string | null
-          cuotas?: number | null
-          estado?: string
-          fecha_otorgamiento?: string
-          fecha_vencimiento?: string
+          credit_id?: string
           id?: string
-          monto_original?: number
-          saldo_pendiente?: number
-          tasa_interes?: number | null
-          venta_id?: string | null
+          is_active?: boolean | null
+          payment_date?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "creditos_cliente_id_fkey"
-            columns: ["cliente_id"]
+            foreignKeyName: "credit_payments_credit_id_fkey"
+            columns: ["credit_id"]
             isOneToOne: false
-            referencedRelation: "clientes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "creditos_venta_id_fkey"
-            columns: ["venta_id"]
-            isOneToOne: false
-            referencedRelation: "ventas"
+            referencedRelation: "credits"
             referencedColumns: ["id"]
           },
         ]
       }
-      detalles_venta: {
+      credits: {
         Row: {
-          cantidad: number
+          client_id: string
           created_at: string | null
-          descuento: number | null
+          due_date: string
           id: string
-          precio_unitario: number
-          producto_id: string
-          subtotal: number
-          venta_id: string
+          is_active: boolean | null
+          paid_usd: number | null
+          sale_id: string | null
+          status: string | null
+          total_usd: number
+          updated_at: string | null
         }
         Insert: {
-          cantidad: number
+          client_id: string
           created_at?: string | null
-          descuento?: number | null
+          due_date: string
           id?: string
-          precio_unitario: number
-          producto_id: string
-          subtotal: number
-          venta_id: string
+          is_active?: boolean | null
+          paid_usd?: number | null
+          sale_id?: string | null
+          status?: string | null
+          total_usd: number
+          updated_at?: string | null
         }
         Update: {
-          cantidad?: number
+          client_id?: string
           created_at?: string | null
-          descuento?: number | null
+          due_date?: string
           id?: string
-          precio_unitario?: number
-          producto_id?: string
-          subtotal?: number
-          venta_id?: string
+          is_active?: boolean | null
+          paid_usd?: number | null
+          sale_id?: string | null
+          status?: string | null
+          total_usd?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "detalles_venta_producto_id_fkey"
-            columns: ["producto_id"]
+            foreignKeyName: "credits_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: "productos"
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "detalles_venta_venta_id_fkey"
-            columns: ["venta_id"]
+            foreignKeyName: "credits_sale_id_fkey"
+            columns: ["sale_id"]
             isOneToOne: false
-            referencedRelation: "ventas"
+            referencedRelation: "sales"
             referencedColumns: ["id"]
           },
         ]
       }
-      pagos_venta: {
-        Row: {
-          banco: string | null
-          created_at: string | null
-          id: string
-          metodo_pago: string
-          monto: number
-          referencia: string | null
-          venta_id: string
-        }
-        Insert: {
-          banco?: string | null
-          created_at?: string | null
-          id?: string
-          metodo_pago: string
-          monto: number
-          referencia?: string | null
-          venta_id: string
-        }
-        Update: {
-          banco?: string | null
-          created_at?: string | null
-          id?: string
-          metodo_pago?: string
-          monto?: number
-          referencia?: string | null
-          venta_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pagos_venta_venta_id_fkey"
-            columns: ["venta_id"]
-            isOneToOne: false
-            referencedRelation: "ventas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      perfiles: {
+      exchange_rates: {
         Row: {
           created_at: string | null
-          email: string
+          effective_date: string
+          from_currency: string
           id: string
-          nombre: string | null
-          rol: string
+          is_active: boolean | null
+          rate: number
+          to_currency: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
-          email: string
-          id: string
-          nombre?: string | null
-          rol?: string
+          effective_date: string
+          from_currency: string
+          id?: string
+          is_active?: boolean | null
+          rate: number
+          to_currency: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
-          email?: string
+          effective_date?: string
+          from_currency?: string
           id?: string
-          nombre?: string | null
-          rol?: string
+          is_active?: boolean | null
+          rate?: number
+          to_currency?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      productos: {
+      products: {
         Row: {
-          activo: boolean | null
-          categoria: string
-          codigo_barras: string | null
+          barcode: string | null
+          base_unit: string
+          category: string
+          conversion_factor: number | null
+          cost_usd: number | null
           created_at: string | null
-          descripcion: string | null
+          current_stock: number
+          description: string | null
           id: string
-          nombre: string
-          precio_compra: number | null
-          precio_venta: number
+          is_active: boolean | null
+          min_stock: number
+          name: string
+          price_usd: number
           sku: string
-          stock_actual: number
-          stock_minimo: number
-          unidad_medida: string
+          unit_type: string
           updated_at: string | null
         }
         Insert: {
-          activo?: boolean | null
-          categoria: string
-          codigo_barras?: string | null
+          barcode?: string | null
+          base_unit?: string
+          category: string
+          conversion_factor?: number | null
+          cost_usd?: number | null
           created_at?: string | null
-          descripcion?: string | null
+          current_stock?: number
+          description?: string | null
           id?: string
-          nombre: string
-          precio_compra?: number | null
-          precio_venta: number
+          is_active?: boolean | null
+          min_stock?: number
+          name: string
+          price_usd: number
           sku: string
-          stock_actual?: number
-          stock_minimo?: number
-          unidad_medida?: string
+          unit_type?: string
           updated_at?: string | null
         }
         Update: {
-          activo?: boolean | null
-          categoria?: string
-          codigo_barras?: string | null
+          barcode?: string | null
+          base_unit?: string
+          category?: string
+          conversion_factor?: number | null
+          cost_usd?: number | null
           created_at?: string | null
-          descripcion?: string | null
+          current_stock?: number
+          description?: string | null
           id?: string
-          nombre?: string
-          precio_compra?: number | null
-          precio_venta?: number
+          is_active?: boolean | null
+          min_stock?: number
+          name?: string
+          price_usd?: number
           sku?: string
-          stock_actual?: number
-          stock_minimo?: number
-          unidad_medida?: string
+          unit_type?: string
           updated_at?: string | null
         }
         Relationships: []
       }
-      tasas_cambio: {
+      profiles: {
         Row: {
-          activa: boolean | null
+          avatar_url: string | null
           created_at: string | null
-          fecha: string
-          fuente: string
+          full_name: string | null
           id: string
-          moneda_destino: string
-          moneda_origen: string
-          tasa: number
+          is_active: boolean | null
+          role: string
+          updated_at: string | null
         }
         Insert: {
-          activa?: boolean | null
+          avatar_url?: string | null
           created_at?: string | null
-          fecha?: string
-          fuente?: string
-          id?: string
-          moneda_destino?: string
-          moneda_origen?: string
-          tasa: number
+          full_name?: string | null
+          id: string
+          is_active?: boolean | null
+          role?: string
+          updated_at?: string | null
         }
         Update: {
-          activa?: boolean | null
+          avatar_url?: string | null
           created_at?: string | null
-          fecha?: string
-          fuente?: string
+          full_name?: string | null
           id?: string
-          moneda_destino?: string
-          moneda_origen?: string
-          tasa?: number
+          is_active?: boolean | null
+          role?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
-      ventas: {
+      sale_items: {
         Row: {
-          cliente_id: string | null
           created_at: string | null
-          estado: string
           id: string
-          impuesto: number
-          metodo_pago: string
-          numero_factura: string
-          observaciones: string | null
-          subtotal: number
-          total: number
-          vendedor_id: string | null
+          is_active: boolean | null
+          product_id: string
+          quantity: number
+          sale_id: string
+          subtotal_usd: number
+          unit_price_usd: number
+          updated_at: string | null
         }
         Insert: {
-          cliente_id?: string | null
           created_at?: string | null
-          estado?: string
           id?: string
-          impuesto?: number
-          metodo_pago: string
-          numero_factura: string
-          observaciones?: string | null
-          subtotal?: number
-          total: number
-          vendedor_id?: string | null
+          is_active?: boolean | null
+          product_id: string
+          quantity: number
+          sale_id: string
+          subtotal_usd: number
+          unit_price_usd: number
+          updated_at?: string | null
         }
         Update: {
-          cliente_id?: string | null
           created_at?: string | null
-          estado?: string
           id?: string
-          impuesto?: number
-          metodo_pago?: string
-          numero_factura?: string
-          observaciones?: string | null
-          subtotal?: number
-          total?: number
-          vendedor_id?: string | null
+          is_active?: boolean | null
+          product_id?: string
+          quantity?: number
+          sale_id?: string
+          subtotal_usd?: number
+          unit_price_usd?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "ventas_cliente_id_fkey"
-            columns: ["cliente_id"]
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "clientes"
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "ventas_vendedor_id_fkey"
-            columns: ["vendedor_id"]
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
             isOneToOne: false
-            referencedRelation: "perfiles"
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sale_payments: {
+        Row: {
+          amount_usd: number
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          payment_date: string | null
+          payment_method: string | null
+          sale_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount_usd: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          payment_date?: string | null
+          payment_method?: string | null
+          sale_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount_usd?: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          payment_date?: string | null
+          payment_method?: string | null
+          sale_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_payments_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          client_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          status: string
+          total_usd: number
+          updated_at: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          status?: string
+          total_usd: number
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          status?: string
+          total_usd?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
@@ -569,3 +562,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
