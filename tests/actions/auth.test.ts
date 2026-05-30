@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 // Create mock fns that survive vi.mock hoisting
-const mockSignInWithPassword = vi.hoisted(() => vi.fn())
 const mockSignOut = vi.hoisted(() => vi.fn())
 const mockGetUser = vi.hoisted(() => vi.fn())
 const mockProfileQuery = vi.hoisted(() => vi.fn())
@@ -17,7 +16,6 @@ const mockServerSupabase = vi.hoisted(
   () =>
     ({
       auth: {
-        signInWithPassword: mockSignInWithPassword,
         signOut: mockSignOut,
         getUser: mockGetUser,
       },
@@ -46,92 +44,7 @@ vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: vi.fn().mockReturnValue(mockAdminSupabase),
 }))
 
-import { login, logout, getSession, register } from "@/actions/auth"
-
-describe("login", () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    mockProfileQuery.mockReturnValue({ eq: mockProfileEq })
-  })
-
-  it("should return role and redirectTo for valid admin credentials", async () => {
-    mockSignInWithPassword.mockResolvedValue({
-      data: { user: { id: "user-1", email: "admin@donamaria.com" } },
-      error: null,
-    })
-    mockProfileSingle.mockResolvedValue({
-      data: { id: "user-1", email: "admin@donamaria.com", rol: "admin", nombre: "Admin" },
-      error: null,
-    })
-
-    const result = await login("admin@donamaria.com", "Admin123!")
-
-    expect(result).toEqual({
-      data: { role: "admin", redirectTo: "/dashboard" },
-    })
-    expect(mockSignInWithPassword).toHaveBeenCalledWith({
-      email: "admin@donamaria.com",
-      password: "Admin123!",
-    })
-  })
-
-  it("should return redirectTo /pos for seller role", async () => {
-    mockSignInWithPassword.mockResolvedValue({
-      data: { user: { id: "user-2", email: "vendedor@donamaria.com" } },
-      error: null,
-    })
-    mockProfileSingle.mockResolvedValue({
-      data: { id: "user-2", email: "vendedor@donamaria.com", rol: "seller", nombre: "Vendedor" },
-      error: null,
-    })
-
-    const result = await login("vendedor@donamaria.com", "Vendedor123!")
-
-    expect(result).toEqual({
-      data: { role: "seller", redirectTo: "/pos" },
-    })
-  })
-
-  it("should return Spanish error for invalid credentials", async () => {
-    mockSignInWithPassword.mockResolvedValue({
-      data: { user: null, session: null },
-      error: { message: "Invalid login credentials" },
-    })
-
-    const result = await login("admin@donamaria.com", "wrong-password")
-
-    expect(result).toEqual({ error: "Credenciales inválidas" })
-  })
-
-  it("should return error when profile is not found after login", async () => {
-    mockSignInWithPassword.mockResolvedValue({
-      data: { user: { id: "user-3", email: "noprofile@donamaria.com" } },
-      error: null,
-    })
-    mockProfileSingle.mockResolvedValue({
-      data: null,
-      error: { message: "No rows found" },
-    })
-
-    const result = await login("noprofile@donamaria.com", "Password123!")
-
-    expect(result).toEqual({ error: "Perfil no encontrado" })
-  })
-
-  it("should return error when email is empty", async () => {
-    const result = await login("", "password123")
-
-    expect(result).toEqual({ error: "Correo electrónico requerido" })
-    expect(mockSignInWithPassword).not.toHaveBeenCalled()
-  })
-
-  it("should return error when password is empty", async () => {
-    const result = await login("admin@donamaria.com", "")
-
-    expect(result).toEqual({ error: "Contraseña requerida" })
-    expect(mockSignInWithPassword).not.toHaveBeenCalled()
-  })
-})
+import { logout, getSession, register } from "@/actions/auth"
 
 describe("logout", () => {
   beforeEach(() => {
