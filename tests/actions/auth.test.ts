@@ -94,7 +94,7 @@ describe("getSession", () => {
       error: null,
     })
     mockProfileSingle.mockResolvedValue({
-      data: { id: "user-1", email: "admin@donamaria.com", rol: "admin", nombre: "Admin" },
+      data: { id: "user-1", email: "admin@donamaria.com", rol: "admin", nombre: "Admin", activo: true },
       error: null,
     })
 
@@ -135,6 +135,29 @@ describe("getSession", () => {
     const result = await getSession()
 
     expect(result).toEqual({ data: null })
+  })
+
+  it("should return isActive false when profile has activo false", async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: "user-inactive", email: "inactivo@donamaria.com" } },
+      error: null,
+    })
+    mockProfileSingle.mockResolvedValue({
+      data: { id: "user-inactive", email: "inactivo@donamaria.com", rol: "seller", nombre: "Inactivo", activo: false },
+      error: null,
+    })
+
+    const result = await getSession()
+
+    expect(result).toEqual({
+      data: {
+        id: "user-inactive",
+        email: "inactivo@donamaria.com",
+        role: "seller",
+        fullName: "Inactivo",
+        isActive: false,
+      },
+    })
   })
 
   it("should return null when getUser errors", async () => {

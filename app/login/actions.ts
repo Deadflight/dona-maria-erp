@@ -14,9 +14,6 @@ export async function loginAction(
   const email = formData.get("email") as string
   const password = formData.get("password") as string
 
-  if (!email) return { error: "Correo electrónico requerido" }
-  if (!password) return { error: "Contraseña requerida" }
-
   const result = await login(email, password)
 
   if ("error" in result) {

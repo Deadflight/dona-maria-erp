@@ -34,6 +34,11 @@ export async function login(
     return { error: "Perfil no encontrado" }
   }
 
+  if (!profile.activo) {
+    await supabase.auth.signOut()
+    return { error: "Usuario inactivo" }
+  }
+
   const redirectTo = profile.rol === "seller" ? "/pos" : "/dashboard"
 
   return { data: { role: profile.rol, redirectTo } }
@@ -84,7 +89,7 @@ export async function getSession(): Promise<{
       email: profile.email,
       role: profile.rol,
       fullName: profile.nombre,
-      isActive: true,
+      isActive: profile.activo,
     },
   }
 }

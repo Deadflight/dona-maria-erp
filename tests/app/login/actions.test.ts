@@ -55,7 +55,9 @@ describe("loginAction", () => {
     expect(result).toEqual({ error: "Credenciales inválidas" })
   })
 
-  it("should validate email is not empty before calling login", async () => {
+  it("should delegate empty email validation to auth login", async () => {
+    mockLogin.mockResolvedValue({ error: "Correo electrónico requerido" })
+
     const formData = new FormData()
     formData.set("email", "")
     formData.set("password", "Admin123!")
@@ -63,10 +65,12 @@ describe("loginAction", () => {
     const result = await loginAction({ error: "" }, formData)
 
     expect(result).toEqual({ error: "Correo electrónico requerido" })
-    expect(mockLogin).not.toHaveBeenCalled()
+    expect(mockLogin).toHaveBeenCalledWith("", "Admin123!")
   })
 
-  it("should validate password is not empty before calling login", async () => {
+  it("should delegate empty password validation to auth login", async () => {
+    mockLogin.mockResolvedValue({ error: "Contraseña requerida" })
+
     const formData = new FormData()
     formData.set("email", "admin@donamaria.com")
     formData.set("password", "")
@@ -74,7 +78,7 @@ describe("loginAction", () => {
     const result = await loginAction({ error: "" }, formData)
 
     expect(result).toEqual({ error: "Contraseña requerida" })
-    expect(mockLogin).not.toHaveBeenCalled()
+    expect(mockLogin).toHaveBeenCalledWith("admin@donamaria.com", "")
   })
 
   it("should pass through 'Perfil no encontrado' error from auth login", async () => {

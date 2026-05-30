@@ -14,6 +14,7 @@ export interface MockProfile {
   email: string
   rol: Role
   nombre: string | null
+  activo: boolean
 }
 
 export function createMockSession(overrides?: Partial<MockSession>): MockSession {
@@ -29,6 +30,7 @@ export function createMockProfile(overrides?: Partial<MockProfile>): MockProfile
     email: "admin@donamaria.com",
     rol: "admin",
     nombre: "Admin",
+    activo: true,
     ...overrides,
   }
 }

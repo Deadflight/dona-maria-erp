@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { createMockProfile } from "@/tests/utils/supabase-mock"
 
 const mockSignInWithPassword = vi.hoisted(() => vi.fn())
+const mockSignOut = vi.hoisted(() => vi.fn())
 const mockSingle = vi.hoisted(() => vi.fn())
 const mockEq = vi.hoisted(() => vi.fn().mockReturnValue({ single: mockSingle }))
 const mockSelect = vi.hoisted(() => vi.fn().mockReturnValue({ eq: mockEq }))
@@ -10,7 +11,7 @@ const mockFrom = vi.hoisted(() => vi.fn().mockReturnValue({ select: mockSelect }
 const mockSupabase = vi.hoisted(
   () =>
     ({
-      auth: { signInWithPassword: mockSignInWithPassword },
+      auth: { signInWithPassword: mockSignInWithPassword, signOut: mockSignOut },
       from: mockFrom,
     }) as any
 )
@@ -140,5 +141,28 @@ describe("login", () => {
 
     expect(result).toEqual({ error: "Contraseña requerida" })
     expect(mockSignInWithPassword).not.toHaveBeenCalled()
+  })
+
+  it("should return Spanish error for inactive user", async () => {
+    mockSignInWithPassword.mockResolvedValue({
+      data: { user: { id: "user-inactive", email: "inactivo@donamaria.com" } },
+      error: null,
+    })
+    mockSingle.mockResolvedValue({
+      data: createMockProfile({
+        id: "user-inactive",
+        email: "inactivo@donamaria.com",
+        rol: "seller",
+        nombre: "Inactivo",
+        activo: false,
+      }),
+      error: null,
+    })
+    mockSignOut.mockResolvedValue({ error: null })
+
+    const result = await login("inactivo@donamaria.com", "Antes123!")
+
+    expect(result).toEqual({ error: "Usuario inactivo" })
+    expect(mockSignOut).toHaveBeenCalledTimes(1)
   })
 })
