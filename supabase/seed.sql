@@ -1,0 +1,17 @@
+-- ===================================================================
+-- Seed: Admin user
+-- Description: Creates the initial admin profile for the system.
+--
+-- NOTE: The auth.users entry and password are created by the
+-- setup script (scripts/create-admin.ts) using GoTrue's API
+-- because PostgreSQL's crypt() produces bcrypt hashes with a
+-- different base64 encoding than Go's bcrypt library (used by
+-- GoTrue/Supabase Auth). Direct SQL inserts to auth.users
+-- with crypt() cannot be verified by GoTrue.
+--
+-- Run after seed: pnpm seed (tsx scripts/create-admin.ts)
+-- ===================================================================
+
+-- Create profile for the admin user (auth.users FK must already exist)
+-- This is intentionally empty — run the setup script instead.
+-- See scripts/create-admin.ts for the full admin creation flow.
