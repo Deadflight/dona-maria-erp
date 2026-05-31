@@ -174,6 +174,53 @@ export type Database = {
           },
         ]
       }
+      inventory_movements: {
+        Row: {
+          id: string
+          producto_id: string
+          cantidad: number
+          tipo_movimiento: string
+          stock_resultante: number
+          referencia_tipo: string | null
+          referencia_id: string | null
+          motivo: string | null
+          created_by: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          producto_id: string
+          cantidad: number
+          tipo_movimiento: string
+          stock_resultante: number
+          referencia_tipo?: string | null
+          referencia_id?: string | null
+          motivo?: string | null
+          created_by?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          producto_id?: string
+          cantidad?: number
+          tipo_movimiento?: string
+          stock_resultante?: number
+          referencia_tipo?: string | null
+          referencia_id?: string | null
+          motivo?: string | null
+          created_by?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       detalles_venta: {
         Row: {
           cantidad: number
@@ -433,10 +480,40 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      stock_from_movements: {
+        Row: {
+          producto_id: string
+          stock_actual: number
+        }
+        Insert: {
+          [_ in never]: never
+        }
+        Update: {
+          [_ in never]: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_movements"
+            referencedColumns: ["producto_id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      record_inventory_movement: {
+        Args: {
+          p_producto_id: string
+          p_cantidad: number
+          p_tipo_movimiento: string
+          p_referencia_tipo?: string
+          p_referencia_id?: string
+          p_motivo?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
