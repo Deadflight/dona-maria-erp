@@ -72,7 +72,7 @@ describe("proxy", () => {
       error: null,
     })
     mockProfileSingle.mockResolvedValue({
-      data: { rol: "admin" },
+      data: { role: "admin" },
       error: null,
     })
 
@@ -90,7 +90,7 @@ describe("proxy", () => {
       error: null,
     })
     mockProfileSingle.mockResolvedValue({
-      data: { rol: "seller" },
+      data: { role: "seller" },
       error: null,
     })
 
@@ -108,7 +108,7 @@ describe("proxy", () => {
       error: null,
     })
     mockProfileSingle.mockResolvedValue({
-      data: { rol: "viewer" },
+      data: { role: "viewer" },
       error: null,
     })
 

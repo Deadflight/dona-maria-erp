@@ -94,7 +94,7 @@ describe("getSession", () => {
       error: null,
     })
     mockProfileSingle.mockResolvedValue({
-      data: { id: "user-1", email: "admin@donamaria.com", rol: "admin", nombre: "Admin", activo: true },
+      data: { id: "user-1", email: "admin@donamaria.com", role: "admin", full_name: "Admin", is_active: true },
       error: null,
     })
 
@@ -137,13 +137,13 @@ describe("getSession", () => {
     expect(result).toEqual({ data: null })
   })
 
-  it("should return isActive false when profile has activo false", async () => {
+  it("should return isActive false when profile has is_active false", async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: "user-inactive", email: "inactivo@donamaria.com" } },
       error: null,
     })
     mockProfileSingle.mockResolvedValue({
-      data: { id: "user-inactive", email: "inactivo@donamaria.com", rol: "seller", nombre: "Inactivo", activo: false },
+      data: { id: "user-inactive", email: "inactivo@donamaria.com", role: "seller", full_name: "Inactivo", is_active: false },
       error: null,
     })
 

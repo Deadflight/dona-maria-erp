@@ -3,41 +3,48 @@ import { readFileSync, existsSync } from "fs"
 import { resolve } from "path"
 
 const SEED_PATH = resolve(__dirname, "../../supabase/seed.sql")
+const SETUP_SCRIPT_PATH = resolve(__dirname, "../../scripts/create-admin.ts")
 
 describe("seed.sql", () => {
   it("should exist as a seed file", () => {
     expect(existsSync(SEED_PATH)).toBe(true)
   })
 
-  it("should insert an admin user into auth.users with encrypted password", () => {
+  it("should explain the crypt() -> GoTrue incompatibility", () => {
     const sql = readFileSync(SEED_PATH, "utf-8")
 
-    expect(sql).toContain("INSERT INTO auth.users")
-    expect(sql).toContain("crypt")
-    expect(sql).toContain("gen_salt('bf')")
-    expect(sql).toContain("admin@ferreteria.com")
+    expect(sql).toContain("crypt()")
+    expect(sql).toContain("GoTrue")
+    expect(sql).toContain("base64 encoding")
+    expect(sql).toContain("create-admin.ts")
   })
 
-  it("should be idempotent using ON CONFLICT or WHERE NOT EXISTS", () => {
+  it("should reference the setup script as the admin creation mechanism", () => {
     const sql = readFileSync(SEED_PATH, "utf-8")
 
-    // Must have either ON CONFLICT or WHERE NOT EXISTS for idempotency
-    const hasOnConflict = sql.includes("ON CONFLICT")
-    const hasWhereNotExists = sql.includes("WHERE NOT EXISTS")
-    expect(hasOnConflict || hasWhereNotExists).toBe(true)
+    expect(sql).toContain("scripts/create-admin.ts")
+    expect(sql).toContain("GoTrue's API")
+  })
+})
+
+describe("scripts/create-admin.ts", () => {
+  it("should exist as a setup script", () => {
+    expect(existsSync(SETUP_SCRIPT_PATH)).toBe(true)
   })
 
-  it("should insert corresponding profile into public.perfiles", () => {
-    const sql = readFileSync(SEED_PATH, "utf-8")
+  it("should use GoTrue Admin API with service_role key", () => {
+    const script = readFileSync(SETUP_SCRIPT_PATH, "utf-8")
 
-    expect(sql).toContain("INSERT INTO public.perfiles")
-    expect(sql).toContain("admin")
-    expect(sql).toContain("Administrador del Sistema")
+    expect(script).toContain("auth.admin.createUser")
+    expect(script).toContain("admin@ferreteria.com")
+    expect(script).toContain("email_confirm")
+    expect(script).toContain("profiles")
+    expect(script).toContain("signInWithPassword")
   })
 
-  it("should set email_confirmed_at so the user can log in immediately", () => {
-    const sql = readFileSync(SEED_PATH, "utf-8")
+  it("should handle admin already existing (idempotent)", () => {
+    const script = readFileSync(SETUP_SCRIPT_PATH, "utf-8")
 
-    expect(sql).toContain("email_confirmed_at")
+    expect(script).toContain("already exists")
   })
 })

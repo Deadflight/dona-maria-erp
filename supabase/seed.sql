@@ -1,32 +1,17 @@
 -- ===================================================================
 -- Seed: Admin user
--- Description: Creates the initial admin user for the system.
--- Idempotent — safe to run multiple times.
+-- Description: Creates the initial admin profile for the system.
+--
+-- NOTE: The auth.users entry and password are created by the
+-- setup script (scripts/create-admin.ts) using GoTrue's API
+-- because PostgreSQL's crypt() produces bcrypt hashes with a
+-- different base64 encoding than Go's bcrypt library (used by
+-- GoTrue/Supabase Auth). Direct SQL inserts to auth.users
+-- with crypt() cannot be verified by GoTrue.
+--
+-- Run after seed: pnpm seed (tsx scripts/create-admin.ts)
 -- ===================================================================
 
--- Admin credentials: admin@ferreteria.com / Admin123!
-INSERT INTO auth.users (
-  id, email, encrypted_password, email_confirmed_at,
-  raw_app_meta_data, raw_user_meta_data,
-  created_at, updated_at, role
-)
-SELECT
-  gen_random_uuid(),
-  'admin@ferreteria.com',
-  crypt('Admin123!', gen_salt('bf')),
-  NOW(),
-  '{"provider":"email","providers":["email"]}',
-  '{"full_name":"Admin"}',
-  NOW(),
-  NOW(),
-  'authenticated'
-WHERE NOT EXISTS (
-  SELECT 1 FROM auth.users WHERE email = 'admin@ferreteria.com'
-);
-
--- Create the corresponding profile
-INSERT INTO public.perfiles (id, email, nombre, rol, activo)
-SELECT id, email, 'Administrador del Sistema', 'admin', true
-FROM auth.users
-WHERE email = 'admin@ferreteria.com'
-ON CONFLICT (id) DO NOTHING;
+-- Create profile for the admin user (auth.users FK must already exist)
+-- This is intentionally empty — run the setup script instead.
+-- See scripts/create-admin.ts for the full admin creation flow.

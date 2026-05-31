@@ -12,9 +12,9 @@ export interface MockSession {
 export interface MockProfile {
   id: string
   email: string
-  rol: Role
-  nombre: string | null
-  activo: boolean
+  role: Role
+  full_name: string | null
+  is_active: boolean
 }
 
 export function createMockSession(overrides?: Partial<MockSession>): MockSession {
@@ -28,9 +28,9 @@ export function createMockProfile(overrides?: Partial<MockProfile>): MockProfile
   return {
     id: "user-1",
     email: "admin@donamaria.com",
-    rol: "admin",
-    nombre: "Admin",
-    activo: true,
+    role: "admin",
+    full_name: "Admin",
+    is_active: true,
     ...overrides,
   }
 }

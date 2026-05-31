@@ -57,8 +57,8 @@ describe("login", () => {
       data: createMockProfile({
         id: "user-2",
         email: "vendedor@donamaria.com",
-        rol: "seller",
-        nombre: "Vendedor",
+        role: "seller",
+        full_name: "Vendedor",
       }),
       error: null,
     })
@@ -79,8 +79,8 @@ describe("login", () => {
       data: createMockProfile({
         id: "user-3",
         email: "visor@donamaria.com",
-        rol: "viewer",
-        nombre: "Visor",
+        role: "viewer",
+        full_name: "Visor",
       }),
       error: null,
     })
@@ -152,9 +152,9 @@ describe("login", () => {
       data: createMockProfile({
         id: "user-inactive",
         email: "inactivo@donamaria.com",
-        rol: "seller",
-        nombre: "Inactivo",
-        activo: false,
+        role: "seller",
+        full_name: "Inactivo",
+        is_active: false,
       }),
       error: null,
     })

@@ -19,7 +19,7 @@ describe("RLS migration: 20260530000009_rls_per_role.sql", () => {
     expect(sql).toContain("SECURITY DEFINER")
     expect(sql).toContain("security definer")
     expect(sql).toContain("auth.uid()")
-    expect(sql).toContain("public.perfiles")
+    expect(sql).toContain("public.profiles")
   })
 
   it("should drop existing per-table policies", () => {
@@ -67,7 +67,7 @@ describe("RLS migration: 20260530000009_rls_per_role.sql", () => {
     const sql = readFileSync(MIGRATION_PATH, "utf-8")
 
     const tables = [
-      "perfiles",
+      "profiles",
       "productos",
       "clientes",
       "ventas",
@@ -84,10 +84,10 @@ describe("RLS migration: 20260530000009_rls_per_role.sql", () => {
     }
   })
 
-  it("should include self-select policy for perfiles", () => {
+  it("should include self-select policy for profiles", () => {
     const sql = readFileSync(MIGRATION_PATH, "utf-8")
 
-    expect(sql).toContain("self_select_perfiles")
+    expect(sql).toContain("self_select_profiles")
     expect(sql).toContain("id = auth.uid()")
   })
 

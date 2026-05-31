@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest"
 import type { Database } from "@/types/database"
 
-describe("Database types - perfiles rol", () => {
-  it("should constrain rol to 'admin' | 'seller' | 'viewer'", () => {
-    type Rol = Database["public"]["Tables"]["perfiles"]["Row"]["rol"]
+describe("Database types - profiles role", () => {
+  it("should constrain role to 'admin' | 'seller' | 'viewer'", () => {
+    type Rol = Database["public"]["Tables"]["profiles"]["Row"]["role"]
 
     // Verify the union type is constrained at the type level
     // This assertion documents the expected type behavior

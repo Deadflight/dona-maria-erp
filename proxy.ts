@@ -28,12 +28,12 @@ export async function proxy(
   // Has session — redirect away from /login
   if (pathname === "/login") {
     const { data: profile } = await supabase
-      .from("perfiles")
-      .select("rol")
+      .from("profiles")
+      .select("role")
       .eq("id", user.id)
       .single()
 
-    const role: Role = profile?.rol ?? "viewer"
+    const role: Role = profile?.role ?? "viewer"
     const redirectTo = role === "seller" ? "/pos" : "/dashboard"
     return NextResponse.redirect(new URL(redirectTo, request.url))
   }

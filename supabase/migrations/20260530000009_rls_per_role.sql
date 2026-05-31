@@ -8,7 +8,7 @@
 -- 1. Helper function: get_user_role()
 -- Returns the role of the currently authenticated user.
 -- Uses SECURITY DEFINER to avoid infinite recursion when querying
--- the perfiles table from a policy ON the perfiles table.
+-- the profiles table from a policy ON the profiles table.
 -- -------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.get_user_role()
 RETURNS TEXT
@@ -17,17 +17,17 @@ STABLE
 SECURITY DEFINER
 SET search_path = ''
 AS $$
-  SELECT rol::TEXT FROM public.perfiles WHERE id = auth.uid();
+  SELECT role::TEXT FROM public.profiles WHERE id = auth.uid();
 $$;
 
 -- -------------------------------------------------------------------
 -- 2. Drop existing permissive policies
 -- -------------------------------------------------------------------
 
--- perfiles
-DROP POLICY IF EXISTS "perfiles_todos" ON public.perfiles;
-DROP POLICY IF EXISTS "perfiles_insertar_propio" ON public.perfiles;
-DROP POLICY IF EXISTS "perfiles_actualizar_propio" ON public.perfiles;
+-- profiles
+DROP POLICY IF EXISTS "perfiles_todos" ON public.profiles;
+DROP POLICY IF EXISTS "perfiles_insertar_propio" ON public.profiles;
+DROP POLICY IF EXISTS "perfiles_actualizar_propio" ON public.profiles;
 
 -- productos
 DROP POLICY IF EXISTS "productos_lectura" ON public.productos;
@@ -65,13 +65,13 @@ DROP POLICY IF EXISTS "tasas_admin_all" ON public.tasas_cambio;
 -- 3. Per-role policies
 -- -------------------------------------------------------------------
 
--- ==================== perfiles ====================
-CREATE POLICY "admin_all_perfiles" ON public.perfiles
+-- ==================== profiles ====================
+CREATE POLICY "admin_all_profiles" ON public.profiles
   FOR ALL TO authenticated
   USING (public.get_user_role() = 'admin')
   WITH CHECK (public.get_user_role() = 'admin');
 
-CREATE POLICY "self_select_perfiles" ON public.perfiles
+CREATE POLICY "self_select_profiles" ON public.profiles
   FOR SELECT TO authenticated
   USING (id = auth.uid());
 

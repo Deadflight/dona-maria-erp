@@ -25,7 +25,7 @@ export async function login(
   }
 
   const { data: profile } = await supabase
-    .from("perfiles")
+    .from("profiles")
     .select("*")
     .eq("id", signInData.user.id)
     .single()
@@ -34,14 +34,14 @@ export async function login(
     return { error: "Perfil no encontrado" }
   }
 
-  if (!profile.activo) {
+  if (!profile.is_active) {
     await supabase.auth.signOut()
     return { error: "Usuario inactivo" }
   }
 
-  const redirectTo = profile.rol === "seller" ? "/pos" : "/dashboard"
+  const redirectTo = profile.role === "seller" ? "/pos" : "/dashboard"
 
-  return { data: { role: profile.rol, redirectTo } }
+  return { data: { role: profile.role, redirectTo } }
 }
 
 export async function logout(): Promise<
@@ -74,7 +74,7 @@ export async function getSession(): Promise<{
   }
 
   const { data: profile } = await supabase
-    .from("perfiles")
+    .from("profiles")
     .select("*")
     .eq("id", userData.user.id)
     .single()
@@ -86,10 +86,10 @@ export async function getSession(): Promise<{
   return {
     data: {
       id: profile.id,
-      email: profile.email,
-      role: profile.rol,
-      fullName: profile.nombre,
-      isActive: profile.activo,
+      email: userData.user.email ?? "",
+      role: profile.role,
+      fullName: profile.full_name,
+      isActive: profile.is_active,
     },
   }
 }
