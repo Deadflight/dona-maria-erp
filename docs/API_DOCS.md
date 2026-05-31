@@ -287,6 +287,80 @@ Obtiene todos los productos activos del catálogo.
 
 ---
 
+### `inventario.listarMovimientosPorProducto`
+Obtiene el historial de movimientos de inventario para un producto específico,
+ordenado del más reciente al más antiguo.
+
+**Parámetros:**
+```typescript
+{
+  productoId: string;       // UUID del producto
+  limit?: number;           // Límite de resultados (default: 50)
+}
+```
+
+**Validaciones:**
+- Requiere sesión autenticada
+- Solo administradores pueden consultar movimientos
+
+**Respuesta:**
+```typescript
+{
+  data: Array<{
+    id: string;
+    producto_id: string;
+    cantidad: number;            // Siempre > 0
+    tipo_movimiento: 'entrada' | 'salida' | 'ajuste';
+    stock_resultante: number;    // Stock del producto DESPUÉS del movimiento
+    referencia_tipo: string | null;
+    referencia_id: string | null;
+    motivo: string | null;
+    created_by: string | null;
+    created_at: string;
+  }> | null;
+  error: string | null;          // 'UNAUTHORIZED' | 'FORBIDDEN' | mensaje de error
+}
+```
+
+---
+
+### `inventario.obtenerMovimientosPorReferencia`
+Obtiene todos los movimientos de inventario asociados a una referencia específica
+(ej. una venta, orden de compra o ajuste manual).
+
+**Parámetros:**
+```typescript
+{
+  referenciaTipo: string;     // Tipo de referencia ('venta', 'compra', 'inventario')
+  referenciaId: string;       // ID de la entidad referenciada
+}
+```
+
+**Validaciones:**
+- Requiere sesión autenticada
+- Solo administradores pueden consultar movimientos
+
+**Respuesta:**
+```typescript
+{
+  data: Array<{
+    id: string;
+    producto_id: string;
+    cantidad: number;
+    tipo_movimiento: 'entrada' | 'salida' | 'ajuste';
+    stock_resultante: number;
+    referencia_tipo: string | null;
+    referencia_id: string | null;
+    motivo: string | null;
+    created_by: string | null;
+    created_at: string;
+  }> | null;
+  error: string | null;
+}
+```
+
+---
+
 ## Ventas
 
 ### `ventas.registrarVentaContado`
