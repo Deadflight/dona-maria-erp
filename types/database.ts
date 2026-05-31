@@ -260,29 +260,32 @@ export type Database = {
           },
         ]
       }
-      perfiles: {
+      profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string | null
-          email: string
+          full_name: string | null
           id: string
-          nombre: string | null
-          rol: string
+          is_active: boolean
+          role: "admin" | "seller" | "viewer"
           updated_at: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string | null
-          email: string
+          full_name?: string | null
           id: string
-          nombre?: string | null
-          rol?: string
+          is_active?: boolean
+          role?: "admin" | "seller" | "viewer"
           updated_at?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string | null
-          email?: string
+          full_name?: string | null
           id?: string
-          nombre?: string | null
-          rol?: string
+          is_active?: boolean
+          role?: "admin" | "seller" | "viewer"
           updated_at?: string | null
         }
         Relationships: []
