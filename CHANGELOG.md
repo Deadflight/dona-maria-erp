@@ -1,3 +1,15 @@
+## [1.2.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.1.0...v1.2.0) (2026-06-02)
+
+### Features
+
+* **db:** add inventory_movements table with RLS, VIEW, and RPC ([6d92c83](https://github.com/Deadflight/dona-maria-erp/commit/6d92c83ebf15f91c58276764f6b40074a89cf5c7)), closes [#23](https://github.com/Deadflight/dona-maria-erp/issues/23)
+* **db:** add purchase_receipts tables with wrapper RPC and proveedores ([02f1d1d](https://github.com/Deadflight/dona-maria-erp/commit/02f1d1d92b4ecd7ae2cd7de2ed545e984487ceeb)), closes [#24](https://github.com/Deadflight/dona-maria-erp/issues/24)
+* **inventario:** add Server Actions for inventory movement queries ([3e05bae](https://github.com/Deadflight/dona-maria-erp/commit/3e05bae9b55637ec83adb8f7bf333e031e159fba)), closes [#23](https://github.com/Deadflight/dona-maria-erp/issues/23)
+
+### Bug Fixes
+
+* **inventario:** rename perfiles/rol to profiles/role in Server Actions ([6111ec7](https://github.com/Deadflight/dona-maria-erp/commit/6111ec72f542234d43e138592a9ad1421b22876a)), closes [#24](https://github.com/Deadflight/dona-maria-erp/issues/24)
+
 ## [1.1.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.0.0...v1.1.0) (2026-05-31)
 
 ### Features
