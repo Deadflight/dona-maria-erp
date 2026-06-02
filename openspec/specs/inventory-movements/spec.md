@@ -71,7 +71,7 @@ Rows MUST be INSERT-only. UPDATE/DELETE MUST be prohibited. Indexes: `product_id
 
 ### Requirement: Row-Level Security
 
-RLS MUST be enabled. `admin` SHALL have INSERT + SELECT. `operador` SHALL have SELECT only. Other roles: no access.
+RLS MUST be enabled. `admin` SHALL have INSERT + SELECT. `operador` SHALL have SELECT only. Other roles: no access. RLS policies MUST reference `public.profiles` and `role` (not `public.perfiles` and `rol`) to match actual database schema.
 
 #### Scenario: Admin inserts
 - GIVEN current user has role `admin`
@@ -88,9 +88,14 @@ RLS MUST be enabled. `admin` SHALL have INSERT + SELECT. `operador` SHALL have S
 - WHEN INSERTing a movement
 - THEN INSERT blocked by RLS
 
+#### Scenario: Admin role check uses correct names
+- GIVEN current user has role `admin` in `profiles` table
+- WHEN checking RLS policy that queries `profiles.role`
+- THEN query resolves correctly, INSERT succeeds
+
 ### Requirement: Server Actions
 
-`listMovementsByProduct(productId, limit?)` MUST return movements for a product, ordered by `created_at DESC`. `getMovementsByReference(refType, refId)` MUST return all movements for a reference.
+`listMovementsByProduct(productId, limit?)` MUST return movements for a product, ordered by `created_at DESC`. `getMovementsByReference(refType, refId)` MUST return all movements for a reference. Both actions MUST query `profiles.role` for admin role verification (not `perfiles.rol`).
 
 #### Scenario: List by product
 - GIVEN product `42` has 5 movements
@@ -101,6 +106,12 @@ RLS MUST be enabled. `admin` SHALL have INSERT + SELECT. `operador` SHALL have S
 - GIVEN 2 movements reference `('sale', 500)`
 - WHEN `getMovementsByReference('sale', 500)` is called
 - THEN both movements are returned
+
+#### Scenario: listMovementsByProduct uses correct table and column
+- GIVEN admin user exists in `profiles` table with `role = 'admin'`
+- WHEN `listMovementsByProduct(42, 3)` is called
+- THEN role check queries `profiles.role` instead of `perfiles.rol`
+- AND query succeeds without table-not-found error
 
 ### Requirement: Backfill Migration
 
