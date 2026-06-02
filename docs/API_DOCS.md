@@ -361,6 +361,132 @@ Obtiene todos los movimientos de inventario asociados a una referencia específi
 
 ---
 
+## Compras / Recepciones
+
+### `compras.crearRecepcion`
+Crea una recepción de mercancía con sus líneas de detalle y movimientos de inventario. La operación es atómica: si falla algún paso, se revierte todo.
+
+**Parámetros:**
+```typescript
+{
+  numero_recepcion: string;          // Número único de recepción
+  proveedor_id: string;              // UUID del proveedor
+  observaciones?: string;            // Notas opcionales
+  items: Array<{
+    producto_id: string;             // UUID del producto
+    cantidad_recibida: number;       // Cantidad > 0
+    precio_compra: number;           // Precio unitario histórico
+  }>;
+}
+```
+
+**Validaciones:**
+- Requiere sesión autenticada
+- Solo administradores pueden crear recepciones
+- `items` no puede estar vacío (validado por RPC)
+- Cada item debe tener `cantidad_recibida > 0`
+- `producto_id` debe existir en la tabla `productos`
+
+**Respuesta:**
+```typescript
+{
+  data: { id: string } | null;      // UUID de la recepción creada
+  error: string | null;             // 'UNAUTHORIZED' | 'FORBIDDEN' | mensaje de error
+}
+```
+
+---
+
+### `compras.listarRecepciones`
+Obtiene todas las recepciones ordenadas de la más reciente a la más antigua, con datos del proveedor y usuario creador.
+
+**Parámetros:**
+```typescript
+{
+  limit?: number;          // Límite de resultados (default: 50)
+  offset?: number;         // Número de resultados a saltar (default: 0)
+}
+```
+
+**Validaciones:**
+- Requiere sesión autenticada
+- Solo administradores pueden listar recepciones
+
+**Respuesta:**
+```typescript
+{
+  data: Array<{
+    id: string;
+    numero_recepcion: string;
+    proveedor_id: string;
+    observaciones: string | null;
+    created_by: string;
+    created_at: string;
+    proveedores: {
+      nombre: string;
+      ruc: string | null;
+    };
+    created_by_profiles: {
+      full_name: string | null;
+    };
+  }> | null;
+  error: string | null;              // 'UNAUTHORIZED' | 'FORBIDDEN' | mensaje de error
+}
+```
+
+---
+
+### `compras.obtenerRecepcionPorId`
+Obtiene una recepción específica con su detalle completo: líneas, datos de producto, proveedor y usuario creador.
+
+**Parámetros:**
+```typescript
+{
+  id: string;  // UUID de la recepción
+}
+```
+
+**Validaciones:**
+- Requiere sesión autenticada
+- Solo administradores pueden consultar recepciones
+
+**Respuesta:**
+```typescript
+{
+  data: {
+    id: string;
+    numero_recepcion: string;
+    proveedor_id: string;
+    observaciones: string | null;
+    created_by: string;
+    created_at: string;
+    proveedores: {
+      id: string;
+      nombre: string;
+      ruc: string | null;
+    };
+    receipt_items: Array<{
+      id: string;
+      receipt_id: string;
+      producto_id: string;
+      cantidad_recibida: number;
+      precio_compra: number;
+      created_at: string;
+      productos: {
+        nombre: string;
+        sku: string;
+      };
+    }>;
+    created_by_profiles: {
+      full_name: string | null;
+    };
+  } | null;
+  error: string | null;              // 'UNAUTHORIZED' | 'FORBIDDEN' | 'Not found' | mensaje de error
+}
+```
+
+---
+
 ## Ventas
 
 ### `ventas.registrarVentaContado`
