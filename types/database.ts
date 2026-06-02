@@ -337,6 +337,131 @@ export type Database = {
         }
         Relationships: []
       }
+      proveedores: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          direccion: string | null
+          email: string | null
+          id: string
+          nombre: string
+          ruc: string | null
+          telefono: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          direccion?: string | null
+          email?: string | null
+          id?: string
+          nombre: string
+          ruc?: string | null
+          telefono?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          direccion?: string | null
+          email?: string | null
+          id?: string
+          nombre?: string
+          ruc?: string | null
+          telefono?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proveedores_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_receipts: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          numero_recepcion: string
+          observaciones: string | null
+          proveedor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          numero_recepcion: string
+          observaciones?: string | null
+          proveedor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          numero_recepcion?: string
+          observaciones?: string | null
+          proveedor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_receipts_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receipt_items: {
+        Row: {
+          cantidad_recibida: number
+          created_at: string | null
+          id: string
+          precio_compra: number
+          producto_id: string
+          recepcion_id: string
+        }
+        Insert: {
+          cantidad_recibida: number
+          created_at?: string | null
+          id?: string
+          precio_compra: number
+          producto_id: string
+          recepcion_id: string
+        }
+        Update: {
+          cantidad_recibida?: number
+          created_at?: string | null
+          id?: string
+          precio_compra?: number
+          producto_id?: string
+          recepcion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_items_recepcion_id_fkey"
+            columns: ["recepcion_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_receipts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       productos: {
         Row: {
           activo: boolean | null
@@ -473,7 +598,7 @@ export type Database = {
             foreignKeyName: "ventas_vendedor_id_fkey"
             columns: ["vendedor_id"]
             isOneToOne: false
-            referencedRelation: "perfiles"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

@@ -35,12 +35,12 @@ export async function listMovementsByProduct(
 
   // -- Role check -----------------------------------------------------------
   const { data: perfil } = await supabase
-    .from("perfiles")
-    .select("rol")
+    .from("profiles")
+    .select("role")
     .eq("id", user.id)
     .single()
 
-  if (!perfil || perfil.rol !== "admin") {
+  if (!perfil || perfil.role !== "admin") {
     return { data: null, error: "FORBIDDEN" }
   }
 
@@ -84,12 +84,12 @@ export async function getMovementsByReference(
 
   // -- Role check -----------------------------------------------------------
   const { data: perfil } = await supabase
-    .from("perfiles")
-    .select("rol")
+    .from("profiles")
+    .select("role")
     .eq("id", user.id)
     .single()
 
-  if (!perfil || perfil.rol !== "admin") {
+  if (!perfil || perfil.role !== "admin") {
     return { data: null, error: "FORBIDDEN" }
   }
 
