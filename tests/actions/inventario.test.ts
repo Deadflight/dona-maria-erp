@@ -14,7 +14,7 @@ vi.mock("@/lib/supabase/server", () => ({
 // ---------------------------------------------------------------------------
 
 const mockGetUser = vi.fn()
-const mockPerfilesSingle = vi.fn()
+const mockProfilesSingle = vi.fn()
 
 /** Assign this before each test to control the resolved value of the movements chain. */
 let movementsResolveValue: { data: unknown; error: unknown } = {
@@ -31,15 +31,15 @@ const mockMovementsChain: Record<string, unknown> = {
   then: (resolve: (v: unknown) => void) => resolve(movementsResolveValue),
 }
 
-/** Query chain for perfiles table (single-row lookup). */
-const mockPerfilesChain: Record<string, unknown> = {
-  select: vi.fn(() => mockPerfilesChain),
-  eq: vi.fn(() => mockPerfilesChain),
-  single: mockPerfilesSingle,
+/** Query chain for profiles table (single-row lookup). */
+const mockProfilesChain: Record<string, unknown> = {
+  select: vi.fn(() => mockProfilesChain),
+  eq: vi.fn(() => mockProfilesChain),
+  single: mockProfilesSingle,
 }
 
 const mockFrom = vi.fn((table: string) => {
-  if (table === "perfiles") return mockPerfilesChain
+  if (table === "profiles") return mockProfilesChain
   return mockMovementsChain
 })
 
@@ -71,17 +71,17 @@ describe("inventario Server Actions", () => {
 
       expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
       expect(mockGetUser).toHaveBeenCalledOnce()
-      expect(mockFrom).not.toHaveBeenCalledWith("perfiles")
+      expect(mockFrom).not.toHaveBeenCalledWith("profiles")
     })
 
     it("returns FORBIDDEN when user role is not admin", async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "operador" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "operador" }, error: null })
 
       const result = await listMovementsByProduct("product-1")
 
       expect(result).toEqual({ data: null, error: "FORBIDDEN" })
-      expect(mockFrom).toHaveBeenCalledWith("perfiles")
+      expect(mockFrom).toHaveBeenCalledWith("profiles")
     })
 
     it("returns movements filtered by product ID with custom limit", async () => {
@@ -91,7 +91,7 @@ describe("inventario Server Actions", () => {
       ]
       movementsResolveValue = { data: expectedData, error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "admin" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       const result = await listMovementsByProduct("product-1", 5)
 
@@ -107,7 +107,7 @@ describe("inventario Server Actions", () => {
     it("uses default limit of 50 when not specified", async () => {
       movementsResolveValue = { data: [], error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "admin" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       await listMovementsByProduct("product-1")
 
@@ -117,7 +117,7 @@ describe("inventario Server Actions", () => {
     it("returns error message when Supabase query fails", async () => {
       movementsResolveValue = { data: null, error: { message: "DB connection error" } }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "admin" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       const result = await listMovementsByProduct("product-1")
 
@@ -136,7 +136,7 @@ describe("inventario Server Actions", () => {
 
     it("returns FORBIDDEN when user role is not admin", async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "operador" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "operador" }, error: null })
 
       const result = await getMovementsByReference("venta", "ref-1")
 
@@ -150,7 +150,7 @@ describe("inventario Server Actions", () => {
       ]
       movementsResolveValue = { data: expectedData, error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "admin" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       const result = await getMovementsByReference("venta", "ref-1")
 
@@ -169,7 +169,7 @@ describe("inventario Server Actions", () => {
     it("returns error message when Supabase query fails", async () => {
       movementsResolveValue = { data: null, error: { message: "Query failed" } }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockPerfilesSingle.mockResolvedValue({ data: { rol: "admin" }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       const result = await getMovementsByReference("venta", "ref-1")
 
