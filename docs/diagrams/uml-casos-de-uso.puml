@@ -1,0 +1,93 @@
+@startuml
+title Diagrama de Casos de Uso - Sistema El Imperio Dona Maria
+
+skinparam packageBorderColor #2C3E50
+skinparam packageFontSize 12
+skinparam packageFontStyle bold
+skinparam usecaseBorderColor #34495E
+skinparam usecaseFontSize 11
+skinparam actorBorderColor #2C3E50
+skinparam actorFontSize 12
+skinparam actorFontStyle bold
+
+left to right direction
+
+' === ACTORES ===
+actor "Operador de\nMostrador" as Operador
+actor "Administrador\n(Propietaria)" as Admin
+
+' === PAQUETE: MOSTRADOR ===
+package "Mostrador" as MOSTRADOR {
+  usecase "CU-01\nBuscar Producto" as CU01
+  usecase "CU-02\nVender al Contado" as CU02
+  usecase "CU-03\nImprimir Nota\n de Venta" as CU03
+  usecase "CU-04\nConsultar Stock" as CU04
+}
+
+' === PAQUETE: GESTION INVENTARIO ===
+package "Gestion de Inventario" as INVENTARIO {
+  usecase "CU-05\nGestionar Productos\n (CRUD)" as CU05
+  usecase "CU-06\nActualizar Precios\n Masivamente" as CU06
+  usecase "CU-07\nRegistrar Entrada\n de Mercancia" as CU07
+}
+
+' === PAQUETE: CLIENTES ===
+package "Gestion de Clientes" as CLIENTES {
+  usecase "CU-08\nGestionar Clientes" as CU08
+}
+
+' === PAQUETE: CREDITOS ===
+package "Gestion de Creditos" as CREDITOS {
+  usecase "CU-09\nVender a Credito" as CU09
+  usecase "CU-10\nRegistrar Abono\n a Credito" as CU10
+  usecase "CU-11\nConsultar Creditos\n Pendientes" as CU11
+}
+
+' === PAQUETE: CONCILIACION ===
+package "Conciliacion\nFinanciera" as CONCILIACION {
+  usecase "CU-12\nVer Cierre de Caja" as CU12
+  usecase "CU-13\nConciliar Cuentas" as CU13
+}
+
+' === PAQUETE: ADMINISTRACION ===
+package "Administracion\ndel Sistema" as ADMIN {
+  usecase "CU-14\nGestionar Usuarios" as CU14
+  usecase "CU-15\nConfigurar Tasa\n de Cambio" as CU15
+}
+
+' === RELACIONES ACTOR - CASO DE USO ===
+Operador --> CU01
+Operador --> CU02
+Operador --> CU03
+Operador --> CU04
+
+Admin --> CU05
+Admin --> CU06
+Admin --> CU07
+Admin --> CU08
+Admin --> CU09
+Admin --> CU10
+Admin --> CU11
+Admin --> CU12
+Admin --> CU13
+Admin --> CU14
+Admin --> CU15
+
+' === RELACIONES INCLUDE/EXTEND ===
+CU02 .|> CU01 : <<include>>
+CU09 .|> CU11 : <<include>>
+CU12 .|> CU13 : <<include>>
+
+note bottom of Operador
+  Atiende clientes en
+  el punto de venta
+  Privilegios: operativo basico
+end note
+
+note bottom of Admin
+  Responsable del comercio
+  Control total del sistema
+  Privilegios: Full Access
+end note
+
+@enduml

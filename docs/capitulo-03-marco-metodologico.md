@@ -180,51 +180,76 @@ El cumplimiento de los objetivos específicos planteados en esta investigación 
 
 ## 3.5 Diagrama de Gantt
 
-Para visualizar la distribución temporal de las actividades, la ruta crítica y el solapamiento de los procesos de ingeniería, se elaboró un Diagrama de Gantt utilizando la herramienta de gestión de proyectos GanttPRO. Este modelo gráfico organiza las actividades bajo una estructura de descomposición del trabajo (EDT), vinculando las tareas mediante dependencias de tipo Fin-Inicio (FI), lo que asegura que cada fase técnica sea la consecuencia directa de la validación de la etapa anterior.
+Para visualizar la distribución temporal de las actividades, la ruta crítica y el solapamiento de los procesos de ingeniería, se elaboró un Diagrama de Gantt (véase *Figura 3.2*) utilizando el lenguaje de diagramación Mermaid, renderizado a través del editor en línea mermaid.live. Este modelo gráfico organiza las 40 actividades bajo una estructura de descomposición del trabajo (EDT), vinculando las tareas mediante dependencias de tipo Fin-Inicio (FI), lo que asegura que cada fase técnica sea la consecuencia directa de la validación de la etapa anterior.
 
-### Representación Visual por Semanas
+La duración total del proyecto es de 40 días hábiles, equivalentes a 80 horas netas de ejecución (2 horas diarias). El cronograma se estructura en las cinco (5) fases descritas en la sección 3.4, donde cada actividad individual tiene una duración de 1 día y cada fase concluye con un hito de validación.
+
+### Correspondencia entre Fases y Método Científico
+
+| Fase | Duración | Método Científico | Hito |
+|------|----------|-------------------|------|
+| **Fase I**: Diagnóstico Operativo | Días 1–8 | Observación → Definición del Problema | Diagnóstico validado |
+| **Fase II**: Modelado Lógico | Días 9–16 | Formulación de Hipótesis | Arquitectura aprobada |
+| **Fase III**: Control de Inventarios | Días 17–24 | Experimentación | Módulo inventario operativo |
+| **Fase IV**: Mostrador y Conciliación | Días 25–32 | Experimentación (cont.) | Motor transaccional estabilizado |
+| **Fase V**: Implantación y Evaluación | Días 33–40 | Análisis → Conclusión | Sistema implantado y acta firmada |
+
+### Figura 3.2: Diagrama de Gantt del Proyecto
+
+> **Instrucciones para generar la imagen**: El diagrama de Gantt se definió mediante código Mermaid. Para visualizarlo e imprimirlo en formato grande:
+> 1. Ir a **[mermaid.live](https://mermaid.live/)**
+> 2. En la pestaña **Code**, pegar el contenido de `docs/diagrams/gantt-source.mmd`
+> 3. Ir a la pestaña **Preview** para visualizar el diagrama
+> 4. Click en **Download as SVG**
+> 5. Guardar como `docs/diagrams/gantt-mermaid.svg`
+>
+> **Nota importante**: El parser de Mermaid usa el caracter `:` como separador entre el nombre de la tarea y sus metadatos. Por esta razon, los nombres de las tareas y hitos **no deben contener dos puntos** — por ejemplo, usar `HITO Diagnostico Validado` en lugar de `HITO: Diagnostico Validado`.
+>
+> El código fuente contiene las 40 actividades del cronograma diario descrito en la sección 3.4, organizadas en 5 fases con dependencias Fin-Inicio y la ruta crítica marcada.
+>
+> ![Diagrama de Gantt del Proyecto](diagrams/gantt-mermaid.svg)
+
+### Dependencias entre Fases y Actividades
 
 ```
-SEMANA 1: [====FASE I: Diagnóstico Operativo====]
-          D1   D2   D3   D4   D5   D6   D7   D8
-          ████████████████████████████████
-
-SEMANA 2: [========FASE II: Modelado Lógico========]
-          D9   D10  D11  D12  D13  D14  D15  D16
-          ████████████████████████████████
-
-SEMANA 3: [====FASE III: Control de Inventarios====]
-          D17  D18  D19  D20  D21  D22  D23  D24
-          ████████████████████████████████
-
-SEMANA 4: [========FASE IV: Mostrador y Conciliación========]
-          D25  D26  D27  D28  D29  D30  D31  D32
-          ████████████████████████████████
-
-SEMANA 5: [========FASE V: Implantación y Evaluación========]
-          D33  D34  D35  D36  D37  D38  D39  D40
-          ████████████████████████████████
-
-LEYENDA:
-██ = Período activo de la fase
+FASE I (Diagnóstico) ──Hito I──> FASE II (Modelado) ──Hito II──> FASE III (Inventario)
+                                                                        │
+                                                                        └─> FASE IV (Mostrador)
+                                                                                  │
+                                                                                  └─> FASE V (Implantación)
 ```
 
-### Dependencias entre Fases
-
-```
-FASE I (Diagnóstico)
-    │
-    └─> FASE II (Modelado) ──> FASE III (Inventario)
-                                    │
-                                    └─> FASE IV (Mostrador)
-                                              │
-                                              └─> FASE V (Implantación)
-```
+Cada actividad individual dentro de una fase depende de la finalización de la actividad anterior de la misma fase (secuencia lineal interna), y la primera actividad de cada fase depende del hito de cierre de la fase precedente.
 
 ---
 
-## 3.6 Resumen del Capítulo
+## 3.6 Diagrama de Actividades del Proceso de Desarrollo
 
-Este capítulo presentó la estructura metodológica del proyecto, enmarcándolo como un Proyecto Factible con investigación de campo de carácter descriptivo. Se delimitó el alcance del MVP, se demostró la viabilidad técnica, operativa, económica y temporal del desarrollo, y se estableció el cronograma de 80 horas distribuidas en 5 fases metodológicas a lo largo de 40 días hábiles.
+Para representar visualmente la secuencia lógica del proceso de desarrollo del sistema, alineándolo con los pasos del método científico (Observación → Definición del Problema → Formulación de Hipótesis → Experimentación → Análisis → Conclusión), se elaboró un Diagrama de Actividades UML utilizando la herramienta draw.io. Este diagrama organiza las actividades en tres swimlanes (particiones) que reflejan los roles involucrados en el proyecto: Investigador (Tesista), Tutor Académico y Propietaria/Usuario.
+
+La correspondencia entre las fases del proyecto y el método científico es la siguiente:
+
+| Fase del Proyecto | Paso del Método Científico | Actividades Clave |
+|-------------------|---------------------------|-------------------|
+| **Fase I**: Diagnóstico Operativo | **Observación** → **Definición del Problema** | Auditoría de procesos, entrevista semiestructurada, formalización del diagnóstico situacional, definición de objetivos y alcance MVP |
+| **Fase II**: Modelado Lógico | **Formulación de Hipótesis** | Diseño de la arquitectura tecnológica (Next.js + Supabase), modelado de datos (DER), elaboración de casos de uso UML |
+| **Fase III y IV**: Implementación | **Experimentación** | Desarrollo de los módulos de inventario, mostrador, conciliación financiera y créditos; pruebas de integración y estrés |
+| **Fase V**: Implantación y Evaluación | **Análisis** → **Conclusión** | Despliegue en producción, capacitación del personal, evaluación de impacto real, firma del acta de conformidad |
+
+El diagrama se presenta a continuación en la *Figura 3.1*.
+
+### Figura 3.1: Diagrama de Actividades del Proceso de Desarrollo
+
+<p align="center">
+  <img src="./diagrams/activity-diagram-desarrollo.svg" alt="Diagrama de Actividades del Proceso de Desarrollo" width="100%" style="max-width: 1120px;">
+</p>
+
+**Fuente**: Elaboración propia (2026).
+
+---
+
+## 3.7 Resumen del Capítulo
+
+Este capítulo presentó la estructura metodológica del proyecto, enmarcándolo como un Proyecto Factible con investigación de campo de carácter descriptivo. Se delimitó el alcance del MVP, se demostró la viabilidad técnica, operativa, económica y temporal del desarrollo, y se estableció el cronograma de 80 horas distribuidas en 5 fases metodológicas a lo largo de 40 días hábiles, representado tanto en un Diagrama de Gantt como en un Diagrama de Actividades UML alineado al método científico.
 
 El siguiente capítulo detallará el análisis de requerimientos y el diseño técnico del sistema, incluyendo los modelos de datos, diagramas UML y la arquitectura de componentes seleccionada.

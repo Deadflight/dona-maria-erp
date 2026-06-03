@@ -1,0 +1,232 @@
+@startuml
+title Diagrama Entidad-Relacion - Sistema El Imperio Dona Maria
+
+skinparam packageBorderColor #2C3E50
+skinparam packageFontSize 12
+skinparam packageFontStyle bold
+skinparam classBorderColor #34495E
+skinparam classFontSize 11
+skinparam classHeaderBackgroundColor #ECF0F1
+skinparam classFontStyle bold
+
+hide circle
+hide empty members
+
+' =============================================
+' TABLAS DEL SISTEMA
+' =============================================
+
+' ---------------------------------------------
+' SEGURIDAD Y ACCESO
+' ---------------------------------------------
+package "Seguridad" {
+  class profiles {
+    id: UUID PK
+    email: TEXT
+    full_name: TEXT
+    role: TEXT
+    is_active: BOOLEAN
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+  }
+}
+
+' ---------------------------------------------
+' CATALOGO E INVENTARIO
+' ---------------------------------------------
+package "Inventario" {
+  class productos {
+    id: UUID PK
+    sku: TEXT
+    nombre: TEXT
+    descripcion: TEXT
+    categoria: TEXT
+    precio_venta: NUMERIC(12,2)
+    precio_compra: NUMERIC(12,2)
+    stock_actual: NUMERIC(10,2)
+    stock_minimo: INTEGER
+    unidad_medida: TEXT
+    codigo_barras: TEXT
+    activo: BOOLEAN
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+  }
+
+  class inventory_movements {
+    id: UUID PK
+    producto_id: UUID FK
+    cantidad: NUMERIC(10,2)
+    tipo_movimiento: TEXT
+    stock_resultante: NUMERIC(10,2)
+    referencia_tipo: TEXT
+    referencia_id: TEXT
+    motivo: TEXT
+    created_by: UUID FK
+    created_at: TIMESTAMPTZ
+  }
+
+  class proveedores {
+    id: UUID PK
+    nombre: TEXT
+    ruc: TEXT
+    direccion: TEXT
+    telefono: TEXT
+    email: TEXT
+    created_at: TIMESTAMPTZ
+    created_by: UUID FK
+  }
+
+  class purchase_receipts {
+    id: UUID PK
+    numero_recepcion: TEXT
+    proveedor_id: UUID FK
+    observaciones: TEXT
+    created_by: UUID FK
+    created_at: TIMESTAMPTZ
+  }
+
+  class receipt_items {
+    id: UUID PK
+    recepcion_id: UUID FK
+    producto_id: UUID FK
+    cantidad_recibida: NUMERIC(10,2)
+    precio_compra: NUMERIC(12,2)
+    created_at: TIMESTAMPTZ
+  }
+}
+
+' ---------------------------------------------
+' CLIENTES
+' ---------------------------------------------
+package "Clientes" {
+  class clientes {
+    id: UUID PK
+    nombre: TEXT
+    telefono: TEXT
+    email: TEXT
+    direccion: TEXT
+    rif_cedula: TEXT
+    tipo: TEXT
+    limite_credito: NUMERIC(14,2)
+    saldo_actual: NUMERIC(14,2)
+    activo: BOOLEAN
+    created_at: TIMESTAMPTZ
+    updated_at: TIMESTAMPTZ
+  }
+}
+
+' ---------------------------------------------
+' VENTAS Y TRANSACCIONES
+' ---------------------------------------------
+package "Ventas" {
+  class ventas {
+    id: UUID PK
+    numero_factura: TEXT
+    cliente_id: UUID FK
+    vendedor_id: UUID FK
+    subtotal: NUMERIC(14,2)
+    impuesto: NUMERIC(14,2)
+    total: NUMERIC(14,2)
+    metodo_pago: TEXT
+    estado: TEXT
+    observaciones: TEXT
+    created_at: TIMESTAMPTZ
+  }
+
+  class detalles_venta {
+    id: UUID PK
+    venta_id: UUID FK
+    producto_id: UUID FK
+    cantidad: INTEGER
+    precio_unitario: NUMERIC(12,2)
+    descuento: NUMERIC(12,2)
+    subtotal: NUMERIC(12,2)
+    created_at: TIMESTAMPTZ
+  }
+
+  class pagos_venta {
+    id: UUID PK
+    venta_id: UUID FK
+    monto: NUMERIC(14,2)
+    metodo_pago: TEXT
+    referencia: TEXT
+    banco: TEXT
+    created_at: TIMESTAMPTZ
+  }
+}
+
+' ---------------------------------------------
+' CREDITOS
+' ---------------------------------------------
+package "Creditos" {
+  class creditos {
+    id: UUID PK
+    cliente_id: UUID FK
+    venta_id: UUID FK
+    monto_original: NUMERIC(14,2)
+    saldo_pendiente: NUMERIC(14,2)
+    tasa_interes: NUMERIC(5,2)
+    cuotas: INTEGER
+    fecha_otorgamiento: DATE
+    fecha_vencimiento: DATE
+    estado: TEXT
+    created_at: TIMESTAMPTZ
+  }
+
+  class abonos_creditos {
+    id: UUID PK
+    credito_id: UUID FK
+    monto: NUMERIC(14,2)
+    fecha_abono: DATE
+    metodo_pago: TEXT
+    referencia: TEXT
+    created_at: TIMESTAMPTZ
+  }
+}
+
+' ---------------------------------------------
+' TASAS DE CAMBIO
+' ---------------------------------------------
+package "Configuracion" {
+  class tasas_cambio {
+    id: UUID PK
+    moneda_origen: TEXT
+    moneda_destino: TEXT
+    tasa: NUMERIC(14,4)
+    fuente: TEXT
+    fecha: DATE
+    activa: BOOLEAN
+    created_at: TIMESTAMPTZ
+  }
+}
+
+' =============================================
+' RELACIONES
+' =============================================
+
+' --- Seguridad ---
+profiles ||..o{ ventas : "vendedor_id"
+profiles ||..o{ inventory_movements : "created_by"
+profiles ||..o{ purchase_receipts : "created_by"
+profiles ||..o{ proveedores : "created_by"
+
+' --- Inventario ---
+productos ||..o{ inventory_movements : "producto_id"
+productos ||..o{ detalles_venta : "producto_id"
+productos ||..o{ receipt_items : "producto_id"
+
+' --- Recepcion ---
+proveedores ||..o{ purchase_receipts : "proveedor_id"
+purchase_receipts ||..o{ receipt_items : "recepcion_id"
+
+' --- Ventas ---
+ventas ||..o{ detalles_venta : "venta_id"
+ventas ||..o{ pagos_venta : "venta_id"
+clientes ||..o{ ventas : "cliente_id"
+
+' --- Creditos ---
+clientes ||..o{ creditos : "cliente_id"
+ventas ||..o{ creditos : "venta_id"
+creditos ||..o{ abonos_creditos : "credito_id"
+
+@enduml

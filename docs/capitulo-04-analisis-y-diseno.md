@@ -737,6 +737,8 @@ src/
 
 ## 4.6 Diseño de Procesos
 
+El diseño de procesos se aborda desde dos perspectivas complementarias. Por un lado, el **proceso de desarrollo del sistema** (véase *Figura 3.1* en el Capítulo III), el cual describe la secuencia metodológica del proyecto alineada al método científico, representada mediante un Diagrama de Actividades UML con swimlanes por actor (Investigador, Tutor, Propietaria). Por otro lado, los **procesos operativos del negocio** que el sistema debe automatizar, los cuales se detallan a continuación como diagramas de flujo.
+
 ### 4.6.1 Flujo de Venta al Contado
 
 ```
