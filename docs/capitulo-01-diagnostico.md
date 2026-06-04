@@ -96,7 +96,7 @@ Se excluyen explícitamente del alcance los procesos contables complejos de car�
 
 ### 1.5.3 Justificación de las Exclusiones
 
-Estas exclusiones se fundamentan en las restricciones de la variable temporal de la práctica pre-profesional (un lapse estricto de 2 meses) y la asignación horaria limitada de 2 horas diarias de ingeniería (80 horas útiles de desarrollo), priorizando el desarrollo de un Producto Mínimo Viable (MVP) que solucione las fallas de control más urgentes de la organización antes de escalar a procesos secundarios.
+Estas exclusiones se fundamentan en las restricciones de la variable temporal de la práctica pre-profesional (un lapse estricto de 2 meses) y la asignación horaria limitada de 3 horas diarias de ingeniería (120 horas útiles de desarrollo), priorizando el desarrollo de un Producto Mínimo Viable (MVP) que solucione las fallas de control más urgentes de la organización antes de escalar a procesos secundarios.
 
 ---
 
@@ -139,7 +139,7 @@ El presente estudio se encuentra limitado por los siguientes factores:
 
 - **Ausencia de datos históricos digitalizados**: No se cuenta con registros electrónicos previos que permitan un análisis cuantitativo riguroso de métricas comerciales. Las cuantificaciones presentadas en el diagnóstico (tiempos de transacción, desfase de precios, duración de conciliación) constituyen estimaciones basadas en observación directa y entrevistas con el personal.
 
-- **Scope temporal restringido**: El período de desarrollo es de 2 meses (80 horas útiles), lo que delimita la complejidad de los módulos a desarrollar. Funcionalidades de mayor envergadura (contabilidad fiscal, integración con impresoras fiscales) quedan fuera del alcance.
+- **Scope temporal restringido**: El período de desarrollo es de 2 meses (120 horas útiles), lo que delimita la complejidad de los módulos a desarrollar. Funcionalidades de mayor envergadura (contabilidad fiscal, integración con impresoras fiscales) quedan fuera del alcance.
 
 - **Infraestructura tecnológica local**: La calidad de la conexión a internet en el establecimiento comercial podrá constituir un factor limitante para el rendimiento del sistema en la nube.
 

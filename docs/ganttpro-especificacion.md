@@ -11,7 +11,7 @@
 | Parámetro | Valor |
 |-----------|-------|
 | **Duración total** | 40 días hábiles |
-| **Jornada** | 2 horas/día (bloques de ingeniería) |
+| **Jornada** | 3 horas/día (bloques de ingeniería) |
 | **Calendario** | Lun–Vie (días hábiles) |
 | **Unidad de tarea** | 1 día = 1 actividad |
 
@@ -109,7 +109,7 @@
 ## Instrucciones para GanttPRO
 
 1. **Crear proyecto nuevo** en GanttPRO con nombre: "Sistema Doña María - Desarrollo"
-2. **Configurar calendario**: Lunes a Viernes, 2 horas/día
+2. **Configurar calendario**: Lunes a Viernes, 3 horas/día
 3. **Crear tareas**: Ingresar las 40 actividades como tareas individuales (una por fila)
 4. **Agrupar por fases**: Crear 5 grupos (Fase I a V) y anidar las actividades correspondientes
 5. **Asignar dependencias**: Usar el tipo **Fin-Inicio (FI)** según la tabla anterior

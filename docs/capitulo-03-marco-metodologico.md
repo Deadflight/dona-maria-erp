@@ -32,7 +32,7 @@ Con el propósito de garantizar la viabilidad del desarrollo tecnológico dentro
 
 **Reportes Contables Avanzados**: Se limita a reportes de cierre de caja y estado de cuentas por cobrar, sin генерация de estados financieros formales.
 
-**Justificación de las Exclusiones**: Estas funciones de carácter tributario, legal y comercial avanzado quedan fuera del alcance debido a la restricción temporal de la práctica pre-profesional (2 meses con bloques de 2 horas diarias / 80 horas útiles en total). Abordar módulos de alta complejidad comprometería la calidad y estabilidad del núcleo transaccional urgente que requiere el negocio para frenar el descontrol de su cuaderno manual.
+**Justificación de las Exclusiones**: Estas funciones de carácter tributario, legal y comercial avanzado quedan fuera del alcance debido a la restricción temporal de la práctica pre-profesional (2 meses con bloques de 3 horas diarias / 120 horas útiles en total). Abordar módulos de alta complejidad comprometería la calidad y estabilidad del núcleo transaccional urgente que requiere el negocio para frenar el descontrol de su cuaderno manual.
 
 ---
 
@@ -89,8 +89,8 @@ La variable tiempo se ha calibrado estrictamente para cumplir con las exigencias
 
 **Restricciones Temporales**:
 - Período de desarrollo: 2 meses (8 semanas / 40 días hábiles de campo)
-- Bloque diario de ingeniería: 2 horas
-- Total de horas útiles de ejecución: 80 horas
+- Bloque diario de ingeniería: 3 horas
+- Total de horas útiles de ejecución: 120 horas
 
 **Viabilidad del Alcance MVP**:
 Al haber delimitado el alcance de forma estricta (excluyendo módulos contables-fiscales del SENIAT de alta complejidad) y concentrar el esfuerzo en un Producto Mínimo Viable (MVP) enfocado exclusivamente en cuatro problemas críticos (búsqueda predictiva de existencias, cálculo automatizado en mostrador, centralización transaccional para conciliación express, y gestión de créditos), el tiempo asignado en el cronograma es perfectamente suficiente para el análisis, diseño, desarrollo, pruebas e implantación de la solución.
@@ -99,7 +99,7 @@ Al haber delimitado el alcance de forma estricta (excluyendo módulos contables-
 
 ## 3.4 Cronograma de Actividades Diario
 
-El cumplimiento de los objetivos específicos planteados en esta investigación se estructuró a través de una planificación operativa dividida en cinco (5) fases metodológicas consecutivas. El cronograma abarca un lapso estricto de dos (2) meses calendario, equivalentes a 40 días hábiles de labor en campo. Cada jornada se planificó en bloques de dos (2) horas diarias de ingeniería, acumulando un total de 80 horas útiles de ejecución.
+El cumplimiento de los objetivos específicos planteados en esta investigación se estructuró a través de una planificación operativa dividida en cinco (5) fases metodológicas consecutivas. El cronograma abarca un lapso estricto de dos (2) meses calendario, equivalentes a 40 días hábiles de labor en campo. Cada jornada se planificó en bloques de tres (3) horas diarias de ingeniería, acumulando un total de 120 horas útiles de ejecución.
 
 ### FASE I: Diagnóstico Operativo y Brechas de Control Financiero (Semanas 1-2)
 
@@ -182,7 +182,7 @@ El cumplimiento de los objetivos específicos planteados en esta investigación 
 
 Para visualizar la distribución temporal de las actividades, la ruta crítica y el solapamiento de los procesos de ingeniería, se elaboró un Diagrama de Gantt (véase *Figura 3.2*) utilizando el lenguaje de diagramación Mermaid, renderizado a través del editor en línea mermaid.live. Este modelo gráfico organiza las 40 actividades bajo una estructura de descomposición del trabajo (EDT), vinculando las tareas mediante dependencias de tipo Fin-Inicio (FI), lo que asegura que cada fase técnica sea la consecuencia directa de la validación de la etapa anterior.
 
-La duración total del proyecto es de 40 días hábiles, equivalentes a 80 horas netas de ejecución (2 horas diarias). El cronograma se estructura en las cinco (5) fases descritas en la sección 3.4, donde cada actividad individual tiene una duración de 1 día y cada fase concluye con un hito de validación.
+La duración total del proyecto es de 40 días hábiles, equivalentes a 120 horas netas de ejecución (3 horas diarias). El cronograma se estructura en las cinco (5) fases descritas en la sección 3.4, donde cada actividad individual tiene una duración de 1 día y cada fase concluye con un hito de validación.
 
 ### Correspondencia entre Fases y Método Científico
 
@@ -250,6 +250,6 @@ El diagrama se presenta a continuación en la *Figura 3.1*.
 
 ## 3.7 Resumen del Capítulo
 
-Este capítulo presentó la estructura metodológica del proyecto, enmarcándolo como un Proyecto Factible con investigación de campo de carácter descriptivo. Se delimitó el alcance del MVP, se demostró la viabilidad técnica, operativa, económica y temporal del desarrollo, y se estableció el cronograma de 80 horas distribuidas en 5 fases metodológicas a lo largo de 40 días hábiles, representado tanto en un Diagrama de Gantt como en un Diagrama de Actividades UML alineado al método científico.
+Este capítulo presentó la estructura metodológica del proyecto, enmarcándolo como un Proyecto Factible con investigación de campo de carácter descriptivo. Se delimitó el alcance del MVP, se demostró la viabilidad técnica, operativa, económica y temporal del desarrollo, y se estableció el cronograma de 120 horas distribuidas en 5 fases metodológicas a lo largo de 40 días hábiles, representado tanto en un Diagrama de Gantt como en un Diagrama de Actividades UML alineado al método científico.
 
 El siguiente capítulo detallará el análisis de requerimientos y el diseño técnico del sistema, incluyendo los modelos de datos, diagramas UML y la arquitectura de componentes seleccionada.
