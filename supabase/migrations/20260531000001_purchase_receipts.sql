@@ -143,10 +143,10 @@ $$;
 --           3. CALLs record_inventory_movement('entrada') per item
 -- -------------------------------------------------------------------
 create or replace function public.create_receipt_with_movements(
-  p_numero_recepcion  text default null,
   p_proveedor_id      uuid,
-  p_observaciones     text default null,
-  p_items             jsonb
+  p_items             jsonb,
+  p_numero_recepcion  text default null,
+  p_observaciones     text default null
 ) returns jsonb
 language plpgsql
 security definer

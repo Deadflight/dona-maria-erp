@@ -44,8 +44,8 @@ create policy "movements_insert_admin" on public.inventory_movements
   for insert to authenticated
   with check (
     exists (
-      select 1 from public.perfiles
-      where id = auth.uid() and rol = 'admin'
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
     )
   );
 
