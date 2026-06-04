@@ -103,76 +103,76 @@ El cumplimiento de los objetivos específicos planteados en esta investigación 
 
 ### FASE I: Diagnóstico Operativo y Brechas de Control Financiero (Semanas 1-2)
 
-| Día | Actividad |
-|-----|-----------|
-| 1 | Auditoría de Procesos en Mostrador (toma de tiempos y detección de cuellos de botella en la atención) |
-| 2 | Mapeo de Canales de Comunicación Inter-Turnos (evaluación del uso de mensajería informal) |
-| 3 | Auditoría del Flujo de Conciliación Financiera (evaluación del riesgo de descuadre en el cuaderno manual) |
-| 4 | Evaluación de Pérdidas por Desabastecimiento y análisis del desfase en la actualización de costos |
-| 5 | Modelado y Levantamiento de Reglas de Negocio Especiales (fracciones decimales y créditos informales) |
-| 6 | Formalización del Diagnóstico Situacional y redacción de la problemática |
-| 7 | Definición de Objetivos (General y Específicos) y establecimiento de la Delimitación del Alcance |
-| 8 | Construcción de la Matriz de Factibilidad Integral (Técnica, Operativa, Económica y Temporal) |
+| Día | Actividad | Duración |
+|-----|-----------|----------|
+| 1 | Auditoría de Procesos en Mostrador (toma de tiempos y detección de cuellos de botella en la atención) | 2h |
+| 2 | Mapeo de Canales de Comunicación Inter-Turnos (evaluación del uso de mensajería informal) | 1h |
+| 3 | Auditoría del Flujo de Conciliación Financiera (evaluación del riesgo de descuadre en el cuaderno manual) | 2h |
+| 4 | Evaluación de Pérdidas por Desabastecimiento y análisis del desfase en la actualización de costos | 1h |
+| 5 | Modelado y Levantamiento de Reglas de Negocio Especiales (fracciones decimales y créditos informales) | 3h |
+| 6 | Formalización del Diagnóstico Situacional y redacción de la problemática | 3h |
+| 7 | Definición de Objetivos (General y Específicos) y establecimiento de la Delimitación del Alcance | 2h |
+| 8 | Construcción de la Matriz de Factibilidad Integral (Técnica, Operativa, Económica y Temporal) | 2h |
 
 **Hito de la Fase I**: Diagnóstico institucional validado y aprobado por los tutores.
 
 ### FASE II: Rediseño de Procesos y Modelado Lógico de la Solución (Semanas 3-4)
 
-| Día | Actividad |
-|-----|-----------|
-| 9 | Rediseño del Flujo de Procesos en Mostrador (arquitectura de la terminal de atención rápida) |
-| 10 | Modelado de Datos para Productos Fraccionados (definición de precisión decimal en base de datos) |
-| 11 | Estructuración del Modelo Relacional Financiero (asociación de ventas, métodos de pago y bancos) |
-| 12 | Construcción de Diagramas de Ingeniería (Modelado UML: Casos de Uso y Diagrama Entidad-Relación) |
-| 13 | Parametrización del Entorno Cloud de Persistencia (creación del proyecto en Supabase con PostgreSQL) |
-| 14 | Inicialización de la Infraestructura de Desarrollo (configuración de Next.js, TypeScript y GitHub) |
-| 15 | Setup del Sistema de Diseño Ergonómico (integración de Tailwind CSS y componentes de shadcn/ui) |
-| 16 | Pruebas de Integración y conectividad síncrona mediante Server Actions hacia la nube |
+| Día | Actividad | Duración |
+|-----|-----------|----------|
+| 9 | Rediseño del Flujo de Procesos en Mostrador (arquitectura de la terminal de atención rápida) | 3h |
+| 10 | Modelado de Datos para Productos Fraccionados (definición de precisión decimal en base de datos) | 2h |
+| 11 | Estructuración del Modelo Relacional Financiero (asociación de ventas, métodos de pago y bancos) | 4h |
+| 12 | Construcción de Diagramas de Ingeniería (Modelado UML: Casos de Uso y Diagrama Entidad-Relación) | 1h |
+| 13 | Parametrización del Entorno Cloud de Persistencia (creación del proyecto en Supabase con PostgreSQL) | 4h |
+| 14 | Inicialización de la Infraestructura de Desarrollo (configuración de Next.js, TypeScript y GitHub) | 2h |
+| 15 | Setup del Sistema de Diseño Ergonómico (integración de Tailwind CSS y componentes de shadcn/ui) | 2h |
+| 16 | Pruebas de Integración y conectividad síncrona mediante Server Actions hacia la nube | 6h |
 
 **Hito de la Fase II**: Arquitectura lógica y entorno tecnológico base inicializado con éxito.
 
 ### FASE III: Mitigación del Descontrol de Existencias e Impacto Inflacionario (Semanas 5-6)
 
-| Día | Actividad |
-|-----|-----------|
-| 17 | Construcción del Panel de Gestión Administrativa (interfaz de supervisión de inventario) |
-| 18 | Desarrollo del Sub-módulo de Alertas Automatizadas de Stock Crítico |
-| 19 | Implementación del Algoritmo de Actualización Masiva de Precios por lotes porcentuales |
-| 20 | Desarrollo de la interfaz para la Recepción y Registro Digital de Mercancía de proveedores |
-| 21 | Programación de Restricciones y Reglas de Validación del lado del servidor |
-| 22 | Implementación del Procesamiento Numérico Fraccionado en las Server Actions de inventario |
-| 23 | Simulación de Carga Integral de Inventario utilizando datos históricos de compras reales |
-| 24 | Documentación Técnica de la Arquitectura de Stock dentro del cuerpo del informe |
+| Día | Actividad | Duración |
+|-----|-----------|----------|
+| 17 | Construcción del Panel de Gestión Administrativa (interfaz de supervisión de inventario) | 8h |
+| 18 | Desarrollo del Sub-módulo de Alertas Automatizadas de Stock Crítico | 2h |
+| 19 | Implementación del Algoritmo de Actualización Masiva de Precios por lotes porcentuales | 2h |
+| 20 | Desarrollo de la interfaz para la Recepción y Registro Digital de Mercancía de proveedores | 4h |
+| 21 | Programación de Restricciones y Reglas de Validación del lado del servidor | 3h |
+| 22 | Implementación del Procesamiento Numérico Fraccionado en las Server Actions de inventario | 1h |
+| 23 | Simulación de Carga Integral de Inventario utilizando datos históricos de compras reales | 2h |
+| 24 | Documentación Técnica de la Arquitectura de Stock dentro del cuerpo del informe | 2h |
 
 **Hito de la Fase III**: Módulo de control de inventarios completamente operativo y validado.
 
 ### FASE IV: Optimización de Mostrador y Automatización de la Conciliación Diaria (Semanas 7-8)
 
-| Día | Actividad |
-|-----|-----------|
-| 25 | Maquetado de la Terminal de Ventas de Alta Velocidad (interfaz ergonómica del punto de venta) |
-| 26 | Desarrollo del Motor de Búsqueda Predictiva en mostrador conectado en tiempo real a Supabase |
-| 27 | Automatización de Venta Express bajo el perfil por defecto de "Consumidor Final" |
-| 28 | Desarrollo del Calculador Síncrono de Transacciones (carrito de compras reactivo en pantalla) |
-| 29 | Programación del Disparador Transaccional (descuento automático y atómico de stock por venta) |
-| 30 | Desarrollo del Módulo de Cierre Financiero Automatizado (agrupación por método de pago y banco) |
-| 31 | Integración del Módulo de Notas de Venta simplificadas en formato PDF bajo demanda |
-| 32 | Pruebas de Estrés y simulaciones de cierre de guardia entre operadores de turno |
+| Día | Actividad | Duración |
+|-----|-----------|----------|
+| 25 | Maquetado de la Terminal de Ventas de Alta Velocidad (interfaz ergonómica del punto de venta) | 10h |
+| 26 | Desarrollo del Motor de Búsqueda Predictiva en mostrador conectado en tiempo real a Supabase | 3h |
+| 27 | Automatización de Venta Express bajo el perfil por defecto de "Consumidor Final" | 3h |
+| 28 | Desarrollo del Calculador Síncrono de Transacciones (carrito de compras reactivo en pantalla) | 2h |
+| 29 | Programación del Disparador Transaccional (descuento automático y atómico de stock por venta) | 2h |
+| 30 | Desarrollo del Módulo de Cierre Financiero Automatizado (agrupación por método de pago y banco) | 5h |
+| 31 | Integración del Módulo de Notas de Venta simplificadas en formato PDF bajo demanda | 4h |
+| 32 | Pruebas de Estrés y simulaciones de cierre de guardia entre operadores de turno | 3h |
 
 **Hito de la Fase IV**: Motor transaccional y módulo de conciliación express estabilizados.
 
 ### FASE V: Validación en Campo, Implantación y Evaluación de Impacto Real (Semanas 8-9)
 
-| Día | Actividad |
-|-----|-----------|
-| 33 | Pruebas Integrales de Concurrencia (múltiples dispositivos simulando ventas y auditorías simultáneas) |
-| 34 | Construcción de la Matriz de Aceptación del Sistema (documentación de casos de prueba) |
-| 35 | Despliegue de la Plataforma Web en Producción a través del servicio cloud de Vercel |
-| 36 | Carga Masiva Inicial e indexación de los 50 artículos de mayor rotación comercial del negocio |
-| 37 | Instalación Física de Terminales y configuración de navegadores locales en los equipos del comercio |
-| 38 | Plan de Inducción Técnica y capacitación guiada al personal de mostrador |
-| 39 | Capacitación en Auditoría Financiera a la propietaria para la sustitución definitiva del cuaderno |
-| 40 | Evaluación de Impacto Real (tiempos de atención antes vs. después), recolección de firmas y cierre del informe |
+| Día | Actividad | Duración |
+|-----|-----------|----------|
+| 33 | Pruebas Integrales de Concurrencia (múltiples dispositivos simulando ventas y auditorías simultáneas) | 3h |
+| 34 | Construcción de la Matriz de Aceptación del Sistema (documentación de casos de prueba) | 2h |
+| 35 | Despliegue de la Plataforma Web en Producción a través del servicio cloud de Vercel | 2h |
+| 36 | Carga Masiva Inicial e indexación de los 50 artículos de mayor rotación comercial del negocio | 2h |
+| 37 | Instalación Física de Terminales y configuración de navegadores locales en los equipos del comercio | 1h |
+| 38 | Plan de Inducción Técnica y capacitación guiada al personal de mostrador | 2h |
+| 39 | Capacitación en Auditoría Financiera a la propietaria para la sustitución definitiva del cuaderno | 2h |
+| 40 | Evaluación de Impacto Real (tiempos de atención antes vs. después), recolección de firmas y cierre del informe | 3h |
 
 **Hito de la Fase V**: Sistema implantado formalmente y acta de conformidad firmada por la empresa.
 
