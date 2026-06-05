@@ -18,6 +18,9 @@ import {
 } from "lucide-react"
 
 import type { Database } from "@/types/database"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -100,10 +103,6 @@ function formatCurrency(value: number): string {
     currency: "MXN",
     minimumFractionDigits: 2,
   }).format(value)
-}
-
-function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(" ")
 }
 
 // ---------------------------------------------------------------------------
@@ -239,28 +238,32 @@ export function ProductTable({
     <div className="space-y-4">
       {/* ---- Viewer Notice ---- */}
       {isViewer && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800/30 dark:bg-amber-900/20 dark:text-amber-300">
-          <Eye className="size-4 shrink-0" />
-          <span>
-            Modo solo lectura — no puedes crear, editar ni eliminar productos.
-          </span>
-        </div>
+        <Alert>
+          <Eye className="size-4" />
+          <AlertTitle>Modo solo lectura</AlertTitle>
+          <AlertDescription>
+            No puedes crear, editar ni eliminar productos.
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* ---- Error Banner ---- */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          <AlertCircle className="size-4 shrink-0" />
-          <span className="flex-1">Error al cargar productos: {error}</span>
+        <>
+          <Alert variant="destructive">
+            <AlertCircle className="size-4" />
+            <AlertTitle>Error al cargar productos</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
           <Button
             variant="outline"
             size="sm"
             onClick={() => router.push("/products")}
           >
-            <RotateCcw className="mr-1 size-3" />
+            <RotateCcw data-icon="inline-start" />
             Reintentar
           </Button>
-        </div>
+        </>
       )}
 
       {/* ---- Toolbar ---- */}
@@ -311,7 +314,7 @@ export function ProductTable({
             }
             className={cn(
               "gap-2",
-              incluirInactivos && "border-primary text-primary",
+              incluirInactivos && "border-brand-accent text-brand-accent",
             )}
           >
             {incluirInactivos ? (
@@ -401,26 +404,17 @@ export function ProductTable({
                     </TableCell>
                     <TableCell>{product.unidad_medida}</TableCell>
                     <TableCell>
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-                          product.activo !== false
-                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400"
-                            : "bg-muted text-muted-foreground",
-                        )}
-                      >
-                        {product.activo !== false ? (
-                          <>
-                            <CheckCircle2 className="size-3" />
-                            Activo
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="size-3" />
-                            Inactivo
-                          </>
-                        )}
-                      </span>
+                      {product.activo !== false ? (
+                        <Badge variant="default">
+                          <CheckCircle2 data-icon="inline-start" />
+                          Activo
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">
+                          <XCircle data-icon="inline-start" />
+                          Inactivo
+                        </Badge>
+                      )}
                     </TableCell>
                     {isAdminOrSeller && (
                       <TableCell>
