@@ -11,6 +11,7 @@ import type { Database } from "@/types/database"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -129,7 +130,7 @@ export function ProductFormDialog({
           </div>
         )}
 
-        <form action={formAction} className="space-y-4">
+        <form action={formAction} className="flex flex-col gap-4">
           {/* Hidden ID for edit mode */}
           {mode === "edit" && (
             <input
@@ -141,7 +142,7 @@ export function ProductFormDialog({
 
           {/* Row 1: SKU + Nombre */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="sku">SKU</Label>
               <Input
                 id="sku"
@@ -156,7 +157,7 @@ export function ProductFormDialog({
               )}
             </div>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="nombre">Nombre</Label>
               <Input
                 id="nombre"
@@ -173,15 +174,15 @@ export function ProductFormDialog({
           </div>
 
           {/* Descripción */}
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="descripcion">Descripción</Label>
-            <textarea
+            <Textarea
               id="descripcion"
               name="descripcion"
               rows={3}
               placeholder="Descripción opcional del producto"
               defaultValue={fieldValue("descripcion")}
-              className="h-20 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1.5 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30"
+              className="h-20"
             />
             {state.errors?.descripcion && (
               <p className="text-xs text-destructive">
@@ -192,7 +193,7 @@ export function ProductFormDialog({
 
           {/* Row 2: Categoría + Unidad de Medida */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="categoria">Categoría</Label>
               <CategorySelect
                 defaultValue={fieldValue("categoria")}
@@ -200,7 +201,7 @@ export function ProductFormDialog({
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="unidad_medida">Unidad de Medida</Label>
               <UnidadSelect
                 defaultValue={fieldValue("unidad_medida")}
@@ -211,7 +212,7 @@ export function ProductFormDialog({
 
           {/* Row 3: Precio Venta + Precio Compra */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="precio_venta">Precio de Venta</Label>
               <Input
                 id="precio_venta"
@@ -229,7 +230,7 @@ export function ProductFormDialog({
               )}
             </div>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="precio_compra">Precio de Compra</Label>
               <Input
                 id="precio_compra"
@@ -250,7 +251,7 @@ export function ProductFormDialog({
 
           {/* Row 4: Stock Actual + Stock Mínimo */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="stock_actual">Stock Actual</Label>
               <Input
                 id="stock_actual"
@@ -267,7 +268,7 @@ export function ProductFormDialog({
               )}
             </div>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="stock_minimo">Stock Mínimo</Label>
               <Input
                 id="stock_minimo"
@@ -286,7 +287,7 @@ export function ProductFormDialog({
           </div>
 
           {/* Código de Barras */}
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <Label htmlFor="codigo_barras">Código de Barras</Label>
             <Input
               id="codigo_barras"
