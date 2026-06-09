@@ -107,3 +107,19 @@ export const productUpdateSchema = z
   )
 
 export type ProductUpdateInput = z.infer<typeof productUpdateSchema>
+
+// ---------------------------------------------------------------------------
+// Bulk Price Update Schema
+// ---------------------------------------------------------------------------
+
+export const bulkUpdatePricesSchema = z.object({
+  ids: z.array(z.string().uuid(), {
+    message: "Debe proporcionar al menos un ID válido",
+  }).min(1, "Debe seleccionar al menos un producto"),
+  porcentaje: z.coerce
+    .number({ message: "El porcentaje debe ser un número" })
+    .min(-99, "Mínimo -99%")
+    .max(1000, "Máximo 1000%"),
+})
+
+export type BulkUpdatePricesInput = z.infer<typeof bulkUpdatePricesSchema>

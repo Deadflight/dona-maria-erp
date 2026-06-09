@@ -1,6 +1,8 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { getSession } from "@/actions/auth"
+import { bulkUpdatePricesSchema } from "@/lib/validations/productos"
 import type { Database } from "@/types/database"
 
 type InventoryMovement = Database["public"]["Tables"]["inventory_movements"]["Row"]
@@ -105,4 +107,151 @@ export async function getMovementsByReference(
   }
 
   return { data, error: null }
+}
+
+// ---------------------------------------------------------------------------
+// Stock Alert Actions
+// ---------------------------------------------------------------------------
+
+export type StockAlertRow = Pick<
+  Database["public"]["Tables"]["productos"]["Row"],
+  "id" | "sku" | "nombre" | "categoria" | "stock_actual" | "stock_minimo" | "precio_venta" | "precio_compra" | "unidad_medida" | "activo" | "updated_at"
+>
+
+export type StockAlertResult = {
+  data: {
+    rows: StockAlertRow[]
+    total: number
+  } | null
+  error: string | null
+}
+
+/**
+ * Lists products where stock_actual <= stock_minimo (critical stock alerts).
+ * All authenticated roles (viewer+) can access.
+ *
+ * @param params.search    - Search term for nombre/sku ilike match
+ * @param params.categoria - Filter by exact category
+ * @param params.page      - Page number (default: 1)
+ * @param params.pageSize  - Items per page (default: 10)
+ * @param params.activo    - When explicitly `false`, shows all; otherwise alerts only
+ */
+export async function listStockAlerts(params: {
+  search?: string
+  categoria?: string
+  page?: number
+  pageSize?: number
+  activo?: boolean
+}): Promise<StockAlertResult> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.rpc("get_stock_alerts", {
+    ...(params.search ? { p_search: params.search } : {}),
+    ...(params.categoria ? { p_categoria: params.categoria } : {}),
+    p_page: params.page ?? 1,
+    p_page_size: params.pageSize ?? 10,
+    p_activo: params.activo !== false,
+  })
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  const result = (data ?? { rows: [], total: 0 }) as unknown as {
+    rows: StockAlertRow[]
+    total: number
+  }
+
+  return {
+    data: {
+      rows: result.rows ?? [],
+      total: result.total ?? 0,
+    },
+    error: null,
+  }
+}
+
+export type BulkPriceResult = {
+  data: { affected: number } | null
+  error: string | null
+}
+
+/**
+ * Updates precio_venta for multiple products by a percentage.
+ * Admin/seller only.
+ *
+ * @param ids        - Array of product UUIDs
+ * @param porcentaje - Percentage to adjust (-99 to 1000)
+ */
+export async function bulkUpdatePrices(
+  ids: string[],
+  porcentaje: number,
+): Promise<BulkPriceResult> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  if (session.data.role !== "admin" && session.data.role !== "seller") {
+    return { data: null, error: "FORBIDDEN" }
+  }
+
+  // -- Zod validation --------------------------------------------------------
+  const parsed = bulkUpdatePricesSchema.safeParse({ ids, porcentaje })
+  if (!parsed.success) {
+    const errors = parsed.error.flatten().fieldErrors
+    const messages: string[] = []
+    if (errors.ids) messages.push(...errors.ids)
+    if (errors.porcentaje) messages.push(...errors.porcentaje)
+    return { data: null, error: messages.join("; ") || "Datos inválidos" }
+  }
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.rpc("bulk_update_prices", {
+    p_ids: parsed.data.ids,
+    p_porcentaje: parsed.data.porcentaje,
+  })
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  const result = (data ?? { affected: 0 }) as unknown as { affected: number }
+
+  return {
+    data: { affected: result.affected ?? 0 },
+    error: null,
+  }
+}
+
+export type AlertCountResult = {
+  data: number | null
+  error: string | null
+}
+
+/**
+ * Returns the count of products with critically low stock (for nav badge).
+ * All authenticated roles can access.
+ */
+export async function getStockAlertCount(): Promise<AlertCountResult> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.rpc("get_stock_alert_count")
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  return { data: (data ?? 0) as number, error: null }
 }
