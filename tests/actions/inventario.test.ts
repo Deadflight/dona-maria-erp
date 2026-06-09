@@ -311,9 +311,9 @@ describe("inventario Server Actions", () => {
   })
 
   describe("bulkUpdatePrices", () => {
-    const validId = "00000000-0000-0000-0000-000000000001"
-    const validId2 = "00000000-0000-0000-0000-000000000002"
-    const validId3 = "00000000-0000-0000-0000-000000000003"
+    const validId = "11111111-1111-4111-8111-111111111111"
+    const validId2 = "22222222-2222-4222-8222-222222222222"
+    const validId3 = "33333333-3333-4333-8333-333333333333"
 
     it("returns UNAUTHORIZED when no session", async () => {
       mockNoSession()
@@ -404,14 +404,14 @@ describe("inventario Server Actions", () => {
       rpcResolveValue = { data: { affected: 2 }, error: null }
 
       await bulkUpdatePrices(
-        ["11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222"],
+        ["11111111-1111-4111-8111-111111111111", "22222222-2222-4222-8222-222222222222"],
         -25,
       )
 
       expect(mockRpc).toHaveBeenCalledWith("bulk_update_prices", {
         p_ids: [
-          "11111111-1111-1111-1111-111111111111",
-          "22222222-2222-2222-2222-222222222222",
+          "11111111-1111-4111-8111-111111111111",
+          "22222222-2222-4222-8222-222222222222",
         ],
         p_porcentaje: -25,
       })

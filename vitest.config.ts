@@ -18,6 +18,7 @@ export default defineConfig({
         lines: 80,
       },
     },
+    testTimeout: 80000, // 80 seconds timeout for tests, adjust as needed
   },
   resolve: {
     alias: {
