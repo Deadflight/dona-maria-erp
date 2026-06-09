@@ -639,6 +639,27 @@ export type Database = {
         }
         Returns: string
       }
+      get_stock_alerts: {
+        Args: {
+          p_search?: string
+          p_categoria?: string
+          p_page?: number
+          p_page_size?: number
+          p_activo?: boolean
+        }
+        Returns: Json
+      }
+      bulk_update_prices: {
+        Args: {
+          p_ids: string[]
+          p_porcentaje: number
+        }
+        Returns: Json
+      }
+      get_stock_alert_count: {
+        Args: Record<string, never>
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
