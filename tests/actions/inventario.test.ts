@@ -3,11 +3,20 @@ import { createClient } from "@/lib/supabase/server"
 import {
   listMovementsByProduct,
   getMovementsByReference,
+  listStockAlerts,
+  bulkUpdatePrices,
+  getStockAlertCount,
 } from "@/lib/supabase/actions/inventario"
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }))
+
+vi.mock("@/actions/auth", () => ({
+  getSession: vi.fn(),
+}))
+
+import { getSession } from "@/actions/auth"
 
 // ---------------------------------------------------------------------------
 // Mock Supabase chain builders
@@ -19,6 +28,12 @@ const mockProfilesSingle = vi.fn()
 /** Assign this before each test to control the resolved value of the movements chain. */
 let movementsResolveValue: { data: unknown; error: unknown } = {
   data: [],
+  error: null,
+}
+
+/** Assign this before each test to control the resolved value of rpc(). */
+let rpcResolveValue: { data: unknown; error: unknown } = {
+  data: null,
   error: null,
 }
 
@@ -38,6 +53,10 @@ const mockProfilesChain: Record<string, unknown> = {
   single: mockProfilesSingle,
 }
 
+const mockRpc = vi.fn(() => ({
+  then: (resolve: (v: typeof rpcResolveValue) => void) => resolve(rpcResolveValue),
+}))
+
 const mockFrom = vi.fn((table: string) => {
   if (table === "profiles") return mockProfilesChain
   return mockMovementsChain
@@ -46,6 +65,27 @@ const mockFrom = vi.fn((table: string) => {
 const mockSupabase = {
   auth: { getUser: mockGetUser },
   from: mockFrom,
+  rpc: mockRpc,
+}
+
+// ---------------------------------------------------------------------------
+// Session helpers
+// ---------------------------------------------------------------------------
+
+function mockSession(role: "admin" | "seller" | "viewer" = "admin") {
+  vi.mocked(getSession).mockResolvedValue({
+    data: {
+      id: "user-1",
+      email: "test@example.com",
+      role,
+      fullName: "Test User",
+      isActive: true,
+    },
+  })
+}
+
+function mockNoSession() {
+  vi.mocked(getSession).mockResolvedValue({ data: null })
 }
 
 // ---------------------------------------------------------------------------
@@ -56,6 +96,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(createClient).mockResolvedValue(mockSupabase as never)
   movementsResolveValue = { data: [], error: null }
+  rpcResolveValue = { data: null, error: null }
 })
 
 // ---------------------------------------------------------------------------
@@ -174,6 +215,254 @@ describe("inventario Server Actions", () => {
       const result = await getMovementsByReference("venta", "ref-1")
 
       expect(result).toEqual({ data: null, error: "Query failed" })
+    })
+  })
+
+  describe("listStockAlerts", () => {
+    it("returns UNAUTHORIZED when no session", async () => {
+      mockNoSession()
+
+      const result = await listStockAlerts({})
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(getSession).toHaveBeenCalledOnce()
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("returns paginated stock alerts with defaults", async () => {
+      mockSession()
+      const expectedRows = [
+        { id: "p1", nombre: "Producto A", stock_actual: 5, stock_minimo: 10 },
+      ]
+      rpcResolveValue = { data: { rows: expectedRows, total: 1 }, error: null }
+
+      const result = await listStockAlerts({})
+
+      expect(result.error).toBeNull()
+      expect(result.data?.rows).toEqual(expectedRows)
+      expect(result.data?.total).toBe(1)
+      expect(mockRpc).toHaveBeenCalledWith("get_stock_alerts", {
+        p_page: 1,
+        p_page_size: 10,
+        p_activo: true,
+      })
+    })
+
+    it("passes search, category, page, and pageSize", async () => {
+      mockSession()
+      rpcResolveValue = { data: { rows: [], total: 0 }, error: null }
+
+      await listStockAlerts({
+        search: "arroz",
+        categoria: "abarrotes",
+        page: 2,
+        pageSize: 25,
+      })
+
+      expect(mockRpc).toHaveBeenCalledWith("get_stock_alerts", {
+        p_search: "arroz",
+        p_categoria: "abarrotes",
+        p_page: 2,
+        p_page_size: 25,
+        p_activo: true,
+      })
+    })
+
+    it("omits search/categoria keys when not provided", async () => {
+      mockSession()
+      rpcResolveValue = { data: { rows: [], total: 0 }, error: null }
+
+      await listStockAlerts({ page: 1 })
+
+      // p_search and p_categoria must NOT be in the call
+      const callArgs = mockRpc.mock.calls[0][1]
+      expect(callArgs).not.toHaveProperty("p_search")
+      expect(callArgs).not.toHaveProperty("p_categoria")
+    })
+
+    it("sets p_activo to false when activo is explicitly false", async () => {
+      mockSession()
+      rpcResolveValue = { data: { rows: [], total: 0 }, error: null }
+
+      await listStockAlerts({ activo: false })
+
+      expect(mockRpc).toHaveBeenCalledWith("get_stock_alerts", expect.objectContaining({
+        p_activo: false,
+      }))
+    })
+
+    it("returns empty result when RPC returns null data", async () => {
+      mockSession()
+      rpcResolveValue = { data: null, error: null }
+
+      const result = await listStockAlerts({})
+
+      expect(result).toEqual({ data: { rows: [], total: 0 }, error: null })
+    })
+
+    it("returns error when RPC call fails", async () => {
+      mockSession()
+      rpcResolveValue = { data: null, error: { message: "RPC error" } }
+
+      const result = await listStockAlerts({})
+
+      expect(result).toEqual({ data: null, error: "RPC error" })
+    })
+  })
+
+  describe("bulkUpdatePrices", () => {
+    const validId = "00000000-0000-0000-0000-000000000001"
+    const validId2 = "00000000-0000-0000-0000-000000000002"
+    const validId3 = "00000000-0000-0000-0000-000000000003"
+
+    it("returns UNAUTHORIZED when no session", async () => {
+      mockNoSession()
+
+      const result = await bulkUpdatePrices([validId], 10)
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("allows admin role", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: { affected: 3 }, error: null }
+
+      const result = await bulkUpdatePrices([validId, validId2, validId3], 15)
+
+      expect(result).toEqual({ data: { affected: 3 }, error: null })
+    })
+
+    it("allows seller role", async () => {
+      mockSession("seller")
+      rpcResolveValue = { data: { affected: 1 }, error: null }
+
+      const result = await bulkUpdatePrices([validId], 10)
+
+      expect(result).toEqual({ data: { affected: 1 }, error: null })
+    })
+
+    it("returns FORBIDDEN for viewer role", async () => {
+      mockSession("viewer")
+
+      const result = await bulkUpdatePrices([validId], 10)
+
+      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("rejects empty ids array via Zod", async () => {
+      mockSession("admin")
+
+      const result = await bulkUpdatePrices([], 10)
+
+      expect(result).toEqual({
+        data: null,
+        error: expect.stringContaining("al menos"),
+      })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("rejects ids with invalid UUIDs via Zod", async () => {
+      mockSession("admin")
+
+      const result = await bulkUpdatePrices(["not-a-uuid"], 10)
+
+      expect(result).toEqual({
+        data: null,
+        error: "Invalid UUID",
+      })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("rejects porcentaje below -99", async () => {
+      mockSession("admin")
+
+      const result = await bulkUpdatePrices([validId], -100)
+
+      expect(result).toEqual({
+        data: null,
+        error: expect.stringContaining("Mínimo"),
+      })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("rejects porcentaje above 1000", async () => {
+      mockSession("admin")
+
+      const result = await bulkUpdatePrices([validId], 1001)
+
+      expect(result).toEqual({
+        data: null,
+        error: expect.stringContaining("Máximo"),
+      })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("calls RPC with correct args after Zod validation", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: { affected: 2 }, error: null }
+
+      await bulkUpdatePrices(
+        ["11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222"],
+        -25,
+      )
+
+      expect(mockRpc).toHaveBeenCalledWith("bulk_update_prices", {
+        p_ids: [
+          "11111111-1111-1111-1111-111111111111",
+          "22222222-2222-2222-2222-222222222222",
+        ],
+        p_porcentaje: -25,
+      })
+    })
+
+    it("returns error when RPC call fails", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: null, error: { message: "Bulk update failed" } }
+
+      const result = await bulkUpdatePrices([validId], 10)
+
+      expect(result).toEqual({ data: null, error: "Bulk update failed" })
+    })
+  })
+
+  describe("getStockAlertCount", () => {
+    it("returns UNAUTHORIZED when no session", async () => {
+      mockNoSession()
+
+      const result = await getStockAlertCount()
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("returns the count from RPC", async () => {
+      mockSession()
+      rpcResolveValue = { data: 7, error: null }
+
+      const result = await getStockAlertCount()
+
+      expect(result).toEqual({ data: 7, error: null })
+      expect(mockRpc).toHaveBeenCalledWith("get_stock_alert_count")
+    })
+
+    it("returns 0 when RPC returns null data", async () => {
+      mockSession()
+      rpcResolveValue = { data: null, error: null }
+
+      const result = await getStockAlertCount()
+
+      expect(result).toEqual({ data: 0, error: null })
+    })
+
+    it("returns error when RPC call fails", async () => {
+      mockSession()
+      rpcResolveValue = { data: null, error: { message: "Count failed" } }
+
+      const result = await getStockAlertCount()
+
+      expect(result).toEqual({ data: null, error: "Count failed" })
     })
   })
 })
