@@ -11,6 +11,10 @@ vi.mock("next/navigation", () => ({
   redirect: mockRedirect,
 }))
 
+vi.mock("@/lib/supabase/actions/inventario", () => ({
+  getStockAlertCount: vi.fn().mockResolvedValue({ data: 5, error: null }),
+}))
+
 import DashboardLayout from "@/app/(dashboard)/layout"
 
 describe("DashboardLayout", () => {
