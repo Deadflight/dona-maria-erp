@@ -97,8 +97,7 @@ declare
 begin
   -- Validate percentage range
   if p_porcentaje < -99 or p_porcentaje > 1000 then
-    raise exception 'Porcentaje fuera de rango: debe estar entre -99 y 1000'
-      using hint = 'El porcentaje recibido fue %', p_porcentaje;
+    raise exception 'Porcentaje fuera de rango: debe estar entre -99 y 1000. Recibido: %', p_porcentaje;
   end if;
 
   -- Atomic bulk update
