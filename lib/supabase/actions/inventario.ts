@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getSession } from "@/actions/auth"
 import { bulkUpdatePricesSchema } from "@/lib/validations/productos"
 import type { Database } from "@/types/database"
+import type { ReceiptListResult } from "@/lib/supabase/actions/compras"
 
 type InventoryMovement = Database["public"]["Tables"]["inventory_movements"]["Row"]
 
@@ -254,4 +255,20 @@ export async function getStockAlertCount(): Promise<AlertCountResult> {
   }
 
   return { data: (data ?? 0) as number, error: null }
+}
+
+// ---------------------------------------------------------------------------
+// Dashboard KPI Actions
+// ---------------------------------------------------------------------------
+
+export type DashboardKPIs = {
+  totalProductos: number
+  alertasStock: number
+  valorInventario: number
+  ultimasRecepciones: ReceiptListResult["data"]
+}
+
+export type DashboardResult = {
+  data: DashboardKPIs | null
+  error: string | null
 }
