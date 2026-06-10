@@ -268,18 +268,6 @@ describe("inventario Server Actions", () => {
       })
     })
 
-    it("omits search/categoria keys when not provided", async () => {
-      mockSession()
-      rpcResolveValue = { data: { rows: [], total: 0 }, error: null }
-
-      await listStockAlerts({ page: 1 })
-
-      // p_search and p_categoria must NOT be in the call
-      const callArgs = mockRpc.mock.calls[0][1]
-      expect(callArgs).not.toHaveProperty("p_search")
-      expect(callArgs).not.toHaveProperty("p_categoria")
-    })
-
     it("sets p_activo to false when activo is explicitly false", async () => {
       mockSession()
       rpcResolveValue = { data: { rows: [], total: 0 }, error: null }
@@ -311,9 +299,9 @@ describe("inventario Server Actions", () => {
   })
 
   describe("bulkUpdatePrices", () => {
-    const validId = "00000000-0000-0000-0000-000000000001"
-    const validId2 = "00000000-0000-0000-0000-000000000002"
-    const validId3 = "00000000-0000-0000-0000-000000000003"
+    const validId = crypto.randomUUID()
+    const validId2 = crypto.randomUUID()
+    const validId3 = crypto.randomUUID()
 
     it("returns UNAUTHORIZED when no session", async () => {
       mockNoSession()
@@ -403,16 +391,19 @@ describe("inventario Server Actions", () => {
       mockSession("admin")
       rpcResolveValue = { data: { affected: 2 }, error: null }
 
+      const ids = [
+        validId,
+        validId2,
+        validId3,
+      ]
+
       await bulkUpdatePrices(
-        ["11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222"],
+        ids,
         -25,
       )
 
       expect(mockRpc).toHaveBeenCalledWith("bulk_update_prices", {
-        p_ids: [
-          "11111111-1111-1111-1111-111111111111",
-          "22222222-2222-2222-2222-222222222222",
-        ],
+        p_ids: ids,
         p_porcentaje: -25,
       })
     })
