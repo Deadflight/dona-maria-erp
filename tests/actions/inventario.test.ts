@@ -1,13 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { createClient } from "@/lib/supabase/server"
-import {
-  listMovementsByProduct,
-  getMovementsByReference,
-  listStockAlerts,
-  bulkUpdatePrices,
-  getStockAlertCount,
-} from "@/lib/supabase/actions/inventario"
-
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
 }))
@@ -16,7 +8,20 @@ vi.mock("@/actions/auth", () => ({
   getSession: vi.fn(),
 }))
 
+vi.mock("@/lib/supabase/actions/compras", () => ({
+  listReceipts: vi.fn(),
+}))
+
 import { getSession } from "@/actions/auth"
+import { listReceipts } from "@/lib/supabase/actions/compras"
+import {
+  listMovementsByProduct,
+  getMovementsByReference,
+  listStockAlerts,
+  bulkUpdatePrices,
+  getStockAlertCount,
+  getDashboardKPIs,
+} from "@/lib/supabase/actions/inventario"
 
 // ---------------------------------------------------------------------------
 // Mock Supabase chain builders
@@ -53,12 +58,53 @@ const mockProfilesChain: Record<string, unknown> = {
   single: mockProfilesSingle,
 }
 
+/** Control value for count query on productos (SELECT count, head: true). */
+let productosCountResolve: {
+  count: number | null
+  data: null
+  error: unknown
+} = { count: 0, data: null, error: null }
+
+/** Control value for data query on productos (stock_actual, precio_compra). */
+let productosDataResolve: {
+  data: Array<{ stock_actual: number; precio_compra: number | null }> | null
+  error: unknown
+} = { data: [], error: null }
+
+/**
+ * Query chain for productos table. The .select() method inspects whether the
+ * caller passed { count: "exact", head: true } to distinguish the COUNT query
+ * from the data (stock_actual, precio_compra) query, and resolves accordingly.
+ */
+const mockProductosChain: Record<string, unknown> = {
+  select: vi.fn(
+    (_selection?: string, opts?: Record<string, unknown>) => {
+      const isCountQuery =
+        opts?.count === "exact" && opts?.head === true
+      return {
+        eq: vi.fn(() => ({
+          then: (
+            resolve: (v: unknown) => void,
+          ) => {
+            resolve(
+              isCountQuery
+                ? productosCountResolve
+                : productosDataResolve,
+            )
+          },
+        })),
+      }
+    },
+  ),
+}
+
 const mockRpc = vi.fn(() => ({
   then: (resolve: (v: typeof rpcResolveValue) => void) => resolve(rpcResolveValue),
 }))
 
 const mockFrom = vi.fn((table: string) => {
   if (table === "profiles") return mockProfilesChain
+  if (table === "productos") return mockProductosChain
   return mockMovementsChain
 })
 
@@ -97,6 +143,8 @@ beforeEach(() => {
   vi.mocked(createClient).mockResolvedValue(mockSupabase as never)
   movementsResolveValue = { data: [], error: null }
   rpcResolveValue = { data: null, error: null }
+  productosCountResolve = { count: 0, data: null, error: null }
+  productosDataResolve = { data: [], error: null }
 })
 
 // ---------------------------------------------------------------------------
@@ -454,6 +502,137 @@ describe("inventario Server Actions", () => {
       const result = await getStockAlertCount()
 
       expect(result).toEqual({ data: null, error: "Count failed" })
+    })
+  })
+
+  describe("getDashboardKPIs", () => {
+    it("returns UNAUTHORIZED when no session", async () => {
+      mockNoSession()
+
+      const result = await getDashboardKPIs()
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(getSession).toHaveBeenCalledOnce()
+    })
+
+    it("returns FORBIDDEN for non-admin role", async () => {
+      mockSession("seller")
+
+      const result = await getDashboardKPIs()
+
+      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
+    })
+
+    it("returns FORBIDDEN for viewer role", async () => {
+      mockSession("viewer")
+
+      const result = await getDashboardKPIs()
+
+      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
+    })
+
+    it("returns correct aggregate values for admin", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: 3, error: null }
+      productosCountResolve = { count: 10, data: null, error: null }
+      productosDataResolve = {
+        data: [
+          { stock_actual: 5, precio_compra: 100 },
+          { stock_actual: 3, precio_compra: 50 },
+        ],
+        error: null,
+      }
+      const mockReceipts = [
+        {
+          id: "rec-1",
+          numero_recepcion: "REC-001",
+          proveedor_id: "prov-1",
+          created_by: "user-1",
+          created_at: "2026-06-10T00:00:00Z",
+          observaciones: null,
+          proveedores: { nombre: "Proveedor A", ruc: null },
+          created_by_profiles: { full_name: "Test User" },
+        },
+      ]
+      vi.mocked(listReceipts).mockResolvedValue({
+        data: mockReceipts,
+        error: null,
+      })
+
+      const result = await getDashboardKPIs()
+
+      expect(result.error).toBeNull()
+      expect(result.data).not.toBeNull()
+      expect(result.data?.totalProductos).toBe(10)
+      expect(result.data?.alertasStock).toBe(3)
+      expect(result.data?.valorInventario).toBe(650) // 5*100 + 3*50
+      expect(result.data?.ultimasRecepciones).toEqual(mockReceipts)
+    })
+
+    it("handles NULL precio_compra via COALESCE to 0", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: 2, error: null }
+      productosCountResolve = { count: 5, data: null, error: null }
+      productosDataResolve = {
+        data: [
+          { stock_actual: 10, precio_compra: null },
+          { stock_actual: 4, precio_compra: 25 },
+        ],
+        error: null,
+      }
+      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+
+      const result = await getDashboardKPIs()
+
+      expect(result.error).toBeNull()
+      expect(result.data?.valorInventario).toBe(100) // 10*0 + 4*25
+    })
+
+    it("returns zero values for empty inventory", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: 0, error: null }
+      productosCountResolve = { count: 0, data: null, error: null }
+      productosDataResolve = { data: [], error: null }
+      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+
+      const result = await getDashboardKPIs()
+
+      expect(result.error).toBeNull()
+      expect(result.data?.totalProductos).toBe(0)
+      expect(result.data?.alertasStock).toBe(0)
+      expect(result.data?.valorInventario).toBe(0)
+      expect(result.data?.ultimasRecepciones).toEqual([])
+    })
+
+    it("returns error when count query fails", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: 0, error: null }
+      productosCountResolve = {
+        count: null,
+        data: null,
+        error: { message: "Count query failed" },
+      }
+      productosDataResolve = { data: [], error: null }
+      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+
+      const result = await getDashboardKPIs()
+
+      expect(result).toEqual({ data: null, error: "Count query failed" })
+    })
+
+    it("returns error when value query fails", async () => {
+      mockSession("admin")
+      rpcResolveValue = { data: 0, error: null }
+      productosCountResolve = { count: 0, data: null, error: null }
+      productosDataResolve = {
+        data: null,
+        error: { message: "Value query failed" },
+      }
+      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+
+      const result = await getDashboardKPIs()
+
+      expect(result).toEqual({ data: null, error: "Value query failed" })
     })
   })
 })
