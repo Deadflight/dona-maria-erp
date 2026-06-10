@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getSession } from "@/actions/auth"
 import { bulkUpdatePricesSchema } from "@/lib/validations/productos"
 import type { Database } from "@/types/database"
+import { listReceipts } from "@/lib/supabase/actions/compras"
 import type { ReceiptListResult } from "@/lib/supabase/actions/compras"
 
 type InventoryMovement = Database["public"]["Tables"]["inventory_movements"]["Row"]
@@ -271,4 +272,76 @@ export type DashboardKPIs = {
 export type DashboardResult = {
   data: DashboardKPIs | null
   error: string | null
+}
+
+/**
+ * Returns aggregate inventory KPIs for the admin dashboard. Runs 4 parallel
+ * queries: active product count, stock alert count, inventory value via
+ * SUM(stock_actual * COALESCE(precio_compra, 0)), and the 5 most recent
+ * purchase receipts. Admin-only gate via session role check.
+ */
+export async function getDashboardKPIs(): Promise<DashboardResult> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  if (session.data.role !== "admin") {
+    return { data: null, error: "FORBIDDEN" }
+  }
+
+  const supabase = await createClient()
+
+  // -- Parallel queries -------------------------------------------------------
+  const [countResult, valueResult, alertCount, recentReceipts] =
+    await Promise.all([
+      supabase
+        .from("productos")
+        .select("*", { count: "exact", head: true })
+        .eq("activo", true),
+      supabase
+        .from("productos")
+        .select("stock_actual, precio_compra")
+        .eq("activo", true),
+      getStockAlertCount(),
+      listReceipts(5),
+    ])
+
+  // -- Error checks -----------------------------------------------------------
+  if (countResult.error) {
+    return { data: null, error: countResult.error.message }
+  }
+
+  if (valueResult.error) {
+    return { data: null, error: valueResult.error.message }
+  }
+
+  if (alertCount.error) {
+    return { data: null, error: alertCount.error }
+  }
+
+  if (recentReceipts.error) {
+    return { data: null, error: recentReceipts.error }
+  }
+
+  // -- Aggregate --------------------------------------------------------------
+  const productos = (valueResult.data ?? []) as Array<{
+    stock_actual: number
+    precio_compra: number | null
+  }>
+
+  const valorInventario = productos.reduce(
+    (sum, row) => sum + (row.stock_actual ?? 0) * (row.precio_compra ?? 0),
+    0,
+  )
+
+  return {
+    data: {
+      totalProductos: countResult.count ?? 0,
+      alertasStock: alertCount.data ?? 0,
+      valorInventario,
+      ultimasRecepciones: recentReceipts.data ?? [],
+    },
+    error: null,
+  }
 }
