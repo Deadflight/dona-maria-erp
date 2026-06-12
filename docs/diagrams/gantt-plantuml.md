@@ -13,57 +13,32 @@ gantt
     weekend saturday
 
     section Fase I: Diagnóstico Operativo (Días 1-8)
-    Auditoría procesos mostrador :crit, a1, 2026-05-16, 1d
-    Mapeo canales comunicación :crit, a2, after a1, 1d
-    Auditoría conciliación financiera :crit, a3, after a2, 1d
-    Evaluación pérdidas desabastecimiento :crit, a4, after a3, 1d
-    Modelado reglas negocio especiales :crit, a5, after a4, 1d
-    Formalización diagnóstico situacional :crit, a6, after a5, 1d
-    Definición objetivos y alcance MVP :crit, a7, after a6, 1d
-    Matriz factibilidad integral :crit, a8, after a7, 1d
-    ◆ Diagnóstico validado :milestone, m1, after a8, 0d
+    Auditoría de procesos :crit, f1a, 2026-05-16, 2d
+    Modelado reglas de negocio :crit, f1b, after f1a, 3d
+    Formalización diagnóstico y alcance :crit, f1c, after f1b, 3d
+    ◆ Diagnóstico validado :milestone, m1, after f1c, 0d
 
-    section Fase II: Rediseño de Procesos (Días 9-16)
-    Rediseño flujo procesos mostrador :crit, a9, after m1, 1d
-    Modelado datos productos fraccionados :crit, a10, after a9, 1d
-    Estructuración modelo relacional financiero :crit, a11, after a10, 1d
-    Diagramas UML (Casos de Uso, DER) :crit, a12, after a11, 1d
-    Parametrización entorno cloud Supabase :crit, a13, after a12, 1d
-    Inicialización infraestructura Next.js :crit, a14, after a13, 1d
-    Setup sistema diseño Tailwind + shadcn :crit, a15, after a14, 1d
-    Pruebas integración y conectividad :crit, a16, after a15, 1d
-    ◆ Arquitectura aprobada :milestone, m2, after a16, 0d
+    section Fase II: Rediseño y Modelado (Días 9-16)
+    Rediseño de flujos :crit, f2a, after m1, 2d
+    Modelado datos y UML :crit, f2b, after f2a, 3d
+    Configuración stack tecnológico :crit, f2c, after f2b, 3d
+    ◆ Arquitectura aprobada :milestone, m2, after f2c, 0d
 
-    section Fase III: Control de Inventario (Días 17-24)
-    Panel gestión administrativa inventario :crit, a17, after m2, 1d
-    Sub-módulo alertas stock crítico :crit, a18, after a17, 1d
-    Algoritmo actualización masiva precios :crit, a19, after a18, 1d
-    Interfaz recepción y registro mercancía :crit, a20, after a19, 1d
-    Restricciones y validaciones servidor :crit, a21, after a20, 1d
-    Procesamiento numérico fraccionado :crit, a22, after a21, 1d
-    Simulación carga datos históricos :crit, a23, after a22, 1d
-    Documentación técnica arquitectura stock :crit, a24, after a23, 1d
-    ◆ Módulo inventario operativo :milestone, m3, after a24, 0d
+    section Fase III: Control de Inventarios (Días 17-24)
+    Panel gestión de inventario :crit, f3a, after m2, 3d
+    Alertas stock y actualización precios :crit, f3b, after f3a, 3d
+    Recepción de mercancía :crit, f3c, after f3b, 2d
+    ◆ Módulo inventario operativo :milestone, m3, after f3c, 0d
 
     section Fase IV: Mostrador y Conciliación (Días 25-32)
-    Maquetado terminal ventas alta velocidad :crit, a25, after m3, 1d
-    Motor búsqueda predictiva mostrador :crit, a26, after a25, 1d
-    Automatización venta express :crit, a27, after a26, 1d
-    Calculador síncrono transacciones carrito :crit, a28, after a27, 1d
-    Disparador transaccional descuento stock :crit, a29, after a28, 1d
-    Módulo cierre financiero automatizado :crit, a30, after a29, 1d
-    Integración módulo notas de venta PDF :crit, a31, after a30, 1d
-    Pruebas estrés simulaciones cierre turnos :crit, a32, after a31, 1d
-    ◆ Motor transaccional estabilizado :milestone, m4, after a32, 0d
+    Terminal de ventas :crit, f4a, after m3, 3d
+    Cierre financiero automatizado :crit, f4b, after f4a, 3d
+    Notas de venta y pruebas :crit, f4c, after f4b, 2d
+    ◆ Motor transaccional estabilizado :milestone, m4, after f4c, 0d
 
     section Fase V: Validación e Implantación (Días 33-40)
-    Pruebas concurrencia multidispositivo :crit, a33, after m4, 1d
-    Matriz aceptación del sistema :crit, a34, after a33, 1d
-    Despliegue plataforma Vercel producción :crit, a35, after a34, 1d
-    Carga masiva inicial e indexación :crit, a36, after a35, 1d
-    Instalación y configuración navegadores :crit, a37, after a36, 1d
-    Inducción técnica y capacitación personal :crit, a38, after a37, 1d
-    Capacitación auditoría propietaria :crit, a39, after a38, 1d
-    Evaluación impacto real cierre informe :crit, a40, after a39, 1d
-    ◆ Sistema implantado y acta firmada :milestone, m5, after a40, 0d
+    Pruebas y matriz de aceptación :crit, f5a, after m4, 3d
+    Despliegue y carga de datos :crit, f5b, after f5a, 2d
+    Capacitación y evaluación impacto :crit, f5c, after f5b, 3d
+    ◆ Sistema implantado y acta firmada :milestone, m5, after f5c, 0d
 ```
