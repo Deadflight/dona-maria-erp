@@ -1,3 +1,30 @@
+## [1.3.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.2.0...v1.3.0) (2026-06-13)
+
+### Features
+
+* **api:** add stock alert RPCs, Zod validation, and Server Actions ([dceb656](https://github.com/Deadflight/dona-maria-erp/commit/dceb656c48359d0977b54e0e288f0a9346d3a237)), closes [#5](https://github.com/Deadflight/dona-maria-erp/issues/5)
+* **api:** add Zod schemas, Server Actions, and tests for productos CRUD ([0b3d53e](https://github.com/Deadflight/dona-maria-erp/commit/0b3d53ea51b6decd94500c4560ceb1c456adc960))
+* **compras:** add purchase receipt Server Actions ([4e6266d](https://github.com/Deadflight/dona-maria-erp/commit/4e6266d43dd5867c3efb2f07ece06778c4c9eed5)), closes [#24](https://github.com/Deadflight/dona-maria-erp/issues/24)
+* **dashboard:** add KPI cards component ([a7f4587](https://github.com/Deadflight/dona-maria-erp/commit/a7f4587031d3827be0a53f6e880fe00f70b69acf))
+* **dashboard:** add quick navigation component ([c87645b](https://github.com/Deadflight/dona-maria-erp/commit/c87645b2c26aa76b259925e1b3e6ddb8af22c0b8))
+* **dashboard:** add stock level table component ([17c2ed0](https://github.com/Deadflight/dona-maria-erp/commit/17c2ed001ef45d3f6e327fdba1d9302ac21606c6))
+* **dashboard:** create RSC page with admin gate and KPI fetch ([4189f3b](https://github.com/Deadflight/dona-maria-erp/commit/4189f3b4f56805e7641e6852ec9c03b65489bcda))
+* **db:** add migration for fractional quantities in detalles_venta ([1410df9](https://github.com/Deadflight/dona-maria-erp/commit/1410df95e135a56914356a9455a0795500b5e7d5))
+* Implement fractional quantities in sale details ([1be4694](https://github.com/Deadflight/dona-maria-erp/commit/1be46947d0a7ea1f5fdd2fa8dbb98359dce4f837))
+* **inventory:** add DashboardKPIs type ([b04c7c6](https://github.com/Deadflight/dona-maria-erp/commit/b04c7c662390281ca1d09f35c1bea8c073fc1054))
+* **inventory:** add stock alert badge to nav sidebar ([01d786d](https://github.com/Deadflight/dona-maria-erp/commit/01d786ded73babdaa3cfa9d39fe217fe928bb7e1))
+* **inventory:** implement getDashboardKPIs server action ([e07e071](https://github.com/Deadflight/dona-maria-erp/commit/e07e07168cc198e4ad1e31f9c9d2ebb14822e0f8))
+* **products:** add UI for products CRUD (table + form dialog) ([caa0bb8](https://github.com/Deadflight/dona-maria-erp/commit/caa0bb850232914144ed1188a7ba96a39a2c0cdc))
+* **stock-alerts:** finalizar ciclo SDD — verify, fix y archive ([fd932fc](https://github.com/Deadflight/dona-maria-erp/commit/fd932fc2b409f24f17cde1c57e39ca6f649ac946))
+
+### Bug Fixes
+
+* **bulk_update_prices:** improve error message for percentage range validation ([d3cbc74](https://github.com/Deadflight/dona-maria-erp/commit/d3cbc743046466c447a5c8465cba1ebf5a194300))
+* **db:** reorder function params in create_receipt_with_movements to meet PG requirement ([7341c28](https://github.com/Deadflight/dona-maria-erp/commit/7341c283b9004e0d612e4f920b9511a50061c54a))
+* **db:** update RLS policy in inventory_movements to use profiles/role after table rename ([fc19931](https://github.com/Deadflight/dona-maria-erp/commit/fc19931f533e315b263e204115cca4745004a8c6))
+* **products:** add shadcn CSS baseline and fix component usage ([6bb4303](https://github.com/Deadflight/dona-maria-erp/commit/6bb4303006e81b6e02e36ba3c4aaeb2edd838d6d))
+* **tests:** mock getStockAlertCount in layout test to prevent cookies() regression ([64a461a](https://github.com/Deadflight/dona-maria-erp/commit/64a461a763bf28b23f93a6896be721f2117c6f31))
+
 ## [1.2.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.1.0...v1.2.0) (2026-06-02)
 
 ### Features
