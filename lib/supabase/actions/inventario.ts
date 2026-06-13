@@ -124,6 +124,8 @@ export type StockAlertResult = {
   data: {
     rows: StockAlertRow[]
     total: number
+    page: number
+    pageSize: number
   } | null
   error: string | null
 }
@@ -169,10 +171,15 @@ export async function listStockAlerts(params: {
     total: number
   }
 
+  const actualPage = params.page ?? 1
+  const actualPageSize = params.pageSize ?? 10
+
   return {
     data: {
       rows: result.rows ?? [],
       total: result.total ?? 0,
+      page: actualPage,
+      pageSize: actualPageSize,
     },
     error: null,
   }

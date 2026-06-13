@@ -92,7 +92,7 @@ export async function createReceipt(
     {
       p_numero_recepcion: data.numero_recepcion,
       p_proveedor_id: data.proveedor_id,
-      p_observaciones: data.observaciones ?? null,
+      p_observaciones: data.observaciones,
       p_items: data.items,
     },
   )
