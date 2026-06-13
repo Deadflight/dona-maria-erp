@@ -174,53 +174,6 @@ export type Database = {
           },
         ]
       }
-      inventory_movements: {
-        Row: {
-          id: string
-          producto_id: string
-          cantidad: number
-          tipo_movimiento: string
-          stock_resultante: number
-          referencia_tipo: string | null
-          referencia_id: string | null
-          motivo: string | null
-          created_by: string | null
-          created_at: string | null
-        }
-        Insert: {
-          id?: string
-          producto_id: string
-          cantidad: number
-          tipo_movimiento: string
-          stock_resultante: number
-          referencia_tipo?: string | null
-          referencia_id?: string | null
-          motivo?: string | null
-          created_by?: string | null
-          created_at?: string | null
-        }
-        Update: {
-          id?: string
-          producto_id?: string
-          cantidad?: number
-          tipo_movimiento?: string
-          stock_resultante?: number
-          referencia_tipo?: string | null
-          referencia_id?: string | null
-          motivo?: string | null
-          created_by?: string | null
-          created_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "inventory_movements_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "productos"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       detalles_venta: {
         Row: {
           cantidad: number
@@ -269,6 +222,53 @@ export type Database = {
           },
         ]
       }
+      inventory_movements: {
+        Row: {
+          cantidad: number
+          created_at: string
+          created_by: string | null
+          id: string
+          motivo: string | null
+          producto_id: string
+          referencia_id: string | null
+          referencia_tipo: string | null
+          stock_resultante: number
+          tipo_movimiento: string
+        }
+        Insert: {
+          cantidad: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          motivo?: string | null
+          producto_id: string
+          referencia_id?: string | null
+          referencia_tipo?: string | null
+          stock_resultante: number
+          tipo_movimiento: string
+        }
+        Update: {
+          cantidad?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          motivo?: string | null
+          producto_id?: string
+          referencia_id?: string | null
+          referencia_tipo?: string | null
+          stock_resultante?: number
+          tipo_movimiento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagos_venta: {
         Row: {
           banco: string | null
@@ -303,161 +303,6 @@ export type Database = {
             columns: ["venta_id"]
             isOneToOne: false
             referencedRelation: "ventas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string | null
-          full_name: string | null
-          id: string
-          is_active: boolean
-          role: "admin" | "seller" | "viewer"
-          updated_at: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string | null
-          full_name?: string | null
-          id: string
-          is_active?: boolean
-          role?: "admin" | "seller" | "viewer"
-          updated_at?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string | null
-          full_name?: string | null
-          id?: string
-          is_active?: boolean
-          role?: "admin" | "seller" | "viewer"
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      proveedores: {
-        Row: {
-          created_at: string | null
-          created_by: string | null
-          direccion: string | null
-          email: string | null
-          id: string
-          nombre: string
-          ruc: string | null
-          telefono: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by?: string | null
-          direccion?: string | null
-          email?: string | null
-          id?: string
-          nombre: string
-          ruc?: string | null
-          telefono?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string | null
-          direccion?: string | null
-          email?: string | null
-          id?: string
-          nombre?: string
-          ruc?: string | null
-          telefono?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "proveedores_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      purchase_receipts: {
-        Row: {
-          created_at: string | null
-          created_by: string
-          id: string
-          numero_recepcion: string
-          observaciones: string | null
-          proveedor_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          created_by: string
-          id?: string
-          numero_recepcion: string
-          observaciones?: string | null
-          proveedor_id: string
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string
-          id?: string
-          numero_recepcion?: string
-          observaciones?: string | null
-          proveedor_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "purchase_receipts_proveedor_id_fkey"
-            columns: ["proveedor_id"]
-            isOneToOne: false
-            referencedRelation: "proveedores"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "purchase_receipts_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      receipt_items: {
-        Row: {
-          cantidad_recibida: number
-          created_at: string | null
-          id: string
-          precio_compra: number
-          producto_id: string
-          recepcion_id: string
-        }
-        Insert: {
-          cantidad_recibida: number
-          created_at?: string | null
-          id?: string
-          precio_compra: number
-          producto_id: string
-          recepcion_id: string
-        }
-        Update: {
-          cantidad_recibida?: number
-          created_at?: string | null
-          id?: string
-          precio_compra?: number
-          producto_id?: string
-          recepcion_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "receipt_items_recepcion_id_fkey"
-            columns: ["recepcion_id"]
-            isOneToOne: false
-            referencedRelation: "purchase_receipts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "receipt_items_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "productos"
             referencedColumns: ["id"]
           },
         ]
@@ -512,6 +357,158 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          is_active: boolean
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          is_active?: boolean
+          role?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          is_active?: boolean
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      proveedores: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          direccion: string | null
+          email: string | null
+          id: string
+          nombre: string
+          ruc: string | null
+          telefono: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          direccion?: string | null
+          email?: string | null
+          id?: string
+          nombre: string
+          ruc?: string | null
+          telefono?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          direccion?: string | null
+          email?: string | null
+          id?: string
+          nombre?: string
+          ruc?: string | null
+          telefono?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proveedores_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_receipts: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          numero_recepcion: string
+          observaciones: string | null
+          proveedor_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          numero_recepcion: string
+          observaciones?: string | null
+          proveedor_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          numero_recepcion?: string
+          observaciones?: string | null
+          proveedor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_receipts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipts_proveedor_id_fkey"
+            columns: ["proveedor_id"]
+            isOneToOne: false
+            referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      receipt_items: {
+        Row: {
+          cantidad_recibida: number
+          created_at: string
+          id: string
+          precio_compra: number
+          producto_id: string
+          recepcion_id: string
+        }
+        Insert: {
+          cantidad_recibida: number
+          created_at?: string
+          id?: string
+          precio_compra: number
+          producto_id: string
+          recepcion_id: string
+        }
+        Update: {
+          cantidad_recibida?: number
+          created_at?: string
+          id?: string
+          precio_compra?: number
+          producto_id?: string
+          recepcion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receipt_items_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "receipt_items_recepcion_id_fkey"
+            columns: ["recepcion_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_receipts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasas_cambio: {
         Row: {
@@ -607,67 +604,57 @@ export type Database = {
     Views: {
       stock_from_movements: {
         Row: {
-          producto_id: string
-          stock_actual: number
-        }
-        Insert: {
-          [_ in never]: never
-        }
-        Update: {
-          [_ in never]: never
+          producto_id: string | null
+          stock_actual: number | null
         }
         Relationships: [
           {
             foreignKeyName: "inventory_movements_producto_id_fkey"
             columns: ["producto_id"]
             isOneToOne: false
-            referencedRelation: "inventory_movements"
-            referencedColumns: ["producto_id"]
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
           },
         ]
       }
     }
     Functions: {
-      record_inventory_movement: {
-        Args: {
-          p_producto_id: string
-          p_cantidad: number
-          p_tipo_movimiento: string
-          p_referencia_tipo?: string
-          p_referencia_id?: string
-          p_motivo?: string
-        }
-        Returns: string
-      }
-      get_stock_alerts: {
-        Args: {
-          p_search?: string
-          p_categoria?: string
-          p_page?: number
-          p_page_size?: number
-          p_activo?: boolean
-        }
-        Returns: Json
-      }
       bulk_update_prices: {
-        Args: {
-          p_ids: string[]
-          p_porcentaje: number
-        }
+        Args: { p_ids: string[]; p_porcentaje: number }
         Returns: Json
-      }
-      get_stock_alert_count: {
-        Args: Record<string, never>
-        Returns: number
       }
       create_receipt_with_movements: {
         Args: {
-          p_proveedor_id: string
           p_items: Json
-          p_numero_recepcion?: string | null
-          p_observaciones?: string | null
+          p_numero_recepcion?: string
+          p_observaciones?: string
+          p_proveedor_id: string
         }
         Returns: Json
+      }
+      generate_receipt_number: { Args: never; Returns: string }
+      get_stock_alert_count: { Args: never; Returns: number }
+      get_stock_alerts: {
+        Args: {
+          p_activo?: boolean
+          p_categoria?: string
+          p_page?: number
+          p_page_size?: number
+          p_search?: string
+        }
+        Returns: Json
+      }
+      get_user_role: { Args: never; Returns: string }
+      record_inventory_movement: {
+        Args: {
+          p_cantidad: number
+          p_motivo?: string
+          p_producto_id: string
+          p_referencia_id?: string
+          p_referencia_tipo?: string
+          p_tipo_movimiento: string
+        }
+        Returns: string
       }
     }
     Enums: {
@@ -804,3 +791,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

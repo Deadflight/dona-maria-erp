@@ -38,10 +38,10 @@ Chain strategy: stacked-to-main
 
 ## Phase 3: UI — Page and Components
 
-- [ ] 3.1 Create `app/(dashboard)/inventory/page.tsx` — RSC reading `searchParams`, calling `listStockAlerts`, passing `initialData` + `session` to client component
-- [ ] 3.2 Create `app/(dashboard)/inventory/_components/stock-alert-table.tsx` — client table with selectable checkboxes, debounced search, category filter, pagination, "Ajustar precios" button
-- [ ] 3.3 Create `app/(dashboard)/inventory/_components/bulk-price-dialog.tsx` — useActionState dialog with percentage input, price preview table, confirm/cancel
+- [x] 3.1 Create `app/(dashboard)/inventory/page.tsx` — RSC reading `searchParams`, calling `listStockAlerts`, passing `initialData` + `session` to client component
+- [x] 3.2 Create `app/(dashboard)/inventory/_components/stock-alert-table.tsx` — client table with selectable checkboxes, debounced search, category filter, pagination, "Ajustar precios" button
+- [x] 3.3 Create `app/(dashboard)/inventory/_components/bulk-price-dialog.tsx` — useActionState dialog with percentage input, price preview table, confirm/cancel
 
 ## Phase 4: Optional — Nav Badge (deferred)
 
-- [ ] 4.1 Update `app/(dashboard)/layout.tsx` — call `getStockAlertCount()` server-side, display badge on /inventory nav link
+- [x] 4.1 Update `app/(dashboard)/layout.tsx` — call `getStockAlertCount()` server-side, display badge on /inventory nav link

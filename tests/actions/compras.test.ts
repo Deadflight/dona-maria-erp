@@ -28,7 +28,7 @@ let receiptListResolveValue: { data: unknown; error: unknown } = {
  *  simultaneously. Methods return the chain itself for chaining. The .then()
  *  method enables await on the chain directly (listReceipts pattern). The
  *  .single mock is used as the terminal call in getReceiptById. */
-const mockReceiptsChain: Record<string, unknown> = {
+const mockReceiptsChain = {
   select: vi.fn(() => mockReceiptsChain),
   order: vi.fn(() => mockReceiptsChain),
   limit: vi.fn(() => mockReceiptsChain),

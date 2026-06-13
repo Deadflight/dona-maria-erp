@@ -236,7 +236,7 @@ import { z } from "zod"
 
 export const bulkPriceSchema = z.object({
   ids: z.array(z.string().uuid()).min(1, "Selecciona al menos un producto"),
-  porcentaje: z
+  porcentaje: z.coerce
     .number()
     .min(-99, "El porcentaje no puede ser menor a -99%")
     .max(1000, "El porcentaje no puede ser mayor a 1000%"),

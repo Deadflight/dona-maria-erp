@@ -32,17 +32,17 @@ Surface products where `stock_actual <= stock_minimo` with bulk price adjustment
 
 ### Requirement: REQ-STOCK-ALERTS-2 — Bulk Price Update
 
-**Description**: The system MUST adjust `precio_venta` by a percentage for selected product IDs in a single DB transaction. Admin/seller role required. Percentage range: [-100, 1000].
+**Description**: The system MUST adjust `precio_venta` by a percentage for selected product IDs in a single DB transaction. Admin/seller role required. Percentage range: [-99, 1000].
 
 **Formula**: `precio_venta = precio_venta * (1 + porcentaje/100)`
 
-**Returns**: `{ data: { updated: number } | null, error: string | null }`
+**Returns**: `{ data: { affected: number } | null, error: string | null }`
 
 #### Scenario: Successful bulk update
 
 - GIVEN 10 products with varying prices, authenticated admin
 - WHEN `bulkUpdatePrices([id1..id10], 10)` is called
-- THEN all 10 prices increase by 10% atomically, return `{ data: { updated: 10 } }`
+- THEN all 10 prices increase by 10% atomically, return `{ data: { affected: 10 } }`
 
 #### Scenario: Bulk update fails — forbidden role
 
@@ -54,7 +54,7 @@ Surface products where `stock_actual <= stock_minimo` with bulk price adjustment
 
 - GIVEN authenticated admin user
 - WHEN `bulkUpdatePrices([id1], -101)` is called
-- THEN return validation error (percentage outside [-100, 1000])
+- THEN return validation error (percentage outside [-99, 1000])
 
 ### Requirement: REQ-STOCK-ALERTS-3 — Stock Alerts UI
 
