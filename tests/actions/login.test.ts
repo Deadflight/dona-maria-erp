@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/types/database"
 import { createMockProfile } from "@/tests/utils/supabase-mock"
+
+// Mock shape: only the methods exercised by `login()`. Keeping it narrow
+// makes the mock contract explicit and avoids drift if the real client grows.
+type LoginSupabaseMock = {
+  auth: Pick<SupabaseClient<Database>["auth"], "signInWithPassword" | "signOut">
+  from: ReturnType<typeof vi.fn>
+}
 
 const mockSignInWithPassword = vi.hoisted(() => vi.fn())
 const mockSignOut = vi.hoisted(() => vi.fn())
@@ -13,7 +22,7 @@ const mockSupabase = vi.hoisted(
     ({
       auth: { signInWithPassword: mockSignInWithPassword, signOut: mockSignOut },
       from: mockFrom,
-    }) as any
+    }) satisfies LoginSupabaseMock
 )
 
 vi.mock("@/lib/supabase/server", () => ({

@@ -4,7 +4,13 @@
 // Imports
 // ---------------------------------------------------------------------------
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react"
 import { useRouter } from "next/navigation"
 import { useActionState } from "react"
 import {
@@ -91,8 +97,6 @@ const CATEGORIES = [
   "Ferretería General",
 ]
 
-const ITEMS_PER_PAGE = 10
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -126,8 +130,18 @@ export function ProductTable({
   const incluirInactivos = searchParams.incluirInactivos === "true"
 
   // --- Search input (debounced) ---
-  const [searchInput, setSearchInput] = useState(search)
+  // The input is controlled by the URL (`search`) — no local state.
+  // We debounce the user's typing and only push to the router when the value
+  // actually differs from what's already in the URL. This avoids the
+  // cascading-render anti-pattern flagged by `react-hooks/set-state-in-effect`.
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
+
+  // Cleanup pending debounce on unmount.
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
 
   const pushSearchParams = useCallback(
     (overrides: Record<string, string | undefined>) => {
@@ -156,24 +170,15 @@ export function ProductTable({
     [router, search, categoria, currentPage, incluirInactivos],
   )
 
-  // Debounce search input → router.push
-  useEffect(() => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      if (searchInput !== search) {
-        pushSearchParams({ search: searchInput || "", page: "1" })
+      if (value !== search) {
+        pushSearchParams({ search: value, page: "1" })
       }
     }, 300)
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchInput])
-
-  // Sync external search param to input when it changes via browser nav
-  useEffect(() => {
-    setSearchInput(search)
-  }, [search])
+  }
 
   // --- Toggle confirm state ---
   const [confirmProduct, setConfirmProduct] = useState<{
@@ -273,8 +278,8 @@ export function ProductTable({
           <div className="relative">
             <Input
               placeholder="Buscar por SKU o nombre..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              value={search}
+              onChange={handleSearchChange}
               className="w-64"
             />
           </div>

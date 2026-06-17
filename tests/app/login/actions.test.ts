@@ -7,7 +7,6 @@ vi.mock("@/actions/auth", () => ({
 }))
 
 import { loginAction } from "@/app/login/actions"
-import type { LoginState } from "@/app/login/actions"
 
 describe("loginAction", () => {
   beforeEach(() => {

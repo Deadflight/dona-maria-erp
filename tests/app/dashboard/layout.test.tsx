@@ -69,7 +69,9 @@ describe("DashboardLayout", () => {
       },
     })
 
-    const result = await DashboardLayout({ children: <div>Content</div> }) as any
+    const result = (await DashboardLayout({
+      children: <div>Content</div>,
+    })) as unknown as React.ReactElement
 
     expect(result).toBeDefined()
     // Children should be somewhere in the rendered output

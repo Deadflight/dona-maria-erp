@@ -15,7 +15,7 @@ const mockMiddlewareClient = vi.hoisted(() =>
         }),
       }),
     },
-    response: {} as any,
+    response: {} as Response,
   })
 )
 
@@ -24,13 +24,7 @@ vi.mock("@/lib/supabase/middleware", () => ({
 }))
 
 import { proxy, proxyConfig } from "@/proxy"
-
-function mockRequest(pathname: string): any {
-  return {
-    nextUrl: { pathname },
-    url: "http://localhost:3000",
-  }
-}
+import { createMockRequest } from "@/tests/utils/request-mock"
 
 describe("proxyConfig", () => {
   it("should export proxyConfig with matcher for dashboard and login", () => {
@@ -47,7 +41,7 @@ describe("proxy", () => {
   it("should redirect to /login when accessing /dashboard without session", async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
 
-    const result = await proxy(mockRequest("/dashboard"))
+    const result = await proxy(createMockRequest("/dashboard"))
 
     expect(result).toBeInstanceOf(Response)
     expect(result!.status).toBe(307)
@@ -58,7 +52,7 @@ describe("proxy", () => {
   it("should redirect to /login when accessing nested dashboard route without session", async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
 
-    const result = await proxy(mockRequest("/dashboard/products"))
+    const result = await proxy(createMockRequest("/dashboard/products"))
 
     expect(result).toBeInstanceOf(Response)
     expect(result!.status).toBe(307)
@@ -76,7 +70,7 @@ describe("proxy", () => {
       error: null,
     })
 
-    const result = await proxy(mockRequest("/login"))
+    const result = await proxy(createMockRequest("/login"))
 
     expect(result).toBeInstanceOf(Response)
     expect(result!.status).toBe(307)
@@ -94,7 +88,7 @@ describe("proxy", () => {
       error: null,
     })
 
-    const result = await proxy(mockRequest("/login"))
+    const result = await proxy(createMockRequest("/login"))
 
     expect(result).toBeInstanceOf(Response)
     expect(result!.status).toBe(307)
@@ -112,7 +106,7 @@ describe("proxy", () => {
       error: null,
     })
 
-    const result = await proxy(mockRequest("/login"))
+    const result = await proxy(createMockRequest("/login"))
 
     expect(result).toBeInstanceOf(Response)
     expect(result!.status).toBe(307)
@@ -126,7 +120,7 @@ describe("proxy", () => {
       error: null,
     })
 
-    const result = await proxy(mockRequest("/dashboard"))
+    const result = await proxy(createMockRequest("/dashboard"))
 
     expect(result).toBeUndefined()
   })
@@ -134,7 +128,7 @@ describe("proxy", () => {
   it("should return undefined for unauthenticated user on /login (pass through)", async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
 
-    const result = await proxy(mockRequest("/login"))
+    const result = await proxy(createMockRequest("/login"))
 
     expect(result).toBeUndefined()
   })

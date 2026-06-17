@@ -1,4 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/types/database"
+
+// Mock shapes: only the methods exercised by `actions/auth.ts` are typed.
+// Keeping them narrow (instead of using the full `SupabaseClient<Database>`)
+// makes the mock contract explicit and avoids drift if the real client grows.
+type ServerSupabaseMock = Pick<
+  SupabaseClient<Database>,
+  "auth" | "from"
+> & {
+  auth: Pick<SupabaseClient<Database>["auth"], "signOut" | "getUser">
+}
+
+type AdminSupabaseMock = {
+  auth: {
+    admin: {
+      createUser: ReturnType<typeof vi.fn>
+    }
+  }
+}
 
 // Create mock fns that survive vi.mock hoisting
 const mockSignOut = vi.hoisted(() => vi.fn())
@@ -22,7 +42,7 @@ const mockServerSupabase = vi.hoisted(
       from: vi.fn().mockReturnValue({
         select: mockProfileQuery,
       }),
-    }) as any
+    }) satisfies ServerSupabaseMock
 )
 
 const mockAdminSupabase = vi.hoisted(
@@ -33,7 +53,7 @@ const mockAdminSupabase = vi.hoisted(
           createUser: mockAdminCreateUser,
         },
       },
-    }) as any
+    }) satisfies AdminSupabaseMock
 )
 
 vi.mock("@/lib/supabase/server", () => ({

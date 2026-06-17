@@ -15,7 +15,7 @@ const mockMiddlewareClient = vi.hoisted(() =>
         }),
       }),
     },
-    response: {} as any,
+    response: {} as Response,
   })
 )
 
@@ -24,13 +24,7 @@ vi.mock("@/lib/supabase/middleware", () => ({
 }))
 
 import { proxy } from "@/proxy"
-
-function mockRequest(pathname: string): any {
-  return {
-    nextUrl: { pathname },
-    url: "http://localhost:3000",
-  }
-}
+import { createMockRequest } from "@/tests/utils/request-mock"
 
 describe("proxy integration", () => {
   beforeEach(() => {
@@ -40,7 +34,7 @@ describe("proxy integration", () => {
   it("should pass through public API routes without session", async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
 
-    const result = await proxy(mockRequest("/api/health"))
+    const result = await proxy(createMockRequest("/api/health"))
 
     expect(result).toBeUndefined()
   })
@@ -48,7 +42,7 @@ describe("proxy integration", () => {
   it("should pass through other public routes without session", async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
 
-    const result = await proxy(mockRequest("/api/products"))
+    const result = await proxy(createMockRequest("/api/products"))
 
     expect(result).toBeUndefined()
   })
@@ -59,7 +53,7 @@ describe("proxy integration", () => {
       error: null,
     })
 
-    const result = await proxy(mockRequest("/dashboard"))
+    const result = await proxy(createMockRequest("/dashboard"))
 
     expect(result).toBeUndefined()
   })
@@ -70,7 +64,7 @@ describe("proxy integration", () => {
       error: null,
     })
 
-    const result = await proxy(mockRequest("/dashboard/products"))
+    const result = await proxy(createMockRequest("/dashboard/products"))
 
     expect(result).toBeUndefined()
   })
@@ -85,7 +79,7 @@ describe("proxy integration", () => {
       error: { message: "No rows found" },
     })
 
-    const result = await proxy(mockRequest("/login"))
+    const result = await proxy(createMockRequest("/login"))
 
     expect(result).toBeInstanceOf(Response)
     expect(result!.status).toBe(307)

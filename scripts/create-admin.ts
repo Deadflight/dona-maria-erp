@@ -15,7 +15,7 @@
  *   - Supabase local instance must be running
  */
 
-import { createClient, type User } from "@supabase/supabase-js"
+import { createClient } from "@supabase/supabase-js"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 
