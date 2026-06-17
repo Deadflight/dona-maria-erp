@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.4.1...v1.5.0) (2026-06-17)
+
+### Features
+
+* define Database and Json types for improved type safety and structure ([9a18ac9](https://github.com/Deadflight/dona-maria-erp/commit/9a18ac9e608e2685eaa896f7d010091a29ff6e0e))
+
 ## [1.4.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.4.0...v1.4.1) (2026-06-17)
 
 ### Bug Fixes
