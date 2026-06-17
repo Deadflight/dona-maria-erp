@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.4.0...v1.4.1) (2026-06-17)
+
+### Bug Fixes
+
+* update expected result structure in listStockAlerts test to include pagination ([cf5bae5](https://github.com/Deadflight/dona-maria-erp/commit/cf5bae5420ec9eb239629dd6d3fe638f395f5d1a))
+
 ## [1.4.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.3.1...v1.4.0) (2026-06-17)
 
 ### Features
