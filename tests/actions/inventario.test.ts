@@ -333,7 +333,7 @@ describe("inventario Server Actions", () => {
 
       const result = await listStockAlerts({})
 
-      expect(result).toEqual({ data: { rows: [], total: 0 }, error: null })
+      expect(result).toEqual({ data: { rows: [], total: 0, page: 1, pageSize: 10 }, error: null })
     })
 
     it("returns error when RPC call fails", async () => {
