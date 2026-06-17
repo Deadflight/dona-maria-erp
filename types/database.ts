@@ -339,6 +339,7 @@ export type Database = {
       }
       proveedores: {
         Row: {
+          activo: boolean | null
           created_at: string | null
           created_by: string | null
           direccion: string | null
@@ -349,6 +350,7 @@ export type Database = {
           telefono: string | null
         }
         Insert: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
           direccion?: string | null
@@ -359,6 +361,7 @@ export type Database = {
           telefono?: string | null
         }
         Update: {
+          activo?: boolean | null
           created_at?: string | null
           created_by?: string | null
           direccion?: string | null
@@ -659,6 +662,10 @@ export type Database = {
       get_stock_alert_count: {
         Args: Record<string, never>
         Returns: number
+      }
+      generate_receipt_number: {
+        Args: Record<string, never>
+        Returns: string
       }
       create_receipt_with_movements: {
         Args: {

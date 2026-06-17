@@ -130,6 +130,40 @@ export async function getProductById(id: string): Promise<{
   return { data, error: null }
 }
 
+/**
+ * Searches active products by name or SKU using ILIKE matching.
+ * All authenticated roles (viewer+) can access.
+ *
+ * @param query - Search term for nombre/sku ilike match
+ * @returns `{ data: Array<{ id, nombre, sku }> }` on success,
+ *          `{ data: null, error }` on failure
+ */
+export async function searchProducts(
+  query: string,
+): Promise<{
+  data: Array<{ id: string; nombre: string; sku: string }> | null
+  error: string | null
+}> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from("productos")
+    .select("id, nombre, sku")
+    .or(`nombre.ilike.%${query}%,sku.ilike.%${query}%`)
+    .limit(20)
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  return { data, error: null }
+}
+
 // ---------------------------------------------------------------------------
 // Mutation Actions
 // ---------------------------------------------------------------------------

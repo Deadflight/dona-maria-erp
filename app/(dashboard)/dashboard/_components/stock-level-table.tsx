@@ -6,7 +6,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { AlertCircle, PackageSearch, RotateCcw } from "lucide-react"
 
 import type { Database } from "@/types/database"

@@ -111,8 +111,8 @@ export async function createReceipt(
 
 /**
  * Lists all purchase receipts ordered by most recent first, with supplier
- * name and creator full name joined. Requires an authenticated session with
- * admin role.
+ * name and creator full name joined. Requires an authenticated session
+ * (viewer+).
  *
  * @param limit - Maximum number of results (default: 50)
  * @param offset - Number of results to skip (default: 0)
@@ -132,17 +132,6 @@ export async function listReceipts(
 
   if (authError || !user) {
     return { data: null, error: "UNAUTHORIZED" }
-  }
-
-  // -- Role check -----------------------------------------------------------
-  const { data: perfil } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single()
-
-  if (!perfil || perfil.role !== "admin") {
-    return { data: null, error: "FORBIDDEN" }
   }
 
   // -- Query ----------------------------------------------------------------
@@ -175,7 +164,7 @@ export async function listReceipts(
 /**
  * Retrieves a single purchase receipt by ID with its line items, product
  * names and SKUs, supplier info, and creator details. Requires an
- * authenticated session with admin role.
+ * authenticated session (viewer+).
  *
  * @param id - UUID of the purchase receipt
  * @returns `{ data: receipt }` on success, `{ data: null, error }` on failure
@@ -195,17 +184,6 @@ export async function getReceiptById(
     return { data: null, error: "UNAUTHORIZED" }
   }
 
-  // -- Role check -----------------------------------------------------------
-  const { data: perfil } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single()
-
-  if (!perfil || perfil.role !== "admin") {
-    return { data: null, error: "FORBIDDEN" }
-  }
-
   // -- Query ----------------------------------------------------------------
   const { data, error } = await supabase
     .from("purchase_receipts")
@@ -220,4 +198,79 @@ export async function getReceiptById(
   }
 
   return { data: data as ReceiptDetailResult["data"], error: null }
+}
+
+// ---------------------------------------------------------------------------
+// listProveedores
+// ---------------------------------------------------------------------------
+
+/**
+ * Lists all active suppliers. Requires an authenticated session (viewer+).
+ *
+ * @returns `{ data: Array<{ id, nombre, ruc }> }` on success,
+ *          `{ data: null, error }` on failure
+ */
+export async function listProveedores(): Promise<{
+  data: Array<{ id: string; nombre: string; ruc: string | null }> | null
+  error: string | null
+}> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  const { data, error } = await supabase
+    .from("proveedores")
+    .select("id, nombre, ruc")
+    .eq("activo", true)
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  return {
+    data: data as Array<{ id: string; nombre: string; ruc: string | null }>,
+    error: null,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// generateReceiptNumber
+// ---------------------------------------------------------------------------
+
+/**
+ * Generates the next sequential receipt number (`RC-{YYYYMMDD}-{NNNN}`) via
+ * the `generate_receipt_number()` RPC. Requires an authenticated session
+ * (viewer+).
+ *
+ * @returns `{ data: string }` on success, `{ data: null, error }` on failure
+ */
+export async function generateReceiptNumber(): Promise<{
+  data: string | null
+  error: string | null
+}> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  const { data, error } = await supabase.rpc("generate_receipt_number")
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  return { data: String(data), error: null }
 }

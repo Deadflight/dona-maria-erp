@@ -7,6 +7,7 @@ import {
   createProduct,
   updateProduct,
   toggleProductActive,
+  searchProducts,
 } from "@/lib/supabase/actions/productos"
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -50,6 +51,7 @@ const mockProductsChain: Record<string, unknown> = {
   or: vi.fn(() => mockProductsChain),
   eq: vi.fn(() => mockProductsChain),
   order: vi.fn(() => mockProductsChain),
+  limit: vi.fn(() => mockProductsChain),
   range: vi.fn(() => mockProductsChain),
   insert: vi.fn(() => mockProductsChain),
   update: vi.fn(() => mockProductsChain),
@@ -462,6 +464,72 @@ describe("productos Server Actions", () => {
 
       expect(result).toEqual({ success: true })
       expect(mockProductsChain.update).toHaveBeenCalledWith({ activo: true })
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // searchProducts
+  // ---------------------------------------------------------------------------
+
+  describe("searchProducts", () => {
+    it("returns UNAUTHORIZED when no user is authenticated", async () => {
+      vi.mocked(getSession).mockResolvedValue({ data: null })
+
+      const result = await searchProducts("test")
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(getSession).toHaveBeenCalledOnce()
+      expect(mockFrom).not.toHaveBeenCalled()
+    })
+
+    it("searches products by nombre using ILIKE", async () => {
+      const expected = [
+        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001" },
+      ]
+      productsResolveValue = { data: expected, error: null, count: undefined }
+
+      const result = await searchProducts("Tornillo")
+
+      expect(result).toEqual({ data: expected, error: null })
+      expect(mockProductsChain.select).toHaveBeenCalledWith("id, nombre, sku")
+      expect(mockProductsChain.or).toHaveBeenCalledWith(
+        "nombre.ilike.%Tornillo%,sku.ilike.%Tornillo%",
+      )
+      expect(mockProductsChain.limit).toHaveBeenCalledWith(20)
+    })
+
+    it("searches products by SKU using ILIKE", async () => {
+      const expected = [
+        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001" },
+      ]
+      productsResolveValue = { data: expected, error: null, count: undefined }
+
+      const result = await searchProducts("TOR")
+
+      expect(result).toEqual({ data: expected, error: null })
+      expect(mockProductsChain.or).toHaveBeenCalledWith(
+        "nombre.ilike.%TOR%,sku.ilike.%TOR%",
+      )
+    })
+
+    it("returns empty array when no products match", async () => {
+      productsResolveValue = { data: [], error: null, count: 0 }
+
+      const result = await searchProducts("zzzznotfound")
+
+      expect(result).toEqual({ data: [], error: null })
+    })
+
+    it("returns error message when Supabase query fails", async () => {
+      productsResolveValue = {
+        data: null,
+        error: { message: "DB error" },
+        count: 0,
+      }
+
+      const result = await searchProducts("test")
+
+      expect(result).toEqual({ data: null, error: "DB error" })
     })
   })
 })

@@ -10,13 +10,11 @@ import {
   PackageSearch,
   AlertCircle,
   RotateCcw,
-  Eye,
   TriangleAlert,
 } from "lucide-react"
 
 import type { Database } from "@/types/database"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -146,11 +144,6 @@ export function StockAlertTable({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput])
-
-  // Sync external search param to input when it changes via browser nav
-  useEffect(() => {
-    setSearchInput(search)
-  }, [search])
 
   // --- Selection state ---
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())

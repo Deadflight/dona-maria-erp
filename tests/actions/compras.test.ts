@@ -4,6 +4,8 @@ import {
   createReceipt,
   listReceipts,
   getReceiptById,
+  listProveedores,
+  generateReceiptNumber,
 } from "@/lib/supabase/actions/compras"
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -38,6 +40,19 @@ const mockReceiptsChain = {
   then: (resolve: (v: unknown) => void) => resolve(receiptListResolveValue),
 }
 
+/** Control value for proveedores chain. */
+let proveedoresResolveValue: { data: unknown; error: unknown } = {
+  data: [],
+  error: null,
+}
+
+/** Query chain for proveedores table (listProveedores). */
+const mockProveedoresChain = {
+  select: vi.fn(() => mockProveedoresChain),
+  eq: vi.fn(() => mockProveedoresChain),
+  then: (resolve: (v: unknown) => void) => resolve(proveedoresResolveValue),
+}
+
 /** Query chain for profiles table (single-row lookup). */
 const mockProfilesChain: Record<string, unknown> = {
   select: vi.fn(() => mockProfilesChain),
@@ -47,6 +62,7 @@ const mockProfilesChain: Record<string, unknown> = {
 
 const mockFrom = vi.fn((table: string) => {
   if (table === "profiles") return mockProfilesChain
+  if (table === "proveedores") return mockProveedoresChain
   return mockReceiptsChain
 })
 
@@ -64,6 +80,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(createClient).mockResolvedValue(mockSupabase as never)
   receiptListResolveValue = { data: [], error: null }
+  proveedoresResolveValue = { data: [], error: null }
 })
 
 // ---------------------------------------------------------------------------
@@ -170,7 +187,7 @@ describe("compras Server Actions", () => {
   })
 
   describe("listReceipts", () => {
-    // --- Task 5a: Auth and Role Validation (spec ESC-2, ESC-3) ---
+    // --- Auth Validation (spec ESC-5: UNAUTHORIZED) ---
 
     it("returns UNAUTHORIZED when no user is authenticated", async () => {
       mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
@@ -181,14 +198,19 @@ describe("compras Server Actions", () => {
       expect(mockGetUser).toHaveBeenCalledOnce()
     })
 
-    it("returns FORBIDDEN when user role is not admin", async () => {
+    // --- Viewer+ can access (spec ESC-4: listReceipts by viewer) ---
+
+    it("returns data when user has viewer role", async () => {
+      receiptListResolveValue = { data: [], error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "operador" }, error: null })
+      // No profiles lookup needed — viewer+ can access
 
       const result = await listReceipts()
 
-      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
-      expect(mockFrom).toHaveBeenCalledWith("profiles")
+      expect(result).toEqual({ data: [], error: null })
+      expect(mockGetUser).toHaveBeenCalledOnce()
+      // Should NOT query profiles for role check
+      expect(mockFrom).not.toHaveBeenCalledWith("profiles")
     })
 
     // --- Task 5c: listReceipts Behavior (spec ESC-4) ---
@@ -212,7 +234,6 @@ describe("compras Server Actions", () => {
       ]
       receiptListResolveValue = { data: expectedData, error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       const result = await listReceipts(5, 0)
 
@@ -228,7 +249,6 @@ describe("compras Server Actions", () => {
     it("uses default limit of 50 when not specified", async () => {
       receiptListResolveValue = { data: [], error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       await listReceipts()
 
@@ -241,7 +261,6 @@ describe("compras Server Actions", () => {
         error: { message: "DB connection error" },
       }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
 
       const result = await listReceipts()
 
@@ -250,7 +269,7 @@ describe("compras Server Actions", () => {
   })
 
   describe("getReceiptById", () => {
-    // --- Task 5a: Auth and Role Validation (spec ESC-2, ESC-3) ---
+    // --- Auth Validation (spec: UNAUTHORIZED) ---
 
     it("returns UNAUTHORIZED when no user is authenticated", async () => {
       mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
@@ -260,17 +279,29 @@ describe("compras Server Actions", () => {
       expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
     })
 
-    it("returns FORBIDDEN when user role is not admin", async () => {
+    // --- Viewer+ can access (spec ESC-6: getReceiptById by viewer) ---
+
+    it("returns data when user has viewer role", async () => {
+      const expectedDetail = {
+        id: "rec-1",
+        numero_recepcion: "REC-001",
+        proveedor_id: "prov-1",
+      }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "operador" }, error: null })
+      mockReceiptsChain.single.mockResolvedValue({
+        data: expectedDetail,
+        error: null,
+      })
 
       const result = await getReceiptById("rec-1")
 
-      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
-      expect(mockFrom).toHaveBeenCalledWith("profiles")
+      expect(result).toEqual({ data: expectedDetail, error: null })
+      expect(mockGetUser).toHaveBeenCalledOnce()
+      // Should NOT query profiles for role check
+      expect(mockFrom).not.toHaveBeenCalledWith("profiles")
     })
 
-    // --- Task 5c: getReceiptById Behavior (spec ESC-5) ---
+    // --- Task 5c: getReceiptById Behavior (spec ESC-6) ---
 
     it("returns receipt detail with items on success", async () => {
       const expectedDetail = {
@@ -304,7 +335,6 @@ describe("compras Server Actions", () => {
         created_by_profiles: { full_name: "Admin User" },
       }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
       mockReceiptsChain.single.mockResolvedValue({
         data: expectedDetail,
         error: null,
@@ -319,7 +349,6 @@ describe("compras Server Actions", () => {
 
     it("returns error message when receipt is not found", async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
       mockReceiptsChain.single.mockResolvedValue({
         data: null,
         error: { message: "Not found" },
@@ -332,7 +361,6 @@ describe("compras Server Actions", () => {
 
     it("returns error message when Supabase query fails", async () => {
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
-      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
       mockReceiptsChain.single.mockResolvedValue({
         data: null,
         error: { message: "Query failed" },
@@ -341,6 +369,87 @@ describe("compras Server Actions", () => {
       const result = await getReceiptById("rec-1")
 
       expect(result).toEqual({ data: null, error: "Query failed" })
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // listProveedores
+  // ---------------------------------------------------------------------------
+
+  describe("listProveedores", () => {
+    // ESC: UNAUTHORIZED when not authenticated
+    it("returns UNAUTHORIZED when no user is authenticated", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
+
+      const result = await listProveedores()
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(mockGetUser).toHaveBeenCalledOnce()
+    })
+
+    // ESC-1: Returns active suppliers
+    it("returns active suppliers with id, nombre, ruc", async () => {
+      const expectedSuppliers = [
+        { id: "prov-1", nombre: "Proveedor A", ruc: "J-12345678" },
+        { id: "prov-2", nombre: "Proveedor B", ruc: "J-87654321" },
+      ]
+      proveedoresResolveValue = { data: expectedSuppliers, error: null }
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+
+      const result = await listProveedores()
+
+      expect(result).toEqual({ data: expectedSuppliers, error: null })
+      expect(mockFrom).toHaveBeenCalledWith("proveedores")
+      expect(mockProveedoresChain.select).toHaveBeenCalledWith("id, nombre, ruc")
+      expect(mockProveedoresChain.eq).toHaveBeenCalledWith("activo", true)
+    })
+
+    it("returns error message when Supabase query fails", async () => {
+      proveedoresResolveValue = {
+        data: null,
+        error: { message: "DB error" },
+      }
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+
+      const result = await listProveedores()
+
+      expect(result).toEqual({ data: null, error: "DB error" })
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // generateReceiptNumber
+  // ---------------------------------------------------------------------------
+
+  describe("generateReceiptNumber", () => {
+    // ESC: UNAUTHORIZED when not authenticated
+    it("returns UNAUTHORIZED when no user is authenticated", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
+
+      const result = await generateReceiptNumber()
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(mockGetUser).toHaveBeenCalledOnce()
+    })
+
+    // ESC-1: Generates sequential number
+    it("calls generate_receipt_number RPC and returns result", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockRpc.mockResolvedValue({ data: "RC-20260610-0001", error: null })
+
+      const result = await generateReceiptNumber()
+
+      expect(result).toEqual({ data: "RC-20260610-0001", error: null })
+      expect(mockRpc).toHaveBeenCalledWith("generate_receipt_number")
+    })
+
+    it("returns error message when RPC call fails", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockRpc.mockResolvedValue({ data: null, error: { message: "RPC error" } })
+
+      const result = await generateReceiptNumber()
+
+      expect(result).toEqual({ data: null, error: "RPC error" })
     })
   })
 })
