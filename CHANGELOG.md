@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.3.1...v1.4.0) (2026-06-17)
+
+### Features
+
+* enhance compras actions with new listProveedores and generateReceiptNumber functions ([5f4786f](https://github.com/Deadflight/dona-maria-erp/commit/5f4786f54da1559b0d985e7bd397935a5b64d4a2))
+
 ## [1.3.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.3.0...v1.3.1) (2026-06-17)
 
 ### Bug Fixes
