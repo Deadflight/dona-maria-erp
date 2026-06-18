@@ -311,7 +311,7 @@ export async function getDashboardKPIs(): Promise<DashboardResult> {
         .select("stock_actual, precio_compra")
         .eq("activo", true),
       getStockAlertCount(),
-      listReceipts(5),
+      listReceipts({ limit: 5 }),
     ])
 
   // -- Error checks -----------------------------------------------------------
