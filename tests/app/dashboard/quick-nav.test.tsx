@@ -18,7 +18,7 @@ describe("QuickNav", () => {
     expect(links.length).toBe(3)
 
     // Link order matches card order in navCards array
-    expect(links[0]).toHaveAttribute("href", "/inventory")
+    expect(links[0]).toHaveAttribute("href", "/receipts")
     expect(links[1]).toHaveAttribute("href", "/products")
     expect(links[2]).toHaveAttribute("href", "/inventory")
   })

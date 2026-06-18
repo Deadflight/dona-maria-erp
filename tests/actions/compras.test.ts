@@ -235,7 +235,7 @@ describe("compras Server Actions", () => {
       receiptListResolveValue = { data: expectedData, error: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
 
-      const result = await listReceipts(5, 0)
+      const result = await listReceipts({ limit: 5, offset: 0 })
 
       expect(result).toEqual({ data: expectedData, error: null })
       expect(mockFrom).toHaveBeenCalledWith("purchase_receipts")

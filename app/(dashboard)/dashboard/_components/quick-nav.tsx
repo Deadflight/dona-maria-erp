@@ -24,7 +24,7 @@ const navCards: NavCard[] = [
   {
     title: "Recepción de Mercancía",
     description: "Registrar entrada de productos al inventario",
-    href: "/inventory",
+    href: "/receipts",
     icon: Package,
   },
   {
