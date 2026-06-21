@@ -23,7 +23,7 @@ export const receiptCreateSchema = z.object({
           .positive("El precio de compra debe ser mayor a 0"),
       }),
     )
-    .min(1, "Debe incluir al menos un artículo"),
+    .min(1, "Debe agregar al menos un producto"),
 })
 
 export type ReceiptFormState = {

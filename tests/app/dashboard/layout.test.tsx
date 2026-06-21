@@ -1,3 +1,4 @@
+import { render } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 const mockGetSession = vi.hoisted(() => vi.fn())
@@ -76,5 +77,40 @@ describe("DashboardLayout", () => {
     expect(result).toBeDefined()
     // Children should be somewhere in the rendered output
     expect(result.props.children).toBeDefined()
+  })
+
+  it("should render Recepción nav link before Inventario", async () => {
+    mockGetSession.mockResolvedValue({
+      data: {
+        id: "user-1",
+        email: "admin@donamaria.com",
+        role: "admin",
+        fullName: "Admin",
+        isActive: true,
+      },
+    })
+
+    const { container } = render(
+      await DashboardLayout({ children: <div>Content</div> }) as unknown as React.ReactElement,
+    )
+
+    const navLinks = container.querySelectorAll("nav a")
+    const labels = Array.from(navLinks).map((link) => {
+      // Extract text content without nested badges
+      const textNode = Array.from(link.childNodes).find(
+        (node) => node.nodeType === Node.TEXT_NODE,
+      )
+      return textNode?.textContent?.trim() ?? ""
+    })
+    const visibleLabels = labels.filter(Boolean)
+
+    expect(visibleLabels).toContain("Recepción")
+    expect(visibleLabels).toContain("Inventario")
+
+    const recepcionIndex = visibleLabels.indexOf("Recepción")
+    const inventarioIndex = visibleLabels.indexOf("Inventario")
+    expect(recepcionIndex).toBeGreaterThanOrEqual(0)
+    expect(inventarioIndex).toBeGreaterThanOrEqual(0)
+    expect(recepcionIndex).toBeLessThan(inventarioIndex)
   })
 })

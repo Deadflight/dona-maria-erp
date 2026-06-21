@@ -1,6 +1,9 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { revalidatePath } from "next/cache"
+import { receiptCreateSchema } from "@/lib/validations/compras"
+import type { ReceiptFormState } from "@/lib/validations/compras"
 import type { Database } from "@/types/database"
 
 // ---------------------------------------------------------------------------
@@ -30,10 +33,14 @@ export type ReceiptListResult = {
     PurchaseReceipt & {
       proveedores: { nombre: string; ruc: string | null }
       created_by_profiles: { full_name: string | null }
+      receipt_items: Array<{ count: number }>
     }
   > | null
+  total: number | null
   error: string | null
 }
+
+export type ReceiptListItem = NonNullable<ReceiptListResult["data"]>[number]
 
 export type ReceiptDetailResult = {
   data: (PurchaseReceipt & {
@@ -131,7 +138,7 @@ export async function listReceipts(
   } = await supabase.auth.getUser()
 
   if (authError || !user) {
-    return { data: null, error: "UNAUTHORIZED" }
+    return { data: null, total: null, error: "UNAUTHORIZED" }
   }
 
   // -- Query ----------------------------------------------------------------
@@ -139,7 +146,8 @@ export async function listReceipts(
   let query = supabase
     .from("purchase_receipts")
     .select(
-      "*, proveedores!inner(nombre, ruc), created_by_profiles:profiles!created_by(full_name)",
+      "*, proveedores!inner(nombre, ruc), created_by_profiles:profiles!created_by(full_name), receipt_items(count)",
+      { count: "exact" },
     )
     .order("created_at", { ascending: false })
     .limit(effectiveLimit)
@@ -148,13 +156,17 @@ export async function listReceipts(
     query = query.range(offset, offset + effectiveLimit - 1)
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
 
   if (error) {
-    return { data: null, error: error.message }
+    return { data: null, total: null, error: error.message }
   }
 
-  return { data: data as ReceiptListResult["data"], error: null }
+  return {
+    data: data as ReceiptListResult["data"],
+    total: count,
+    error: null,
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -273,4 +285,76 @@ export async function generateReceiptNumber(): Promise<{
   }
 
   return { data: String(data), error: null }
+}
+
+// ---------------------------------------------------------------------------
+// createReceiptAction — Server action for useActionState (form → Zod → RPC)
+// ---------------------------------------------------------------------------
+
+/**
+ * Wraps `createReceipt` for use with `useActionState` in the receipt creation
+ * form. Parses FormData (including indexed item fields), validates with
+ * `receiptCreateSchema`, and returns structured form state with errors.
+ *
+ * @param _prevState - Previous form state (useActionState pattern)
+ * @param formData - Form data with `proveedor_id`, `numero_recepcion`,
+ *   `observaciones`, and indexed item fields (`items[N].producto_id`,
+ *   `items[N].cantidad_recibida`, `items[N].precio_compra`)
+ * @returns `{ success: true, data: { id } }` on success,
+ *          `{ errors }` on validation failure,
+ *          `{ message }` on other errors
+ */
+export async function createReceiptAction(
+  _prevState: ReceiptFormState,
+  formData: FormData,
+): Promise<ReceiptFormState> {
+  // -- Parse items from indexed FormData fields ------------------------------
+  const items: Array<{
+    producto_id: string
+    cantidad_recibida: number
+    precio_compra: number
+  }> = []
+
+  let index = 0
+  while (formData.has(`items[${index}].producto_id`)) {
+    items.push({
+      producto_id: formData.get(`items[${index}].producto_id`) as string,
+      cantidad_recibida: Number(
+        formData.get(`items[${index}].cantidad_recibida`),
+      ),
+      precio_compra: Number(formData.get(`items[${index}].precio_compra`)),
+    })
+    index++
+  }
+
+  // -- Validate --------------------------------------------------------------
+  const validated = receiptCreateSchema.safeParse({
+    proveedor_id: formData.get("proveedor_id"),
+    numero_recepcion: formData.get("numero_recepcion"),
+    observaciones: formData.get("observaciones") || undefined,
+    items,
+  })
+
+  if (!validated.success) {
+    return {
+      errors: validated.error.flatten().fieldErrors as Record<
+        string,
+        string[]
+      >,
+    }
+  }
+
+  // -- Submit ----------------------------------------------------------------
+  const result = await createReceipt(validated.data)
+
+  if (result.data) {
+    revalidatePath("/receipts")
+    return { success: true, data: result.data }
+  }
+
+  if (result.error === "FORBIDDEN") {
+    return { message: "No tienes permisos para realizar esta acción" }
+  }
+
+  return { message: result.error ?? "Error al crear la recepción" }
 }
