@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.7.0...v1.7.1) (2026-06-21)
+
+### Bug Fixes
+
+* **ci:** harden repo verification chain ([d229de5](https://github.com/Deadflight/dona-maria-erp/commit/d229de5721c3df81f1a728541bf85b06c0e994de))
+
 ## [1.7.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.6.0...v1.7.0) (2026-06-21)
 
 ### Features
