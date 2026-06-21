@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.7.1...v1.8.0) (2026-06-21)
+
+### Features
+
+* **scripts:** add Jira bulk import script for project phases ([b3ca0bf](https://github.com/Deadflight/dona-maria-erp/commit/b3ca0bf08c53d8c03ea5cda70cd3750ca0cd216d))
+
 ## [1.7.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.7.0...v1.7.1) (2026-06-21)
 
 ### Bug Fixes
