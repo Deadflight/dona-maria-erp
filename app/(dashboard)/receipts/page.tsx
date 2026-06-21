@@ -22,10 +22,11 @@ export default async function ReceiptsPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const [{ data: session }, result] = await Promise.all([
     getSession(),
-    listReceipts(
-      sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
-      sp.page ? (parseInt(sp.page, 10) - 1) * (parseInt(sp.pageSize ?? "10", 10)) : 0,
-    ),
+    listReceipts({
+      limit: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
+      offset: sp.page ? (parseInt(sp.page, 10) - 1) * (parseInt(sp.pageSize ?? "10", 10)) : 0,
+      search: sp.search || undefined,
+    }),
   ])
 
   const pageData = result.data

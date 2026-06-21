@@ -121,14 +121,17 @@ export async function createReceipt(
  * name and creator full name joined. Requires an authenticated session
  * (viewer+).
  *
- * @param limit - Maximum number of results (default: 50)
- * @param offset - Number of results to skip (default: 0)
+ * @param params.limit - Maximum number of results (default: 50)
+ * @param params.offset - Number of results to skip (default: 0)
+ * @param params.search - Optional search term matching numero_recepcion or
+ *                        proveedor nombre (ILIKE)
  * @returns `{ data: receipts[] }` on success, `{ data: null, error }` on failure
  */
-export async function listReceipts(
-  limit?: number,
-  offset?: number,
-): Promise<ReceiptListResult> {
+export async function listReceipts(params?: {
+  limit?: number
+  offset?: number
+  search?: string
+}): Promise<ReceiptListResult> {
   const supabase = await createClient()
 
   // -- Auth check -----------------------------------------------------------
@@ -142,7 +145,7 @@ export async function listReceipts(
   }
 
   // -- Query ----------------------------------------------------------------
-  const effectiveLimit = limit ?? 50
+  const effectiveLimit = params?.limit ?? 50
   let query = supabase
     .from("purchase_receipts")
     .select(
@@ -152,8 +155,14 @@ export async function listReceipts(
     .order("created_at", { ascending: false })
     .limit(effectiveLimit)
 
-  if (offset !== undefined) {
-    query = query.range(offset, offset + effectiveLimit - 1)
+  if (params?.search) {
+    query = query.or(
+      `numero_recepcion.ilike.%${params.search}%,proveedores.nombre.ilike.%${params.search}%`,
+    )
+  }
+
+  if (params?.offset !== undefined) {
+    query = query.range(params.offset, params.offset + effectiveLimit - 1)
   }
 
   const { data, error, count } = await query

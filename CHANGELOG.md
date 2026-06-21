@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.5.0...v1.6.0) (2026-06-18)
+
+### Features
+
+* **recepcion:** add receipt list UI with detail dialog and search ([87635e2](https://github.com/Deadflight/dona-maria-erp/commit/87635e2975a84eeba26c086a4621eaf11aaf4e12))
+
 ## [1.5.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.4.1...v1.5.0) (2026-06-17)
 
 ### Features
