@@ -9,7 +9,6 @@ const navItems = [
   { label: "Productos", href: "/products" },
   { label: "Ventas", href: "/sales" },
   { label: "Clientes", href: "/clients" },
-<<<<<<< HEAD
   { label: "Recepción", href: "/receipts", icon: Package },
   { label: "Inventario", href: "/inventory" },
 ]

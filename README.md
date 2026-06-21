@@ -139,6 +139,39 @@ src/
 - [Documentación API](./docs/API_DOCS.md)
 - [Decisiones de Arquitectura](./docs/adr/)
 
+## Estado del Proyecto
+
+> **Actualizado**: 21/06/2026
+
+| Fase | Avance | Estado |
+|------|--------|--------|
+| **I** — Diagnóstico Operativo | 8/8 tareas | ✅ Completo |
+| **II** — Rediseño y Modelado | 8/8 tareas | ✅ Completo |
+| **III** — Control de Inventarios | 4/7 tareas + 1 hito | ⚠️ En progreso (57%) |
+| **IV** — Mostrador y Conciliación | 0/8 tareas | ⏳ Pendiente |
+| **V** — Validación e Implantación | 0/8 tareas | ⏳ Pendiente |
+
+### Detalle Fase III
+
+| # | Tarea | Estado | PR / Notas |
+|---|-------|--------|------------|
+| 17 | Panel de gestión administrativa de inventario | ⚠️ Parcial | CRUD productos + tabla movimientos listo. Falta dashboard consolidado |
+| 18 | Alertas de stock crítico | ✅ | Visual en navbar + filtro en tabla |
+| 19 | Actualización masiva de precios | ✅ | Modal con ajuste por % global |
+| 20 | Recepción y registro de mercancía | ✅ | PR #53 mergeado. Listado, detalle, formulario creación |
+| 21 | Restricciones y validaciones server-side | ✅ | Zod schemas, RLS, validaciones |
+| 22 | Procesamiento numérico fraccionado | ❌ | Pendiente de implementar |
+| 23 | Simulación de carga / seed data | ❌ | Pendiente |
+| 24 | Documentación técnica de stock | ❌ | Pendiente |
+| ◆ | **Hito III: Módulo inventario operativo** | ⏳ | Depende de tareas 22→23→24→17 |
+
+### Fases IV y V
+
+| Fase | Tareas clave |
+|------|-------------|
+| **IV — Mostrador (POS)** | Terminal ventas, búsqueda predictiva, venta express, carrito, descuento stock, cierre caja, notas PDF, pruebas estrés |
+| **V — Validación** | Pruebas concurrencia, matriz aceptación, deploy Vercel, carga datos, instalación terminales, capacitación, evaluación |
+
 ## Licencia
 
 Proyecto desarrollado como práctica pre-profesional.
