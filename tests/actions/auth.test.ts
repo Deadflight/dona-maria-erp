@@ -1,17 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
-import type { SupabaseClient } from "@supabase/supabase-js"
-import type { Database } from "@/types/database"
+
+type ServerSupabaseMock = {
+  auth: {
+    signOut: ReturnType<typeof vi.fn>
+    getUser: ReturnType<typeof vi.fn>
+  }
+  from: ReturnType<typeof vi.fn>
+}
 
 // Mock shapes: only the methods exercised by `actions/auth.ts` are typed.
 // Keeping them narrow (instead of using the full `SupabaseClient<Database>`)
 // makes the mock contract explicit and avoids drift if the real client grows.
-type ServerSupabaseMock = Pick<
-  SupabaseClient<Database>,
-  "auth" | "from"
-> & {
-  auth: Pick<SupabaseClient<Database>["auth"], "signOut" | "getUser">
-}
-
 type AdminSupabaseMock = {
   auth: {
     admin: {

@@ -1,16 +1,10 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
+const rootFontVariables = {
+  "--font-geist-sans": "Arial, Helvetica, sans-serif",
+  "--font-geist-mono": '"Courier New", Courier, monospace',
+} as React.CSSProperties
 
 export const viewport = {
   themeColor: "#0A2D69",
@@ -47,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="es" style={rootFontVariables}>
       <body className="min-h-full flex flex-col bg-bg-base text-text-primary antialiased">
         {children}
       </body>

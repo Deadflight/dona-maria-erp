@@ -16,6 +16,7 @@ interface PageProps {
 // ---------------------------------------------------------------------------
 
 export default async function NewReceiptPage(_props: PageProps) {
+  void _props
   const { data: session } = await getSession()
 
   // -- Admin gate ------------------------------------------------------------

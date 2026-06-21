@@ -1,23 +1,13 @@
-import type { NextRequest } from "next/server"
-
-/**
- * Minimal subset of `NextRequest` that the proxy() handler actually reads.
- * Keeping it narrow lets proxy tests stay typed without re-implementing the
- * whole `NextRequest` surface (cookies, headers, geo, etc.) just to satisfy
- * the type checker.
- */
-export type MockRequest = Pick<NextRequest, "nextUrl" | "url">
+import { NextRequest } from "next/server"
 
 /**
  * Builds a fake request suitable for unit-testing the Next.js middleware/proxy
- * function. Only the fields read by `proxy.ts` are populated.
+ * function. Using a real `NextRequest` keeps tests aligned with the contract
+ * consumed by `proxy()`.
  */
 export function createMockRequest(
   pathname: string,
   url = "http://localhost:3000",
-): MockRequest {
-  return {
-    nextUrl: { pathname } as NextRequest["nextUrl"],
-    url,
-  }
+): NextRequest {
+  return new NextRequest(new URL(pathname, url))
 }
