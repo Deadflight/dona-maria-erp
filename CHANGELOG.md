@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.6.0...v1.7.0) (2026-06-21)
+
+### Features
+
+* **recepcion:** implement full receipt management UI ([4026621](https://github.com/Deadflight/dona-maria-erp/commit/4026621ae60fe26294e4809ce50914dd48d674ab))
+
 ## [1.6.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.5.0...v1.6.0) (2026-06-18)
 
 ### Features
