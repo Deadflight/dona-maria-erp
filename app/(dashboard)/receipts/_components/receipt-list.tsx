@@ -4,7 +4,7 @@
 // Imports
 // ---------------------------------------------------------------------------
 
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   PackageSearch,
@@ -13,7 +13,6 @@ import {
   Eye,
 } from "lucide-react"
 
-import { cn } from "@/lib/utils"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -119,7 +118,7 @@ export function ReceiptList({
   }, [searchInput])
 
   // --- Detail dialog state ---
-  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptListItem | null>(null)
+  const [, setSelectedReceipt] = useState<ReceiptListItem | null>(null)
 
   // --- Pagination ---
   const totalPages = initialData

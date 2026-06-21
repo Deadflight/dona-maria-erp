@@ -1,10 +1,25 @@
 import { render, screen } from "@testing-library/react"
 import { describe, it, expect, vi } from "vitest"
 import { ReceiptDetailDialog } from "@/app/(dashboard)/receipts/_components/receipt-detail-dialog"
+import type { ReceiptDetailResult } from "@/lib/supabase/actions/compras"
 
 // ---------------------------------------------------------------------------
 // Sample data
 // ---------------------------------------------------------------------------
+
+type ReceiptDetail = NonNullable<ReceiptDetailResult["data"]>
+
+const baseSupplier = {
+  id: "prov-1",
+  nombre: "Proveedor A",
+  ruc: "J-12345678",
+  activo: true,
+  created_at: "2026-06-01T00:00:00Z",
+  created_by: "user-1",
+  direccion: null,
+  email: null,
+  telefono: null,
+} satisfies ReceiptDetail["proveedores"]
 
 const receiptDetail = {
   id: "rec-1",
@@ -13,7 +28,7 @@ const receiptDetail = {
   observaciones: null,
   created_by: "user-1",
   created_at: "2026-06-10T12:00:00Z",
-  proveedores: { id: "prov-1", nombre: "Proveedor A", ruc: "J-12345678" },
+  proveedores: baseSupplier,
   receipt_items: [
     {
       id: "item-1",
@@ -35,7 +50,7 @@ const receiptDetail = {
     },
   ],
   created_by_profiles: { full_name: "Admin User" },
-}
+} satisfies ReceiptDetail
 
 const receiptDetailEmptyItems = {
   id: "rec-2",
@@ -44,10 +59,15 @@ const receiptDetailEmptyItems = {
   observaciones: null,
   created_by: "user-1",
   created_at: "2026-06-10T14:00:00Z",
-  proveedores: { id: "prov-2", nombre: "Proveedor B", ruc: "J-87654321" },
+  proveedores: {
+    ...baseSupplier,
+    id: "prov-2",
+    nombre: "Proveedor B",
+    ruc: "J-87654321",
+  },
   receipt_items: [],
   created_by_profiles: { full_name: "Admin User" },
-}
+} satisfies ReceiptDetail
 
 // ---------------------------------------------------------------------------
 // Tests

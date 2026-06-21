@@ -14,6 +14,7 @@ vi.mock("@/lib/supabase/actions/compras", () => ({
 
 import { getSession } from "@/actions/auth"
 import { listReceipts } from "@/lib/supabase/actions/compras"
+import type { ReceiptListResult } from "@/lib/supabase/actions/compras"
 import {
   listMovementsByProduct,
   getMovementsByReference,
@@ -132,6 +133,17 @@ function mockSession(role: "admin" | "seller" | "viewer" = "admin") {
 
 function mockNoSession() {
   vi.mocked(getSession).mockResolvedValue({ data: null })
+}
+
+function createReceiptListResult(
+  data: ReceiptListResult["data"],
+  total = data?.length ?? 0,
+): ReceiptListResult {
+  return {
+    data,
+    total,
+    error: null,
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -552,12 +564,12 @@ describe("inventario Server Actions", () => {
           observaciones: null,
           proveedores: { nombre: "Proveedor A", ruc: null },
           created_by_profiles: { full_name: "Test User" },
+          receipt_items: [{ count: 2 }],
         },
-      ]
-      vi.mocked(listReceipts).mockResolvedValue({
-        data: mockReceipts,
-        error: null,
-      })
+      ] satisfies NonNullable<ReceiptListResult["data"]>
+      vi.mocked(listReceipts).mockResolvedValue(
+        createReceiptListResult(mockReceipts, 1),
+      )
 
       const result = await getDashboardKPIs()
 
@@ -580,7 +592,7 @@ describe("inventario Server Actions", () => {
         ],
         error: null,
       }
-      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
 
       const result = await getDashboardKPIs()
 
@@ -593,7 +605,7 @@ describe("inventario Server Actions", () => {
       rpcResolveValue = { data: 0, error: null }
       productosCountResolve = { count: 0, data: null, error: null }
       productosDataResolve = { data: [], error: null }
-      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
 
       const result = await getDashboardKPIs()
 
@@ -613,7 +625,7 @@ describe("inventario Server Actions", () => {
         error: { message: "Count query failed" },
       }
       productosDataResolve = { data: [], error: null }
-      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
 
       const result = await getDashboardKPIs()
 
@@ -628,7 +640,7 @@ describe("inventario Server Actions", () => {
         data: null,
         error: { message: "Value query failed" },
       }
-      vi.mocked(listReceipts).mockResolvedValue({ data: [], error: null })
+      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
 
       const result = await getDashboardKPIs()
 

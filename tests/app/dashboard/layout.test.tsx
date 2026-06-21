@@ -74,9 +74,10 @@ describe("DashboardLayout", () => {
       children: <div>Content</div>,
     })) as unknown as React.ReactElement
 
+    const { getByText } = render(result)
+
     expect(result).toBeDefined()
-    // Children should be somewhere in the rendered output
-    expect(result.props.children).toBeDefined()
+    expect(getByText("Content")).toBeInTheDocument()
   })
 
   it("should render Recepción nav link before Inventario", async () => {

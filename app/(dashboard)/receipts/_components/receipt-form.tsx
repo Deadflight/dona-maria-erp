@@ -124,17 +124,26 @@ function ProductCombobox({
   const [results, setResults] = useState<ProductResult[]>([])
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
+  const handleSearchChange = useCallback((nextSearch: string) => {
+    setSearch(nextSearch)
+
+    if (nextSearch.trim().length < 1) {
+      setResults([])
+    }
+  }, [])
+
   // Debounced product search
   useEffect(() => {
-    if (!search || search.length < 1) {
-      setResults([])
+    const normalizedSearch = search.trim()
+
+    if (normalizedSearch.length < 1) {
       return
     }
 
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
-      const res = await searchProducts(search)
-      if (res.data) setResults(res.data)
+      const res = await searchProducts(normalizedSearch)
+      setResults(res.data ?? [])
     }, 300)
 
     return () => {
@@ -162,7 +171,7 @@ function ProductCombobox({
           <CommandInput
             placeholder="Buscar producto por nombre o SKU..."
             value={search}
-            onValueChange={setSearch}
+            onValueChange={handleSearchChange}
           />
           <CommandList>
             <CommandEmpty>
@@ -271,11 +280,6 @@ export function ReceiptForm({
 
   // Parse item-level errors from server response
   const itemErrors = parseItemErrors(state.errors)
-  const topLevelErrors = state.errors
-    ? Object.entries(state.errors).filter(
-        ([key]) => !key.startsWith("items."),
-      )
-    : []
 
   // --- Render ---------------------------------------------------------------
   return (
