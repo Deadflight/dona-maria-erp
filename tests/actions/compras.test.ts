@@ -21,9 +21,10 @@ const mockProfilesSingle = vi.fn()
 const mockRpc = vi.fn()
 
 /** Control value for listReceipts chain (await on chain directly). */
-let receiptListResolveValue: { data: unknown; error: unknown } = {
+let receiptListResolveValue: { data: unknown; error: unknown; count: number | null } = {
   data: [],
   error: null,
+  count: null,
 }
 
 /** Query chain for purchase_receipts — used by listReceipts and getReceiptById
@@ -79,7 +80,7 @@ const mockSupabase = {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.mocked(createClient).mockResolvedValue(mockSupabase as never)
-  receiptListResolveValue = { data: [], error: null }
+  receiptListResolveValue = { data: [], error: null, count: null }
   proveedoresResolveValue = { data: [], error: null }
 })
 
@@ -194,20 +195,20 @@ describe("compras Server Actions", () => {
 
       const result = await listReceipts()
 
-      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(result).toEqual({ data: null, total: null, error: "UNAUTHORIZED" })
       expect(mockGetUser).toHaveBeenCalledOnce()
     })
 
     // --- Viewer+ can access (spec ESC-4: listReceipts by viewer) ---
 
     it("returns data when user has viewer role", async () => {
-      receiptListResolveValue = { data: [], error: null }
+      receiptListResolveValue = { data: [], error: null, count: 5 }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
       // No profiles lookup needed — viewer+ can access
 
       const result = await listReceipts()
 
-      expect(result).toEqual({ data: [], error: null })
+      expect(result).toEqual({ data: [], total: 5, error: null })
       expect(mockGetUser).toHaveBeenCalledOnce()
       // Should NOT query profiles for role check
       expect(mockFrom).not.toHaveBeenCalledWith("profiles")
@@ -232,12 +233,12 @@ describe("compras Server Actions", () => {
           created_by_profiles: { full_name: "Admin User" },
         },
       ]
-      receiptListResolveValue = { data: expectedData, error: null }
+      receiptListResolveValue = { data: expectedData, error: null, count: 2 }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
 
       const result = await listReceipts({ limit: 5, offset: 0 })
 
-      expect(result).toEqual({ data: expectedData, error: null })
+      expect(result).toEqual({ data: expectedData, total: 2, error: null })
       expect(mockFrom).toHaveBeenCalledWith("purchase_receipts")
       expect(mockReceiptsChain.order).toHaveBeenCalledWith("created_at", {
         ascending: false,
@@ -247,7 +248,7 @@ describe("compras Server Actions", () => {
     })
 
     it("uses default limit of 50 when not specified", async () => {
-      receiptListResolveValue = { data: [], error: null }
+      receiptListResolveValue = { data: [], error: null, count: null }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
 
       await listReceipts()
@@ -259,12 +260,13 @@ describe("compras Server Actions", () => {
       receiptListResolveValue = {
         data: null,
         error: { message: "DB connection error" },
+        count: null,
       }
       mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
 
       const result = await listReceipts()
 
-      expect(result).toEqual({ data: null, error: "DB connection error" })
+      expect(result).toEqual({ data: null, total: null, error: "DB connection error" })
     })
   })
 

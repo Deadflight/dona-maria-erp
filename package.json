@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest --run",
+    "jira-import": "tsx scripts/jira-import.ts",
     "seed": "tsx scripts/create-admin.ts",
     "release": "semantic-release",
     "generate:types": "npx supabase gen types typescript --local > database.types.ts"

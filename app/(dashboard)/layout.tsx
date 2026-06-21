@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { Package } from "lucide-react"
 import { getSession } from "@/actions/auth"
 import { getStockAlertCount } from "@/lib/supabase/actions/inventario"
 
@@ -8,7 +9,8 @@ const navItems = [
   { label: "Productos", href: "/products" },
   { label: "Ventas", href: "/sales" },
   { label: "Clientes", href: "/clients" },
-  { label: "Recepción", href: "/receipts" },
+<<<<<<< HEAD
+  { label: "Recepción", href: "/receipts", icon: Package },
   { label: "Inventario", href: "/inventory" },
 ]
 
@@ -33,20 +35,24 @@ export default async function DashboardLayout({
           <p className="text-xs text-muted-foreground capitalize">{session.role}</p>
         </div>
         <nav className="flex-1 space-y-1 p-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted"
-            >
-              {item.label}
-              {item.href === "/inventory" && (alertCount ?? 0) > 0 && (
-                <span className="ml-auto inline-flex h-5 w-fit min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
-                  {alertCount}
-                </span>
-              )}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const Icon = "icon" in item ? item.icon : null
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-muted"
+              >
+                {Icon && <Icon className="size-4 shrink-0" />}
+                {item.label}
+                {item.href === "/inventory" && (alertCount ?? 0) > 0 && (
+                  <span className="ml-auto inline-flex h-5 w-fit min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
+                    {alertCount}
+                  </span>
+                )}
+              </Link>
+            )
+          })}
         </nav>
       </aside>
       <main className="flex-1 p-6">{children}</main>

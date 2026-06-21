@@ -1,22 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
+import { describe, it, expect, vi } from "vitest"
 import { ReceiptDetailDialog } from "@/app/(dashboard)/receipts/_components/receipt-detail-dialog"
 
-const mockPush = vi.hoisted(() => vi.fn())
-const mockReplace = vi.hoisted(() => vi.fn())
+// ---------------------------------------------------------------------------
+// Sample data
+// ---------------------------------------------------------------------------
 
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush, replace: mockReplace }),
-}))
-
-const mockGetReceiptById = vi.hoisted(() => vi.fn())
-
-vi.mock("@/lib/supabase/actions/compras", () => ({
-  getReceiptById: mockGetReceiptById,
-}))
-
-
-const sampleDetail = {
+const receiptDetail = {
   id: "rec-1",
   numero_recepcion: "RC-20260610-0001",
   proveedor_id: "prov-1",
@@ -27,110 +17,106 @@ const sampleDetail = {
   receipt_items: [
     {
       id: "item-1",
-      receipt_id: "rec-1",
+      recepcion_id: "rec-1",
       producto_id: "prod-1",
       cantidad_recibida: 10,
-      precio_compra: 25,
+      precio_compra: 25.5,
       created_at: "2026-06-10T12:00:00Z",
-      productos: { nombre: "Producto 1", sku: "SKU-001" },
+      productos: { nombre: "Tornillo 1/2", sku: "TOR-001" },
     },
     {
       id: "item-2",
-      receipt_id: "rec-1",
+      recepcion_id: "rec-1",
       producto_id: "prod-2",
       cantidad_recibida: 5,
       precio_compra: 30,
       created_at: "2026-06-10T12:00:00Z",
-      productos: { nombre: "Producto 2", sku: "SKU-002" },
+      productos: { nombre: "Tuerca 1/2", sku: "TUE-001" },
     },
   ],
   created_by_profiles: { full_name: "Admin User" },
 }
 
+const receiptDetailEmptyItems = {
+  id: "rec-2",
+  numero_recepcion: "RC-20260610-0002",
+  proveedor_id: "prov-2",
+  observaciones: null,
+  created_by: "user-1",
+  created_at: "2026-06-10T14:00:00Z",
+  proveedores: { id: "prov-2", nombre: "Proveedor B", ruc: "J-87654321" },
+  receipt_items: [],
+  created_by_profiles: { full_name: "Admin User" },
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
 describe("ReceiptDetailDialog", () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it("renders receipt header information after fetch resolves", async () => {
-    mockGetReceiptById.mockResolvedValue({ data: sampleDetail, error: null })
-
+  it("shows header with supplier, number, date and creator", () => {
     render(
       <ReceiptDetailDialog
-        receiptId="rec-1"
+        receipt={receiptDetail}
         open={true}
-        onOpenChange={() => { }}
+        onOpenChange={vi.fn()}
       />,
     )
 
-    await waitFor(() => {
-      expect(screen.getByText("RC-20260610-0001")).toBeInTheDocument()
-    })
     expect(screen.getByText("Proveedor A")).toBeInTheDocument()
+    expect(screen.getByText("RC-20260610-0001")).toBeInTheDocument()
     expect(screen.getByText("Admin User")).toBeInTheDocument()
+    // Date should be formatted (e.g., "10 jun 2026")
+    expect(screen.getByText(/jun 2026/)).toBeInTheDocument()
   })
 
-  it("renders items table with products after fetch", async () => {
-    mockGetReceiptById.mockResolvedValue({ data: sampleDetail, error: null })
-
+  it("shows items table with subtotals and total", () => {
     render(
       <ReceiptDetailDialog
-        receiptId="rec-1"
+        receipt={receiptDetail}
         open={true}
-        onOpenChange={() => { }}
+        onOpenChange={vi.fn()}
       />,
     )
 
-    await waitFor(() => {
-      expect(screen.getByText("Producto 1")).toBeInTheDocument()
-    })
-    expect(screen.getByText("SKU-001")).toBeInTheDocument()
-    expect(screen.getByText("Producto 2")).toBeInTheDocument()
-    expect(screen.getByText("SKU-002")).toBeInTheDocument()
+    // Item names
+    expect(screen.getByText("Tornillo 1/2")).toBeInTheDocument()
+    expect(screen.getByText("Tuerca 1/2")).toBeInTheDocument()
+
+    // SKUs
+    expect(screen.getByText("TOR-001")).toBeInTheDocument()
+    expect(screen.getByText("TUE-001")).toBeInTheDocument()
+
+    // Item 1 subtotal: 10 × $25.50 = $255.00
+    expect(screen.getByText("$255.00")).toBeInTheDocument()
+    // Item 2 subtotal: 5 × $30.00 = $150.00
+    expect(screen.getByText("$150.00")).toBeInTheDocument()
   })
 
-  it("shows item quantities and prices after fetch", async () => {
-    mockGetReceiptById.mockResolvedValue({ data: sampleDetail, error: null })
-
+  it("shows total of all items", () => {
     render(
       <ReceiptDetailDialog
-        receiptId="rec-1"
+        receipt={receiptDetail}
         open={true}
-        onOpenChange={() => { }}
+        onOpenChange={vi.fn()}
       />,
     )
 
-    await waitFor(() => {
-      expect(screen.getByText("10")).toBeInTheDocument()
-    })
-    expect(screen.getByText("5")).toBeInTheDocument()
+    // Total: $255.00 + $150.00 = $405.00
+    expect(screen.getByText("$405.00")).toBeInTheDocument()
   })
 
-  it("does not render content when open is false", () => {
+  it("shows empty items message when no items", () => {
     render(
       <ReceiptDetailDialog
-        receiptId={null}
-        open={false}
-        onOpenChange={() => {}}
-      />,
-    )
-
-    expect(screen.queryByText("RC-20260610-0001")).not.toBeInTheDocument()
-  })
-
-  it("shows error message when fetch fails", async () => {
-    mockGetReceiptById.mockResolvedValue({ data: null, error: "Not found" })
-
-    render(
-      <ReceiptDetailDialog
-        receiptId="rec-999"
+        receipt={receiptDetailEmptyItems}
         open={true}
-        onOpenChange={() => { }}
+        onOpenChange={vi.fn()}
       />,
     )
 
-    await waitFor(() => {
-      expect(screen.getByText(/not found/i)).toBeInTheDocument()
-    })
+    expect(
+      screen.getByText("No hay artículos en esta recepción"),
+    ).toBeInTheDocument()
   })
 })

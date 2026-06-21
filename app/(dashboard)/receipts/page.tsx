@@ -3,27 +3,47 @@ import { listReceipts } from "@/lib/supabase/actions/compras"
 import { ReceiptList } from "./_components/receipt-list"
 
 // ---------------------------------------------------------------------------
-// Page
+// Types
 // ---------------------------------------------------------------------------
 
 interface PageProps {
   searchParams: Promise<{
     search?: string
+    page?: string
+    pageSize?: string
   }>
 }
 
+// ---------------------------------------------------------------------------
+// RSC: Receipts Page
+// ---------------------------------------------------------------------------
+
 export default async function ReceiptsPage({ searchParams }: PageProps) {
   const sp = await searchParams
-  const { data: session } = await getSession()
+  const [{ data: session }, result] = await Promise.all([
+    getSession(),
+    listReceipts({
+      limit: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
+      offset: sp.page ? (parseInt(sp.page, 10) - 1) * (parseInt(sp.pageSize ?? "10", 10)) : 0,
+      search: sp.search || undefined,
+    }),
+  ])
 
-  const result = await listReceipts({ search: sp.search })
+  const pageData = result.data
+    ? {
+        rows: result.data,
+        total: result.total ?? result.data.length,
+        page: sp.page ? parseInt(sp.page, 10) : 1,
+        pageSize: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
+      }
+    : null
 
   return (
     <ReceiptList
-      initialData={result.data}
+      initialData={pageData}
       error={result.error}
-      isAdmin={session?.role === "admin"}
-      searchParams={sp as Record<string, string>}
+      searchParams={sp}
+      session={session}
     />
   )
 }
