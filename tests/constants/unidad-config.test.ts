@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { UNIDAD_CONFIG, getStep, type TipoUnidad, type UnidadBase } from "@/lib/constants/unidad-config"
+import { UNIDAD_CONFIG, getStep, type TipoUnidad } from "@/lib/constants/unidad-config"
 
 // ---------------------------------------------------------------------------
 // Tests — Task 2.1: unidad-config constants
