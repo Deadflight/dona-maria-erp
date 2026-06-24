@@ -34,6 +34,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
+import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
 import type { ReceiptFormState } from "@/lib/validations/compras"
 import { createReceiptAction } from "@/lib/supabase/actions/compras"
 import { searchProducts } from "@/lib/supabase/actions/productos"
@@ -52,6 +53,7 @@ type ProductResult = {
   id: string
   nombre: string
   sku: string
+  tipo_unidad: TipoUnidad
 }
 
 type ReceiptFormItem = {
@@ -59,6 +61,7 @@ type ReceiptFormItem = {
   producto_id: string
   nombre: string
   sku: string
+  tipo_unidad: TipoUnidad
   cantidad_recibida: number
   precio_compra: number
 }
@@ -81,6 +84,7 @@ function createEmptyItem(): ReceiptFormItem {
     producto_id: "",
     nombre: "",
     sku: "",
+    tipo_unidad: "unidad",
     cantidad_recibida: 0,
     precio_compra: 0,
   }
@@ -116,7 +120,7 @@ function ProductCombobox({
   value,
   onSelect,
 }: {
-  value: { id: string; nombre: string; sku: string } | null
+  value: { id: string; nombre: string; sku: string; tipo_unidad: TipoUnidad } | null
   onSelect: (product: ProductResult) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -143,7 +147,7 @@ function ProductCombobox({
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       const res = await searchProducts(normalizedSearch)
-      setResults(res.data ?? [])
+      setResults((res.data ?? []) as ProductResult[])
     }, 300)
 
     return () => {
@@ -258,11 +262,12 @@ export function ReceiptForm({
       setItems((prev) =>
         prev.map((item) =>
           item.key === key
-            ? {
+              ? {
                 ...item,
                 producto_id: product.id,
                 nombre: product.nombre,
                 sku: product.sku,
+                tipo_unidad: product.tipo_unidad,
               }
             : item,
         ),
@@ -420,6 +425,7 @@ export function ReceiptForm({
                   </thead>
                   <tbody>
                     {items.map((item, idx) => {
+                      const unitCfg = UNIDAD_CONFIG[item.tipo_unidad] ?? UNIDAD_CONFIG.unidad
                       const subtotal = item.cantidad_recibida * item.precio_compra
                       const cantidadError = itemErrors.get(
                         `${idx}.cantidad_recibida`,
@@ -438,6 +444,7 @@ export function ReceiptForm({
                                       id: item.producto_id,
                                       nombre: item.nombre,
                                       sku: item.sku,
+                                      tipo_unidad: item.tipo_unidad,
                                     }
                                   : null
                               }
@@ -450,12 +457,17 @@ export function ReceiptForm({
                               name={`items[${idx}].producto_id`}
                               value={item.producto_id}
                             />
+                            <input
+                              type="hidden"
+                              name={`items[${idx}].tipo_unidad`}
+                              value={item.tipo_unidad}
+                            />
                           </td>
                           <td className="py-2 pr-2">
                             <Input
                               type="number"
-                              min="0"
-                              step="1"
+                              min={unitCfg.min}
+                              step={unitCfg.step}
                               placeholder="0"
                               value={item.cantidad_recibida || ""}
                               onChange={(e) =>
@@ -487,7 +499,7 @@ export function ReceiptForm({
                             <Input
                               type="number"
                               min="0"
-                              step="1"
+                              step="0.01"
                               placeholder="0"
                               value={item.precio_compra || ""}
                               onChange={(e) =>

@@ -141,7 +141,7 @@ export async function getProductById(id: string): Promise<{
 export async function searchProducts(
   query: string,
 ): Promise<{
-  data: Array<{ id: string; nombre: string; sku: string }> | null
+  data: Array<{ id: string; nombre: string; sku: string; tipo_unidad: string }> | null
   error: string | null
 }> {
   const session = await getSession()
@@ -153,7 +153,7 @@ export async function searchProducts(
 
   const { data, error } = await supabase
     .from("productos")
-    .select("id, nombre, sku")
+    .select("id, nombre, sku, tipo_unidad")
     .or(`nombre.ilike.%${query}%,sku.ilike.%${query}%`)
     .limit(20)
 
