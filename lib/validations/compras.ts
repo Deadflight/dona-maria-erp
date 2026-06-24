@@ -17,10 +17,12 @@ export const receiptCreateSchema = z.object({
         producto_id: z.string().uuid("ID de producto inválido"),
         cantidad_recibida: z.coerce
           .number()
-          .positive("La cantidad debe ser mayor a 0"),
+          .positive("La cantidad debe ser mayor a 0")
+          .multipleOf(0.01, "Máximo 2 decimales"),
         precio_compra: z.coerce
           .number()
-          .positive("El precio de compra debe ser mayor a 0"),
+          .positive("El precio de compra debe ser mayor a 0")
+          .multipleOf(0.01, "Máximo 2 decimales"),
       }),
     )
     .min(1, "Debe agregar al menos un producto"),

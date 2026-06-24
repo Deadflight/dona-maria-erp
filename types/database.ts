@@ -6,6 +6,12 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+// ---------------------------------------------------------------------------
+// Fractional product unit types (added via migration 20260624000000)
+// ---------------------------------------------------------------------------
+export type TipoUnidad = "unidad" | "peso" | "longitud" | "mixto"
+export type UnidadBase = "und" | "kg" | "m" | "cm"
+
 export type Database = {
   graphql_public: {
     Tables: {
@@ -479,6 +485,9 @@ export type Database = {
           sku: string
           stock_actual: number
           stock_minimo: number
+          tipo_unidad: string
+          unidad_base: string
+          factor_conversion: number
           unidad_medida: string
           updated_at: string | null
         }
@@ -495,6 +504,9 @@ export type Database = {
           sku: string
           stock_actual?: number
           stock_minimo?: number
+          tipo_unidad?: string
+          unidad_base?: string
+          factor_conversion?: number
           unidad_medida?: string
           updated_at?: string | null
         }
@@ -511,6 +523,9 @@ export type Database = {
           sku?: string
           stock_actual?: number
           stock_minimo?: number
+          tipo_unidad?: string
+          unidad_base?: string
+          factor_conversion?: number
           unidad_medida?: string
           updated_at?: string | null
         }
@@ -678,7 +693,8 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      TipoUnidad: TipoUnidad
+      UnidadBase: UnidadBase
     }
     CompositeTypes: {
       [_ in never]: never
@@ -808,6 +824,9 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      TipoUnidad: ["unidad", "peso", "longitud", "mixto"] as const,
+      UnidadBase: ["und", "kg", "m", "cm"] as const,
+    },
   },
 } as const
