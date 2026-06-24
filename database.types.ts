@@ -314,6 +314,7 @@ export type Database = {
           codigo_barras: string | null
           created_at: string | null
           descripcion: string | null
+          factor_conversion: number
           id: string
           nombre: string
           precio_compra: number | null
@@ -321,6 +322,8 @@ export type Database = {
           sku: string
           stock_actual: number
           stock_minimo: number
+          tipo_unidad: string
+          unidad_base: string
           unidad_medida: string
           updated_at: string | null
         }
@@ -330,6 +333,7 @@ export type Database = {
           codigo_barras?: string | null
           created_at?: string | null
           descripcion?: string | null
+          factor_conversion?: number
           id?: string
           nombre: string
           precio_compra?: number | null
@@ -337,6 +341,8 @@ export type Database = {
           sku: string
           stock_actual?: number
           stock_minimo?: number
+          tipo_unidad?: string
+          unidad_base?: string
           unidad_medida?: string
           updated_at?: string | null
         }
@@ -346,6 +352,7 @@ export type Database = {
           codigo_barras?: string | null
           created_at?: string | null
           descripcion?: string | null
+          factor_conversion?: number
           id?: string
           nombre?: string
           precio_compra?: number | null
@@ -353,6 +360,8 @@ export type Database = {
           sku?: string
           stock_actual?: number
           stock_minimo?: number
+          tipo_unidad?: string
+          unidad_base?: string
           unidad_medida?: string
           updated_at?: string | null
         }
