@@ -61,8 +61,8 @@ describe("ReceiptForm", () => {
     })
     mockSearchProductsAction.mockResolvedValue({
       data: [
-        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001" },
-        { id: "prod-2", nombre: "Tuerca 1/2", sku: "TUE-001" },
+        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001", tipo_unidad: "unidad" },
+        { id: "prod-2", nombre: "Tuerca 1/2", sku: "TUE-001", tipo_unidad: "peso" },
       ],
       error: null,
     })
@@ -300,5 +300,52 @@ describe("ReceiptForm", () => {
     expect(
       screen.getByPlaceholderText("Opcional — notas sobre la recepción"),
     ).toBeInTheDocument()
+  })
+
+  // -------------------------------------------------------------------
+  // ESC-009/011: Dynamic step on cantidad_recibida based on tipo_unidad
+  // -------------------------------------------------------------------
+
+  it("defaults cantidad_recibida step to 1 when item has no tipo_unidad", () => {
+    renderForm()
+
+    // Add an item
+    fireEvent.click(screen.getByRole("button", { name: /agregar producto/i }))
+
+    const rows = getItemRows()
+    const cantidadInput = rows[0].querySelectorAll("input[type='number']")[0] as HTMLInputElement
+
+    // Default tipo_unidad is 'unidad', step should be 1
+    expect(cantidadInput).toHaveAttribute("step", "1")
+    expect(cantidadInput).toHaveAttribute("min", "1")
+  })
+
+  it("renders hidden tipo_unidad input with default 'unidad' for new items", () => {
+    renderForm()
+
+    fireEvent.click(screen.getByRole("button", { name: /agregar producto/i }))
+
+    const rows = getItemRows()
+    const hiddenTipoUnidad = rows[0].querySelector(
+      'input[name$=".tipo_unidad"]',
+    ) as HTMLInputElement
+
+    expect(hiddenTipoUnidad).toBeInTheDocument()
+    expect(hiddenTipoUnidad.value).toBe("unidad")
+  })
+
+  // -------------------------------------------------------------------
+  // ESC-011: precio_compra step fixed at 0.01
+  // -------------------------------------------------------------------
+
+  it("renders precio_compra input with step=0.01", () => {
+    renderForm()
+
+    fireEvent.click(screen.getByRole("button", { name: /agregar producto/i }))
+
+    const rows = getItemRows()
+    const precioInput = rows[0].querySelectorAll("input[type='number']")[1] as HTMLInputElement
+
+    expect(precioInput).toHaveAttribute("step", "0.01")
   })
 })
