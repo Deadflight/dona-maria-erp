@@ -8,6 +8,8 @@ import { useActionState, useEffect, useState } from "react"
 import { AlertCircle } from "lucide-react"
 
 import type { Database } from "@/types/database"
+import { UNIDAD_CONFIG, getStep } from "@/lib/constants/unidad-config"
+import type { TipoUnidad, UnidadBase } from "@/lib/constants/unidad-config"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -103,6 +105,22 @@ export function ProductFormDialog({
       return value != null ? String(value) : ""
     }
     return undefined
+  }
+
+  // --- Tipo Unidad state for dynamic step / select filtering ---
+  const initialTipoUnidad = (fieldValue("tipo_unidad") as TipoUnidad) ?? "unidad"
+  const [tipoUnidad, setTipoUnidad] = useState<TipoUnidad>(initialTipoUnidad)
+  const [unidadBase, setUnidadBase] = useState<UnidadBase>(
+    (fieldValue("unidad_base") as UnidadBase) ?? "und",
+  )
+
+  // When tipoUnidad changes, reset unidad_base if current value is not in new options
+  const handleTipoUnidadChange = (newTipo: TipoUnidad) => {
+    setTipoUnidad(newTipo)
+    const newOptions = UNIDAD_CONFIG[newTipo].unidadOptions
+    if (!newOptions.includes(unidadBase)) {
+      setUnidadBase(newOptions[0])
+    }
   }
 
   const title = mode === "create" ? "Nuevo Producto" : "Editar Producto"
@@ -210,6 +228,28 @@ export function ProductFormDialog({
             </div>
           </div>
 
+          {/* Row 2b: Tipo de Unidad + Unidad Base (fractional config) */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label>Tipo de Unidad</Label>
+              <TipoUnidadSelect
+                value={tipoUnidad}
+                onChange={handleTipoUnidadChange}
+                error={state.errors?.tipo_unidad?.[0]}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label>Unidad Base</Label>
+              <UnidadBaseSelect
+                tipoUnidad={tipoUnidad}
+                value={unidadBase}
+                onChange={setUnidadBase}
+                error={state.errors?.unidad_base?.[0]}
+              />
+            </div>
+          </div>
+
           {/* Row 3: Precio Venta + Precio Compra */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
@@ -257,7 +297,8 @@ export function ProductFormDialog({
                 id="stock_actual"
                 name="stock_actual"
                 type="number"
-                min="0"
+                min={UNIDAD_CONFIG[tipoUnidad].min}
+                step={getStep(tipoUnidad)}
                 placeholder="0"
                 defaultValue={fieldValue("stock_actual") ?? "0"}
               />
@@ -274,7 +315,8 @@ export function ProductFormDialog({
                 id="stock_minimo"
                 name="stock_minimo"
                 type="number"
-                min="0"
+                min={UNIDAD_CONFIG[tipoUnidad].min}
+                step={getStep(tipoUnidad)}
                 placeholder="0"
                 defaultValue={fieldValue("stock_minimo") ?? "0"}
               />
@@ -285,6 +327,27 @@ export function ProductFormDialog({
               )}
             </div>
           </div>
+
+          {/* Factor de Conversión (visible for peso/longitud/mixto) */}
+          {tipoUnidad !== "unidad" && (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="factor_conversion">Factor de Conversión</Label>
+              <Input
+                id="factor_conversion"
+                name="factor_conversion"
+                type="number"
+                step="0.01"
+                min="0.001"
+                placeholder="1"
+                defaultValue={fieldValue("factor_conversion") ?? "1"}
+              />
+              {state.errors?.factor_conversion && (
+                <p className="text-xs text-destructive">
+                  {state.errors.factor_conversion.join(", ")}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Código de Barras */}
           <div className="flex flex-col gap-1.5">
@@ -393,6 +456,82 @@ function UnidadSelect({
         </SelectContent>
       </Select>
       <input type="hidden" name="unidad_medida" value={value} />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components for fractional product unit configuration
+// ---------------------------------------------------------------------------
+
+function TipoUnidadSelect({
+  value,
+  onChange,
+  error,
+}: {
+  value: TipoUnidad
+  onChange: (v: TipoUnidad) => void
+  error?: string
+}) {
+  return (
+    <>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          if (v !== null) onChange(v as TipoUnidad)
+        }}
+      >
+        <SelectTrigger className="w-full" aria-label="Tipo de Unidad">
+          <SelectValue placeholder="Seleccionar" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(UNIDAD_CONFIG).map(([key, config]) => (
+            <SelectItem key={key} value={key}>
+              {config.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <input type="hidden" name="tipo_unidad" value={value} />
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </>
+  )
+}
+
+function UnidadBaseSelect({
+  tipoUnidad,
+  value,
+  onChange,
+  error,
+}: {
+  tipoUnidad: TipoUnidad
+  value: UnidadBase
+  onChange: (v: UnidadBase) => void
+  error?: string
+}) {
+  const options = UNIDAD_CONFIG[tipoUnidad].unidadOptions
+
+  return (
+    <>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          if (v !== null) onChange(v as UnidadBase)
+        }}
+      >
+        <SelectTrigger className="w-full" aria-label="Unidad Base">
+          <SelectValue placeholder="Seleccionar" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt} value={opt}>
+              {opt}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <input type="hidden" name="unidad_base" value={value} />
       {error && <p className="text-xs text-destructive">{error}</p>}
     </>
   )
