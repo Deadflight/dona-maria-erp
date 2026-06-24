@@ -62,6 +62,153 @@ Obtiene la sesión actual del usuario autenticado.
 
 ---
 
+## Productos
+
+### `productos.listProducts`
+Lista productos con búsqueda opcional, filtro por categoría y paginación.
+
+**Parámetros:**
+```typescript
+{
+  search?: string;         // Búsqueda por nombre o SKU
+  categoria?: string;      // Filtrar por categoría exacta
+  page?: number;           // Página (default: 1)
+  pageSize?: number;       // Items por página (default: 10)
+  activo?: boolean;        // false para mostrar todos; default: solo activos
+}
+```
+
+**Respuesta:**
+```typescript
+{
+  data: {
+    rows: Array<{
+      id: string;
+      codigo_barra: string | null;
+      descripcion: string;
+      tipo_unidad: 'unidad' | 'peso' | 'longitud' | 'mixto';
+      unidad_base: 'kg' | 'm' | 'cm' | 'und';
+      factor_conversion: number;
+      precio_venta: number;
+      stock_actual: number;
+      stock_minimo: number;
+      activo: boolean;
+    }>;
+    total: number;
+    page: number;
+    pageSize: number;
+  } | null;
+  error: string | null;            // 'UNAUTHORIZED' | mensaje de error
+}
+```
+
+---
+
+### `productos.searchProducts`
+Busca productos activos por nombre o SKU para usarlos en combos/selectores.
+
+**Parámetros:**
+```typescript
+{
+  query: string;           // Texto a buscar
+}
+```
+
+**Respuesta:**
+```typescript
+{
+  data: Array<{
+    id: string;
+    nombre: string;
+    sku: string;
+    tipo_unidad: 'unidad' | 'peso' | 'longitud' | 'mixto';
+  }> | null;
+  error: string | null;            // 'UNAUTHORIZED' | mensaje de error
+}
+```
+
+---
+
+### `productos.createProduct`
+Crea un nuevo producto. Usa el patrón `useActionState` con FormData.
+
+**Parámetros (FormData):**
+```typescript
+{
+  sku: string;                     // SKU único del producto
+  nombre: string;                  // Nombre del producto
+  descripcion?: string | null;     // Descripción opcional
+  categoria: string;               // Categoría
+  precio_venta: number;            // Precio de venta > 0
+  precio_compra?: number | null;   // Precio de compra opcional
+  stock_actual?: number;           // Default: 0. Máximo 2 decimales
+  stock_minimo?: number;           // Default: 0. Máximo 2 decimales
+  unidad_medida: string;           // Unidad de medida (texto libre)
+  tipo_unidad?: 'unidad' | 'peso' | 'longitud' | 'mixto';  // Default: 'unidad'
+  unidad_base?: 'kg' | 'm' | 'cm' | 'und';                  // Default: 'und'
+  factor_conversion?: number;      // Default: 1. Debe ser positivo
+  codigo_barras?: string | null;   // Código de barras opcional
+}
+```
+
+**Validaciones:**
+- `precio_venta` > 0
+- `stock_actual` >= 0, máximo 2 decimales
+- `stock_minimo` >= 0, máximo 2 decimales
+- Si `tipo_unidad = 'unidad'`, `stock_actual` y `stock_minimo` deben ser enteros
+- Solo administradores y vendedores pueden crear productos
+
+**Respuesta:**
+```typescript
+{
+  success: boolean;
+  data?: { id: string };           // UUID del producto creado
+  errors?: Record<string, string[]>;  // Errores de validación por campo
+  message?: string;                // Mensaje de error general
+}
+```
+
+---
+
+### `productos.updateProduct`
+Actualiza un producto existente. Usa el patrón `useActionState` con FormData.
+
+**Parámetros (FormData):**
+```typescript
+{
+  id: string;                      // UUID del producto (campo oculto)
+  sku?: string;
+  nombre?: string;
+  descripcion?: string | null;
+  categoria?: string;
+  precio_venta?: number;
+  precio_compra?: number | null;
+  stock_actual?: number;
+  stock_minimo?: number;
+  unidad_medida?: string;
+  tipo_unidad?: 'unidad' | 'peso' | 'longitud' | 'mixto';
+  unidad_base?: 'kg' | 'm' | 'cm' | 'und';
+  factor_conversion?: number;
+  codigo_barras?: string | null;
+}
+```
+
+**Validaciones:**
+- Al menos un campo debe proporcionarse
+- Mismas reglas de stock y tipo_unidad que `createProduct`
+- Solo administradores y vendedores pueden actualizar productos
+
+**Respuesta:**
+```typescript
+{
+  success: boolean;
+  errors?: Record<string, string[]>;
+  message?: string;
+}
+```
+
+---
+
 ## Inventario
 
 ### `inventario.buscarProductos`

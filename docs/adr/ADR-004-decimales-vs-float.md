@@ -20,7 +20,7 @@ Se debe elegir el tipo de dato para representar estos valores. Las opciones son:
 ## Decisión
 Se utiliza **DECIMAL(10,2)** para montos en USD y **DECIMAL(10,2)** para montos en VES.
 
-Para cantidades de productos (stock, cantidad vendida) se utiliza **DECIMAL(10,3)** para permitir fracciones de hasta 3 decimales (ej: 2.5 kg de cemento).
+Para cantidades de productos (stock, cantidad vendida) se utiliza **DECIMAL(10,2)** para permitir fracciones de hasta 2 decimales (ej: 2.50 kg de cemento).
 
 ## Razones
 
@@ -64,8 +64,8 @@ DECIMAL(p,s) = NUMERIC(p,s)  -- Son synonymos en PostgreSQL
 | `total_ves` | DECIMAL(10,2) | 2 decimales para totales en VES |
 | `tasa_cambio` | DECIMAL(10,2) | 2 decimales para tasa (ej: 50.25) |
 | `monto_ves` (pagos) | DECIMAL(10,2) | 2 decimales para montos |
-| `stock_actual` | DECIMAL(10,3) | 3 decimales para fracciones (ej: 2.5 kg) |
-| `cantidad_vendida` | DECIMAL(10,3) | 3 decimales para productos fraccionados |
+| `stock_actual` | DECIMAL(10,2) | 2 decimales para fracciones (ej: 2.50 kg) |
+| `cantidad_vendida` | DECIMAL(10,2) | 2 decimales para productos fraccionados |
 
 ## Constraints aplicadas
 
@@ -103,3 +103,13 @@ CHECK (precio_unitario_usd >= 0)
 - DECIMAL ocupa más espacio que FLOAT (aprox 8 bytes vs 4 bytes)
 - Menos eficiente en operaciones muy intensivas en cálculo
 - Para el volumen de la ferretería (< 50 transacciones/día), esto no es problema
+
+## Nota: Desviación de precisión en stock
+
+El ADR original especificaba `DECIMAL(10,3)` para `stock_actual` y `cantidad_vendida`, pero todas las migraciones existentes y nuevas usan `DECIMAL(10,2)`. Esta decisión se tomó por consistencia: el sistema completo (`precios`, `montos`, `cantidades` en recepciones, RPCs) utiliza `(10,2)`. Usar `(10,3)` solo para stock habría introducido una asimetría sin beneficio real, dado que:
+
+- El negocio opera con 2 decimales (kg, m, unidades fraccionarias)
+- El redondeo a 2 decimales es predecible y consistente en todos los cálculos
+- No hay requerimiento actual para precisión de 3 decimales en inventario
+
+Si en el futuro se requiere precisión de 3 decimales (ej: gramos en lugar de kg), se deberá actualizar esta decisión y migrar todas las columnas numéricas afectadas de forma consistente.
