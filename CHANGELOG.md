@@ -1,3 +1,11 @@
+## [1.8.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.7.1...v1.8.0) (2026-06-24)
+
+### Features
+
+* **db:** add tipo_unidad, unidad_base, factor_conversion columns ([c588251](https://github.com/Deadflight/dona-maria-erp/commit/c588251d49518213406033e3b0c07d0f1e59799c)), closes [#1](https://github.com/Deadflight/dona-maria-erp/issues/1)
+* **scripts:** add Jira bulk import script for project phases ([b3ca0bf](https://github.com/Deadflight/dona-maria-erp/commit/b3ca0bf08c53d8c03ea5cda70cd3750ca0cd216d))
+* **ui:** add TipoUnidad/UnidadBase selects and dynamic step to product forms ([7dcf515](https://github.com/Deadflight/dona-maria-erp/commit/7dcf515a0e65f34e483277a622f4b0c7ed5e81e0)), closes [#2](https://github.com/Deadflight/dona-maria-erp/issues/2)
+
 ## [1.8.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.7.1...v1.8.0) (2026-06-21)
 
 ### Features
