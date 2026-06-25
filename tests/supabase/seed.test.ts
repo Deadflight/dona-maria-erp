@@ -4,6 +4,7 @@ import { resolve } from "path"
 
 const SEED_PATH = resolve(__dirname, "../../supabase/seed.sql")
 const SETUP_SCRIPT_PATH = resolve(__dirname, "../../scripts/create-admin.ts")
+const RECEIPTS_SCRIPT_PATH = resolve(__dirname, "../../scripts/seed-receipts.ts")
 
 describe("seed.sql", () => {
   it("should exist as a seed file", () => {
@@ -13,18 +14,16 @@ describe("seed.sql", () => {
   it("should contain INSERT for proveedores", () => {
     const sql = readFileSync(SEED_PATH, "utf-8")
     expect(sql).toContain("INSERT INTO public.proveedores")
-    const matches = sql.match(/INSERT INTO public\.proveedores.*?VALUES\s*\(/gs)
+    const matches = sql.match(/INSERT INTO public\.proveedores[\s\S]*?VALUES\s*\(/)
     expect(matches).not.toBeNull()
     expect(matches!.length).toBeGreaterThanOrEqual(1)
   })
 
   it("should contain at least 3 proveedores", () => {
     const sql = readFileSync(SEED_PATH, "utf-8")
-    const firstParen = sql.indexOf("(")
-    const lastParen = sql.lastIndexOf(")")
     const valuesBlock = sql.slice(
       sql.indexOf("VALUES", sql.indexOf("proveedores")),
-      lastParen + 1
+      sql.lastIndexOf(")") + 1
     )
     const valueCount = (valuesBlock.match(/\([^)]*\)/g) || []).length
     expect(valueCount).toBeGreaterThanOrEqual(3)
@@ -34,7 +33,6 @@ describe("seed.sql", () => {
     const sql = readFileSync(SEED_PATH, "utf-8")
     expect(sql).toContain("INSERT INTO public.productos")
     expect(sql).toContain("VALUES")
-    const matches = sql.match(/\([^)]*\)/g)
     const valuesAfterProductos = sql.slice(sql.indexOf("productos") + 10)
     const valueCount = (valuesAfterProductos.match(/\([^)]*\)/g) || []).length
     expect(valueCount).toBeGreaterThanOrEqual(20)
@@ -96,5 +94,54 @@ describe("scripts/create-admin.ts", () => {
   it("should handle admin already existing (idempotent)", () => {
     const script = readFileSync(SETUP_SCRIPT_PATH, "utf-8")
     expect(script).toContain("already exists")
+  })
+})
+
+describe("scripts/seed-receipts.ts", () => {
+  it("should exist as a seed script", () => {
+    expect(existsSync(RECEIPTS_SCRIPT_PATH)).toBe(true)
+  })
+
+  it("should use service_role key for Supabase client", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    expect(script).toContain("SUPABASE_SERVICE_ROLE_KEY")
+    expect(script).toContain("createClient")
+  })
+
+  it("should reference the same admin email as create-admin.ts", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    expect(script).toContain("admin@ferreteria.com")
+  })
+
+  it("should reference proveedor UUIDs from seed.sql", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    expect(script).toContain("a0000000-0000-4000-a000-000000000001")
+    expect(script).toContain("a0000000-0000-4000-a000-000000000002")
+    expect(script).toContain("a0000000-0000-4000-a000-000000000003")
+  })
+
+  it("should reference producto UUIDs from seed.sql", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    expect(script).toContain("b0000000-0000-4000-b000-000000000001")
+    expect(script).toContain("b0000000-0000-4000-b000-000000000011")
+    expect(script).toContain("b0000000-0000-4000-b000-000000000024")
+  })
+
+  it("should define at least 3 receipts in RECEIPTS array", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    const receiptBlocks = script.match(/numero:\s*"[^"]+"/g) || []
+    expect(receiptBlocks.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it("should insert into purchase_receipts with upsert", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    expect(script).toContain("purchase_receipts")
+    expect(script).toContain("onConflict")
+  })
+
+  it("should insert into receipt_items with upsert", () => {
+    const script = readFileSync(RECEIPTS_SCRIPT_PATH, "utf-8")
+    expect(script).toContain("receipt_items")
+    expect(script).toContain("onConflict")
   })
 })

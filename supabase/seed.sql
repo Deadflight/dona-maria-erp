@@ -12,7 +12,7 @@
 -- GoTrue/Supabase Auth). Direct SQL inserts to auth.users with crypt()
 -- cannot be verified by GoTrue.
 --
--- Run after reset: pnpm seed (tsx scripts/create-admin.ts)
+-- Run after reset: pnpm seed (create-admin.ts + seed-receipts.ts)
 -- ===================================================================
 
 -- ===================================================================
