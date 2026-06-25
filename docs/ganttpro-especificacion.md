@@ -19,7 +19,7 @@
 
 ## Estructura de Fases y Actividades
 
-> **Estado real al 21/06/2026**: Fases I-II ✅ Completas | Fase III ⚠️ En progreso (4/8 tareas) | Fases IV-V ⏳ Pendientes
+> **Estado real al 25/06/2026**: Fases I-II ✅ Completas | Fase III ⚠️ En progreso (5/8 tareas) | Fases IV-V ⏳ Pendientes
 
 ### FASE I: Diagnóstico Operativo y Brechas de Control Financiero (Días 1–8) ✅
 **Color**: Azul (#1565C0)
@@ -58,7 +58,7 @@
 ### FASE III: Mitigación del Descontrol de Existencias (Días 17–24) ⚠️
 **Color**: Naranja (#E65100)
 **Correspondencia científica**: Experimentación
-**Hito**: Módulo de inventario operativo (Día 24) — ⏳ Pendiente (57% avanzado)
+**Hito**: Módulo de inventario operativo (Día 24) — ⏳ Pendiente (71% avanzado)
 
 | # | Actividad | Duración | Dependencia | Estado | Notas |
 |---|-----------|----------|-------------|--------|-------|
@@ -67,7 +67,7 @@
 | 19 | Implementación del algoritmo de actualización masiva de precios | 1 día | 18 (FI) | ✅ | Modal con % global de ajuste |
 | 20 | Desarrollo de interfaz para recepción y registro de mercancía | 1 día | 19 (FI) | ✅ | Listado + detalle + formulario creación (PR #53 mergeado) |
 | 21 | Programación de restricciones y validaciones del lado del servidor | 1 día | 20 (FI) | ✅ | Zod schemas, RLS, validaciones server-side |
-| 22 | Implementación del procesamiento numérico fraccionado | 1 día | 21 (FI) | ❌ | Siguiente tarea a implementar |
+| 22 | Implementación del procesamiento numérico fraccionado | 1 día | 21 (FI) | ✅ | Migraciones + UI + docs. Scope extendido con tipo_unidad/unidad_base/factor_conversion |
 | 23 | Simulación de carga integral con datos históricos | 1 día | 22 (FI) | ❌ | Seed data para pruebas |
 | 24 | Documentación técnica de la arquitectura de stock | 1 día | 23 (FI) | ❌ | Docs de arquitectura |
 | **Hito III** | ◆ Módulo de control de inventarios operativo y validado | — | 24 (FI) | ⏳ |
