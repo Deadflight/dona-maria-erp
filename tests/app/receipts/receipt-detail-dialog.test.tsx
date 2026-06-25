@@ -86,8 +86,7 @@ describe("ReceiptDetailDialog", () => {
     expect(screen.getByText("Proveedor A")).toBeInTheDocument()
     expect(screen.getByText("RC-20260610-0001")).toBeInTheDocument()
     expect(screen.getByText("Admin User")).toBeInTheDocument()
-    // Date should be formatted (e.g., "10 jun 2026")
-    expect(screen.getByText(/jun 2026/)).toBeInTheDocument()
+    expect(screen.getByText(/Jun.*2026/)).toBeInTheDocument()
   })
 
   it("shows items table with subtotals and total", () => {

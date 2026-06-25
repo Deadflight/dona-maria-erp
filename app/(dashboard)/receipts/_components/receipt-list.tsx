@@ -26,6 +26,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { ReceiptListItem } from "@/lib/supabase/actions/compras"
+import { getReceiptById } from "@/lib/supabase/actions/compras"
+import { ReceiptDetailDialog } from "@/app/(dashboard)/receipts/_components/receipt-detail-dialog"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -118,7 +120,15 @@ export function ReceiptList({
   }, [searchInput])
 
   // --- Detail dialog state ---
-  const [, setSelectedReceipt] = useState<ReceiptListItem | null>(null)
+  const [detailReceipt, setDetailReceipt] = useState<NonNullable<Awaited<ReturnType<typeof getReceiptById>>["data"]> | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+
+  const openDetail = useCallback(async (id: string) => {
+    setDetailLoading(true)
+    const result = await getReceiptById(id)
+    setDetailReceipt(result.data)
+    setDetailLoading(false)
+  }, [])
 
   // --- Pagination ---
   const totalPages = initialData
@@ -255,7 +265,7 @@ export function ReceiptList({
                   <TableRow
                     key={receipt.id}
                     className="cursor-pointer transition-colors hover:bg-muted/50"
-                    onClick={() => setSelectedReceipt(receipt)}
+                    onClick={() => openDetail(receipt.id)}
                   >
                     <TableCell className="font-mono text-xs font-medium">
                       {receipt.numero_recepcion}
@@ -325,6 +335,14 @@ export function ReceiptList({
           </div>
         </div>
       )}
+
+      {/* ---- Detail Dialog ---- */}
+      <ReceiptDetailDialog
+        receipt={detailReceipt}
+        open={detailReceipt !== null}
+        loading={detailLoading}
+        onOpenChange={(open) => { if (!open) { setDetailReceipt(null) } }}
+      />
     </div>
   )
 }

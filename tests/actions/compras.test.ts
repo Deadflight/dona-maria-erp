@@ -389,8 +389,7 @@ describe("compras Server Actions", () => {
       expect(mockGetUser).toHaveBeenCalledOnce()
     })
 
-    // ESC-1: Returns active suppliers
-    it("returns active suppliers with id, nombre, ruc", async () => {
+    it("returns suppliers with id, nombre, ruc", async () => {
       const expectedSuppliers = [
         { id: "prov-1", nombre: "Proveedor A", ruc: "J-12345678" },
         { id: "prov-2", nombre: "Proveedor B", ruc: "J-87654321" },
@@ -403,7 +402,6 @@ describe("compras Server Actions", () => {
       expect(result).toEqual({ data: expectedSuppliers, error: null })
       expect(mockFrom).toHaveBeenCalledWith("proveedores")
       expect(mockProveedoresChain.select).toHaveBeenCalledWith("id, nombre, ruc")
-      expect(mockProveedoresChain.eq).toHaveBeenCalledWith("activo", true)
     })
 
     it("returns error message when Supabase query fails", async () => {

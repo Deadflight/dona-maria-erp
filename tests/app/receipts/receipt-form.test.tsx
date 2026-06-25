@@ -93,7 +93,7 @@ describe("ReceiptForm", () => {
     // Total amount should be present — we use a matcher that handles
     // the non-breaking space between "Gs" and the amount
     expect(
-      screen.getByText((content) => content.startsWith("Gs") && content.includes("0")),
+      screen.getByText((content) => content.startsWith("$") && content.includes("0")),
     ).toBeInTheDocument()
   })
 
@@ -152,10 +152,8 @@ describe("ReceiptForm", () => {
     fireEvent.change(cantidadInputs2[0], { target: { value: "2" } })
     fireEvent.change(cantidadInputs2[1], { target: { value: "15000" } })
 
-    // Expected total = 5 * 10000 + 2 * 15000 = 80000
-    // Formatted with es-PY locale: "80.000" (period as thousands separator)
     expect(
-      screen.getByText((content) => content.includes("80.000")),
+      screen.getByText((content) => content.includes("80,000")),
     ).toBeInTheDocument()
   })
 

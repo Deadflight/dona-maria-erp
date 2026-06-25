@@ -249,7 +249,6 @@ export async function listProveedores(): Promise<{
   const { data, error } = await supabase
     .from("proveedores")
     .select("id, nombre, ruc")
-    .eq("activo", true)
 
   if (error) {
     return { data: null, error: error.message }

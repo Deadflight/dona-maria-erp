@@ -38,6 +38,7 @@ import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
 import type { ReceiptFormState } from "@/lib/validations/compras"
 import { createReceiptAction } from "@/lib/supabase/actions/compras"
 import { searchProducts } from "@/lib/supabase/actions/productos"
+import { formatCurrency } from "@/lib/format"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,10 +89,6 @@ function createEmptyItem(): ReceiptFormItem {
     cantidad_recibida: 0,
     precio_compra: 0,
   }
-}
-
-function formatCurrency(n: number): string {
-  return `Gs\u00A0${n.toLocaleString("es-PY")}`
 }
 
 /** Parses dot-notation field errors like "items.0.precio_compra" into a map
@@ -605,7 +602,9 @@ function SupplierSelect({
           className={cn("w-full", error && "border-destructive")}
           aria-label="Proveedor"
         >
-          <SelectValue placeholder="Seleccionar proveedor" />
+          <SelectValue placeholder="Seleccionar proveedor">
+            {suppliers.find((s) => s.id === value)?.nombre}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {suppliers.map((s) => (
