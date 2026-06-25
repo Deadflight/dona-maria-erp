@@ -147,7 +147,7 @@ src/
 |------|--------|--------|
 | **I** — Diagnóstico Operativo | 8/8 tareas | ✅ Completo |
 | **II** — Rediseño y Modelado | 8/8 tareas | ✅ Completo |
-| **III** — Control de Inventarios | 5/7 tareas + 1 hito | ⚠️ En progreso (71%) |
+| **III** — Control de Inventarios | 6/7 tareas + 1 hito | ⚠️ En progreso (86%) |
 | **IV** — Mostrador y Conciliación | 0/8 tareas | ⏳ Pendiente |
 | **V** — Validación e Implantación | 0/8 tareas | ⏳ Pendiente |
 
@@ -161,9 +161,9 @@ src/
 | 20 | Recepción y registro de mercancía | ✅ | PR #53 mergeado. Listado, detalle, formulario creación |
 | 21 | Restricciones y validaciones server-side | ✅ | Zod schemas, RLS, validaciones |
 | 22 | Procesamiento numérico fraccionado | ✅ | Migraciones, UI, docs. Scope extendido con tipo_unidad/unidad_base/factor_conversion |
-| 23 | Simulación de carga / seed data | ❌ | Pendiente |
+| 23 | Simulación de carga / seed data | ✅ | Seed SQL completa (proveedores, productos, movimientos) |
 | 24 | Documentación técnica de stock | ❌ | Pendiente |
-| ◆ | **Hito III: Módulo inventario operativo** | ⏳ | Depende de tareas 22→23→24→17 |
+| ◆ | **Hito III: Módulo inventario operativo** | ⏳ | Depende de tareas 17, 24 |
 
 ### Fases IV y V
 
