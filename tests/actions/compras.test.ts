@@ -6,10 +6,15 @@ import {
   getReceiptById,
   listProveedores,
   generateReceiptNumber,
+  createReceiptAction,
 } from "@/lib/supabase/actions/compras"
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
+}))
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
 }))
 
 // ---------------------------------------------------------------------------
@@ -33,6 +38,7 @@ let receiptListResolveValue: { data: unknown; error: unknown; count: number | nu
  *  .single mock is used as the terminal call in getReceiptById. */
 const mockReceiptsChain = {
   select: vi.fn(() => mockReceiptsChain),
+  or: vi.fn(() => mockReceiptsChain),
   order: vi.fn(() => mockReceiptsChain),
   limit: vi.fn(() => mockReceiptsChain),
   range: vi.fn(() => mockReceiptsChain),
@@ -268,6 +274,17 @@ describe("compras Server Actions", () => {
 
       expect(result).toEqual({ data: null, total: null, error: "DB connection error" })
     })
+
+    it("applies search filter when search param is provided", async () => {
+      receiptListResolveValue = { data: [], error: null, count: 0 }
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+
+      await listReceipts({ search: "Proveedor A" })
+
+      expect(mockReceiptsChain.or).toHaveBeenCalledWith(
+        expect.stringContaining("Proveedor A"),
+      )
+    })
   })
 
   describe("getReceiptById", () => {
@@ -452,6 +469,107 @@ describe("compras Server Actions", () => {
       const result = await generateReceiptNumber()
 
       expect(result).toEqual({ data: null, error: "RPC error" })
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // createReceiptAction (FormData → Zod → createReceipt)
+  // ---------------------------------------------------------------------------
+
+  describe("createReceiptAction", () => {
+    const prevState = { errors: undefined as Record<string, string[]> | undefined }
+
+    it("parses indexed FormData items and calls createReceipt on success", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
+      mockRpc.mockResolvedValue({ data: { receipt_id: "rec-1" }, error: null })
+
+      const formData = new FormData()
+      formData.set("proveedor_id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+      formData.set("numero_recepcion", "REC-001")
+      formData.set("observaciones", "Test observaciones")
+      formData.set("items[0].producto_id", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22")
+      formData.set("items[0].cantidad_recibida", "10")
+      formData.set("items[0].precio_compra", "25")
+
+      const result = await createReceiptAction(prevState, formData)
+
+      expect(result).toEqual({ success: true, data: { id: "rec-1" } })
+      expect(mockRpc).toHaveBeenCalledWith("create_receipt_with_movements", {
+        p_numero_recepcion: "REC-001",
+        p_proveedor_id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        p_observaciones: "Test observaciones",
+        p_items: [{ producto_id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22", cantidad_recibida: 10, precio_compra: 25 }],
+      })
+    })
+
+    it("returns errors when Zod validation fails", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+
+      const formData = new FormData()
+      formData.set("proveedor_id", "")  // empty — should fail Zod
+      formData.set("numero_recepcion", "")
+      // No items
+
+      const result = await createReceiptAction(prevState, formData)
+
+      expect(result).toHaveProperty("errors")
+      expect(result.errors).toBeDefined()
+    })
+
+    it("returns FORBIDDEN message when user lacks admin role", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "operador" }, error: null })
+
+      const formData = new FormData()
+      formData.set("proveedor_id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+      formData.set("numero_recepcion", "REC-001")
+      formData.set("items[0].producto_id", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22")
+      formData.set("items[0].cantidad_recibida", "5")
+      formData.set("items[0].precio_compra", "10")
+
+      const result = await createReceiptAction(prevState, formData)
+
+      expect(result).toEqual({ message: "No tienes permisos para realizar esta acción" })
+    })
+
+    it("returns generic error message when createReceipt fails", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
+      mockRpc.mockResolvedValue({ data: null, error: { message: "DB error" } })
+
+      const formData = new FormData()
+      formData.set("proveedor_id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+      formData.set("numero_recepcion", "REC-001")
+      formData.set("items[0].producto_id", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22")
+      formData.set("items[0].cantidad_recibida", "5")
+      formData.set("items[0].precio_compra", "10")
+
+      const result = await createReceiptAction(prevState, formData)
+
+      expect(result).toEqual({ message: "DB error" })
+    })
+
+    it("handles multiple indexed items", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
+      mockRpc.mockResolvedValue({ data: { receipt_id: "rec-2" }, error: null })
+
+      const formData = new FormData()
+      formData.set("proveedor_id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+      formData.set("numero_recepcion", "REC-002")
+      formData.set("items[0].producto_id", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22")
+      formData.set("items[0].cantidad_recibida", "10")
+      formData.set("items[0].precio_compra", "25")
+      formData.set("items[1].producto_id", "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a33")
+      formData.set("items[1].cantidad_recibida", "5")
+      formData.set("items[1].precio_compra", "30")
+
+      const result = await createReceiptAction(prevState, formData)
+
+      expect(result).toEqual({ success: true, data: { id: "rec-2" } })
+      const [, params] = mockRpc.mock.calls[0]
+      expect(params.p_items).toHaveLength(2)
     })
   })
 })
