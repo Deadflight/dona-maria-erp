@@ -10,11 +10,43 @@ El soporte de esta propuesta radica en una **Investigación de Campo**, ya que l
 
 ---
 
-## 3.2 Delimitación del Alcance Operativo
+## 3.2 Población y Muestra
+
+La población objeto de estudio está conformada por la totalidad del personal que labora en la Ferretería "El Imperio Doña María", ubicada en Cumaná, estado Sucre. Dado el tamaño reducido de la organización, la población se compone de tres (3) sujetos, cada uno con roles y responsabilidades diferenciadas dentro del negocio:
+
+1. **Dueña y administradora**: Encargada de la gestión integral del negocio, incluyendo control de inventario, facturación, conciliación financiera, relación con proveedores y toma de decisiones administrativas.
+2. **Empleada de mostrador**: Responsable de la atención al cliente, ventas directas y manejo de caja durante la jornada comercial.
+3. **Practicante (autor del proyecto)**: Durante el período de prácticas pre-profesionales, rotó por los puestos de atención al cliente, ventas y control de inventario, lo que permitió una comprensión directa de los procesos operativos desde la ejecución misma de las tareas.
+
+Se optó por un **muestreo censal**, ya que se trabajó con el 100% de la población (N=3). En poblaciones finitas y de tamaño reducido como esta, el censo es la técnica más apropiada pues garantiza que la totalidad de los sujetos involucrados en los procesos objeto de estudio sean considerados, eliminando el error de muestreo y asegurando la representatividad absoluta de los datos recolectados.
+
+### 3.2.1 Técnicas e Instrumentos de Recolección de Datos
+
+Para la recolección de información se emplearon las siguientes técnicas, seleccionadas en función de su pertinencia para un proyecto factible con diseño de campo:
+
+| Técnica | Sujeto | Instrumento | Propósito |
+|---------|--------|-------------|-----------|
+| Entrevista semiestructurada | Dueña | Guía de entrevista | Identificar procesos administrativos, control de inventario, gestión de créditos y requerimientos funcionales |
+| Observación participante | Practicante | Bitácora de campo | Experimentar directamente los flujos de venta y atención al cliente, registrar tiempos, cuellos de botella y oportunidades de mejora |
+| Observación directa | Empleada de mostrador | Ficha de observación | Documentar el flujo real de atención en mostrador, tiempos de transacción y manejo de caja |
+| Análisis documental | Dueña / Practicante | Matriz de registro | Revisar cuadernos de ventas, facturas anteriores, registros de inventario físico y formatos de control existentes |
+
+### 3.2.2 Procedimiento
+
+El proceso de recolección de datos se desarrolló en las siguientes etapas:
+
+1. **Entrevista inicial con la dueña**: Se realizó una sesión de entrevista semiestructurada para comprender el panorama general del negocio, identificar los procesos críticos y documentar las principales debilidades del modelo de trabajo manual.
+2. **Inmersión operativa del practicante**: Durante las primeras semanas de la práctica, el autor del proyecto asumió turnos en los puestos de atención al cliente, ventas en mostrador y apoyo en inventario, generando registros detallados en una bitácora de campo sobre los tiempos de transacción, las interrupciones operativas y las tareas manuales repetitivas.
+3. **Observación del puesto de ventas**: Se documentó el flujo de atención de la empleada de mostrador en horario comercial regular, registrando las interacciones con clientes, el uso de herramientas de apoyo (cuaderno, calculadora) y los tiempos de cada etapa del proceso de venta.
+4. **Análisis de registros históricos**: Se revisaron los cuadernos de ventas de los últimos tres meses y los registros de inventario disponibles para cuantificar las métricas de diagnóstico presentadas en el Capítulo I.
+
+---
+
+## 3.3 Delimitación del Alcance Operativo
 
 Con el propósito de garantizar la viabilidad del desarrollo tecnológico dentro de las restricciones del período de prácticas pre-profesionales, se definen estrictamente los límites del sistema de información bajo un enfoque de Producto Mínimo Viable (MVP):
 
-### 3.2.1 Procesos Incluidos en el Sistema (Inclusiones)
+### 3.3.1 Procesos Incluidos en el Sistema (Inclusiones)
 
 **Módulo de Inventario Dinámico**: Automatización del catálogo de productos con soporte para unidades fraccionadas (peso en kg, longitud en m/cm), algoritmo de actualización masiva de costos para contrarrestar el rezago inflacionario y un sub-módulo de alertas visuales de stock crítico cuando el nivel de existencia alcance o supere el umbral mínimo configurado por producto.
 
@@ -24,7 +56,7 @@ Con el propósito de garantizar la viabilidad del desarrollo tecnológico dentro
 
 **Módulo de Créditos y Cobranzas**: Registro digital de clientes con gestión de límite de crédito discrecional, seguimiento de ventas a crédito, registro de abonos y notificaciones de mora automática.
 
-### 3.2.2 Procesos Excluidos del Sistema (Exclusiones)
+### 3.3.2 Procesos Excluidos del Sistema (Exclusiones)
 
 **Contabilidad Legal y Fiscal Completa**: Se excluye explícitamente la generación automatizada de Libros de Compra y Venta, el cálculo y declaración formal del Impuesto al Valor Agregado (IVA) ante el SENIAT, y el acoplamiento con sistemas de impresión fiscal homologados.
 
@@ -36,24 +68,25 @@ Con el propósito de garantizar la viabilidad del desarrollo tecnológico dentro
 
 ---
 
-## 3.3 Estudio de Factibilidad del Proyecto Factible
+## 3.4 Estudio de Factibilidad del Proyecto Factible
 
 Para demostrar la viabilidad integral de la solución propuesta y justificar la inversión de esfuerzo de ingeniería durante el período de prácticas pre-profesionales, se procedió a realizar un análisis multidimensional basado en los cuatro pilares fundamentales de la formulación de proyectos:
 
-### 3.3.1 Factibilidad Técnica
+### 3.4.1 Factibilidad Técnica
 
 El proyecto es técnicamente viable debido a la madurez, compatibilidad y ligereza de las herramientas de software seleccionadas para la arquitectura de la solución.
 
 **Stack Tecnológico**:
-- **Frontend y Backend**: Next.js 14+ con TypeScript y Server Actions
-- **Base de Datos**: Supabase (PostgreSQL gestionado en la nube)
-- **Autenticación**: Supabase Auth (email/password)
+- **Frontend y Backend**: Next.js 16.2.6 + React 19.2.4 con TypeScript 5.9 y Server Actions
+- **Base de Datos**: Supabase v2.106 (PostgreSQL 15+ gestionado en la nube)
+- **Autenticación**: Supabase Auth (email/password, JWT)
 - **Despliegue**: Vercel (alojamiento web)
-- **UI Components**: Tailwind CSS + shadcn/ui
+- **UI Components**: Tailwind CSS v4 + shadcn/ui v4 (Base Nova)
+- **Validación**: Zod v4
 
 El sistema se estructura bajo el patrón cliente-servidor, permitiendo que las interfaces reactivas de alta velocidad en el mostrador ejecuten funciones del lado del servidor (Server Actions) eficientes. La elección de Supabase elimina la necesidad de configurar, mantener y respaldar servidores locales físicos — los cuales estarían expuestos a fallas eléctricas o pérdidas de datos —. La comunicación se realiza mediante protocolos seguros HTTPS en la nube, requiriendo únicamente una computadora con navegador web y conexión básica a internet en el local comercial.
 
-### 3.3.2 Factibilidad Operativa
+### 3.4.2 Factibilidad Operativa
 
 La viabilidad operativa está plenamente garantizada porque el diseño del sistema se ha estructurado con base en los puntos de dolor exactos expresados por el personal y la gerencia:
 
@@ -63,7 +96,7 @@ La viabilidad operativa está plenamente garantizada porque el diseño del siste
 
 3. **Clientes con Crédito**: Al operar el sistema bajo la figura de venta a crédito con verificación de saldo disponible, se protege al comercio de sobre-endeudamiento de clientes y se lleva un registro histórico de cada deuda.
 
-### 3.3.3 Factibilidad Económica
+### 3.4.3 Factibilidad Económica
 
 El proyecto presenta una relación de costo-beneficio altamente favorable, determinando una factibilidad económica del 100%.
 
@@ -83,7 +116,7 @@ El proyecto presenta una relación de costo-beneficio altamente favorable, deter
 
 La inversión económica para la ferretería es de $0 USD en tecnología durante la fase inicial, con opción a escalar a planes de pago solo si el volumen del negocio lo amerita.
 
-### 3.3.4 Factibilidad Temporal
+### 3.4.4 Factibilidad Temporal
 
 La variable tiempo se ha calibrado estrictamente para cumplir con las exigencias metodológicas universitarias.
 
@@ -97,7 +130,7 @@ Al haber delimitado el alcance de forma estricta (excluyendo módulos contables-
 
 ---
 
-## 3.4 Cronograma de Actividades Diario
+## 3.5 Cronograma de Actividades Diario
 
 El cumplimiento de los objetivos específicos planteados en esta investigación se estructuró a través de una planificación operativa dividida en cinco (5) fases metodológicas consecutivas. El cronograma abarca un lapso estricto de dos (2) meses calendario, equivalentes a 40 días hábiles de labor en campo. Cada jornada se planificó en bloques de tres (3) horas diarias de ingeniería, acumulando un total de 120 horas útiles de ejecución.
 
@@ -178,11 +211,11 @@ El cumplimiento de los objetivos específicos planteados en esta investigación 
 
 ---
 
-## 3.5 Diagrama de Gantt
+## 3.6 Diagrama de Gantt
 
 Para visualizar la distribución temporal de las actividades, la ruta crítica y el solapamiento de los procesos de ingeniería, se elaboró un Diagrama de Gantt (véase *Figura 3.2*) utilizando el lenguaje de diagramación Mermaid, renderizado a través del editor en línea mermaid.live. Este modelo gráfico organiza las 5 fases del proyecto bajo una estructura de descomposición del trabajo (EDT), vinculando las tareas mediante dependencias de tipo Fin-Inicio (FI), lo que asegura que cada fase técnica sea la consecuencia directa de la validación de la etapa anterior.
 
-La duración total del proyecto es de 40 días hábiles, equivalentes a 120 horas netas de ejecución (3 horas diarias). El cronograma se estructura en las cinco (5) fases descritas en la sección 3.4, donde cada actividad individual tiene una duración de 1 día y cada fase concluye con un hito de validación.
+La duración total del proyecto es de 40 días hábiles, equivalentes a 120 horas netas de ejecución (3 horas diarias). El cronograma se estructura en las cinco (5) fases descritas en la sección 3.5, donde cada actividad individual tiene una duración de 1 día y cada fase concluye con un hito de validación.
 
 ### Correspondencia entre Fases y Método Científico
 
@@ -196,18 +229,11 @@ La duración total del proyecto es de 40 días hábiles, equivalentes a 120 hora
 
 ### Figura 3.2: Diagrama de Gantt del Proyecto
 
-> **Instrucciones para generar la imagen**: El diagrama de Gantt se definió mediante código Mermaid. Para visualizarlo e imprimirlo en formato grande:
-> 1. Ir a **[mermaid.live](https://mermaid.live/)**
-> 2. En la pestaña **Code**, pegar el contenido de `docs/diagrams/gantt-source.mmd`
-> 3. Ir a la pestaña **Preview** para visualizar el diagrama
-> 4. Click en **Download as SVG**
-> 5. Guardar como `docs/diagrams/gantt-mermaid.svg`
->
-> **Nota importante**: El parser de Mermaid usa el caracter `:` como separador entre el nombre de la tarea y sus metadatos. Por esta razon, los nombres de las tareas y hitos **no deben contener dos puntos** — por ejemplo, usar `HITO Diagnostico Validado` en lugar de `HITO: Diagnostico Validado`.
->
-> El código fuente contiene las 5 fases del proyecto descritas en la sección 3.4, cada una compuesta por 3 tareas agrupadas con su hito de validación correspondiente y dependencias Fin-Inicio entre tareas y fases.
->
-> ![Diagrama de Gantt del Proyecto](diagrams/gantt-mermaid.svg)
+El diagrama de Gantt se elaboró utilizando la herramienta Mermaid y se renderizó en formato SVG. Las 5 fases del proyecto se organizan bajo una estructura de descomposición del trabajo (EDT), vinculando las tareas mediante dependencias de tipo Fin-Inicio (FI). La fuente Mermaid se encuentra en `docs/diagrams/gantt-plantuml.md`.
+
+![Diagrama de Gantt del Proyecto](diagrams/gantt-mermaid.svg)
+
+**Fuente**: Elaboración propia (2026).
 
 ### Dependencias entre Fases y Actividades
 
@@ -223,9 +249,9 @@ Cada actividad individual dentro de una fase depende de la finalización de la a
 
 ---
 
-## 3.6 Diagrama de Actividades del Proceso de Desarrollo (SDD)
+## 3.7 Diagrama de Actividades del Proceso de Desarrollo (SDD)
 
-Para representar visualmente la secuencia lógica del proceso de desarrollo del sistema, alineándolo con los pasos del método científico (Observación → Definición del Problema → Formulación de Hipótesis → Experimentación → Análisis → Conclusión) y con el proceso de desarrollo Specification-Driven Development (SDD) descrito en la sección 3.8, se elaboró un Diagrama de Actividades UML utilizando la herramienta draw.io. Este diagrama organiza las actividades en tres swimlanes (particiones) que reflejan los roles involucrados en el proyecto: Investigador (Tesista), Tutor Académico y Propietaria/Usuario.
+Para representar visualmente la secuencia lógica del proceso de desarrollo del sistema, alineándolo con los pasos del método científico (Observación → Definición del Problema → Formulación de Hipótesis → Experimentación → Análisis → Conclusión) y con el proceso de desarrollo Specification-Driven Development (SDD) descrito en la sección 3.9, se elaboró un Diagrama de Actividades UML utilizando la herramienta draw.io. Este diagrama organiza las actividades en tres swimlanes (particiones) que reflejan los roles involucrados en el proyecto: Investigador (Tesista), Tutor Académico y Propietaria/Usuario.
 
 La correspondencia entre las fases del proyecto y el método científico es la siguiente:
 
@@ -248,7 +274,7 @@ El diagrama se presenta a continuación en la *Figura 3.1*.
 
 ---
 
-## 3.7 Resumen del Capítulo
+## 3.8 Resumen del Capítulo
 
 Este capítulo presentó la estructura metodológica del proyecto, enmarcándolo como un Proyecto Factible con investigación de campo de carácter descriptivo. Se delimitó el alcance del MVP, se demostró la viabilidad técnica, operativa, económica y temporal del desarrollo, y se estableció el cronograma de 120 horas distribuidas en 5 fases metodológicas a lo largo de 40 días hábiles. Asimismo, se definió el proceso de desarrollo de software Specification-Driven Development (SDD) como el marco de trabajo para la implementación del sistema, detallando sus fases, artefactos y ciclo de vida. Todo lo anterior se representa tanto en un Diagrama de Gantt como en un Diagrama de Actividades UML alineado al método científico.
 
@@ -256,15 +282,15 @@ El siguiente capítulo detallará el análisis de requerimientos y el diseño t�
 
 ---
 
-## 3.8 Proceso de Desarrollo de Software: Specification-Driven Development (SDD)
+## 3.9 Proceso de Desarrollo de Software: Specification-Driven Development (SDD)
 
-### 3.8.1 Definición
+### 3.9.1 Definición
 
 Specification-Driven Development (SDD) es un proceso de desarrollo de software orientado a cambios atómicos y verificables, donde cada modificación del sistema sigue un ciclo de vida completo que comienza con una especificación formal y culmina con una verificación explícita. SDD combina principios del desarrollo dirigido por especificaciones, integración continua y entregas incrementales, adaptándose particularmente bien a proyectos de pequeña escala con equipos reducidos.
 
 A diferencia de los procesos de desarrollo tradicionales donde la verificación ocurre al final del proyecto, SDD incorpora la verificación como una fase obligatoria e ineludible dentro de cada cambio individual, garantizando que cada modificación cumple con los criterios de aceptación definidos antes de considerarse completa.
 
-### 3.8.2 Ciclo de Vida del Cambio SDD
+### 3.9.2 Ciclo de Vida del Cambio SDD
 
 SDD organiza el trabajo en cambios atómicos. Cada cambio atraviesa un ciclo de hasta ocho fases secuenciales:
 
@@ -281,7 +307,7 @@ SDD organiza el trabajo en cambios atómicos. Cada cambio atraviesa un ciclo de 
 
 Cada fase produce un artefacto tangible que persiste en el repositorio del proyecto, creando un registro de auditoría completo de todas las decisiones y cambios realizados.
 
-### 3.8.3 Ciclos de Desarrollo en SDD
+### 3.9.3 Ciclos de Desarrollo en SDD
 
 SDD opera en tres niveles de ciclo, inspirándose en la metáfora del reloj utilizada por marcos metodológicos balanceados:
 
@@ -291,7 +317,7 @@ SDD opera en tres niveles de ciclo, inspirándose en la metáfora del reloj util
 
 3. **Ciclo de Versión**: Corresponde a un conjunto de cambios que, en conjunto, habilitan un hito funcional del proyecto. Una versión es un producto acabado que puede ser utilizado por los usuarios finales. En el contexto de este proyecto, cada hito del cronograma representa una versión.
 
-### 3.8.4 Evidencia del Proceso en el Proyecto
+### 3.9.4 Evidencia del Proceso en el Proyecto
 
 El proceso SDD se ha aplicado sistemáticamente a lo largo del desarrollo del sistema, quedando registrado en el directorio `openspec/changes/` del repositorio. Hasta la fecha del presente informe, se han ejecutado los siguientes cambios:
 
@@ -314,9 +340,9 @@ El proceso SDD se ha aplicado sistemáticamente a lo largo del desarrollo del si
 
 Cada cambio archivado incluye un `verify-report.md` que documenta las pruebas realizadas y confirma que la implementación cumple con lo especificado, demostrando el cumplimiento del principio de verificación obligatoria de SDD.
 
-### 3.8.5 Correspondencia entre SDD y las Fases del Proyecto
+### 3.9.5 Correspondencia entre SDD y las Fases del Proyecto
 
-Las fases del cronograma del proyecto (sección 3.4) se corresponden con los ciclos de versión de SDD de la siguiente manera:
+Las fases del cronograma del proyecto (sección 3.5) se corresponden con los ciclos de versión de SDD de la siguiente manera:
 
 | Fase del Proyecto | Ciclo SDD | Cambios Asociados |
 |-------------------|-----------|-------------------|
@@ -326,7 +352,7 @@ Las fases del cronograma del proyecto (sección 3.4) se corresponden con los cic
 | **Fase IV**: Mostrador y Conciliación (Semanas 7-8) | Ciclos de Cambio completos del módulo POS | Purchase Receipts, Recepción de Mercancía |
 | **Fase V**: Implantación y Evaluación (Semanas 8-9) | Verify + Archive del sistema completo | UI Baseline Fix, verificación integral |
 
-### 3.8.6 Justificación de SDD para el Proyecto
+### 3.9.6 Justificación de SDD para el Proyecto
 
 La selección de SDD como proceso de desarrollo responde a las siguientes características del proyecto:
 
@@ -340,7 +366,7 @@ La selección de SDD como proceso de desarrollo responde a las siguientes caract
 
 5. **Restricción temporal**: Con 120 horas útiles distribuidas en 40 días hábiles, SDD evita la sobrecarga burocrática de procesos pesados (como RUP o una adaptación completa de CMMI) sin caer en la falta de disciplina de enfoques exclusivamente ágiles no documentados.
 
-### 3.8.7 Roles en SDD para este Proyecto
+### 3.9.7 Roles en SDD para este Proyecto
 
 El proceso SDD, adaptado al contexto del proyecto, define los siguientes roles:
 
@@ -350,14 +376,14 @@ El proceso SDD, adaptado al contexto del proyecto, define los siguientes roles:
 | **Revisor** | Tutor Académico | Validar las propuestas y especificaciones, aprobar el diseño y revisar los reportes de verificación |
 | **Cliente / Usuario** | Propietaria y personal de la ferretería | Validar los incrementos funcionales, proporcionar retroalimentación sobre las especificaciones y aceptar las versiones entregadas |
 
-### 3.8.8 Herramientas de Soporte
+### 3.9.8 Herramientas de Soporte
 
 El proceso SDD se apoya en las siguientes herramientas:
 
 - **Repositorio Git**: Para el control de versiones del código fuente y los artefactos SDD
 - **Directorio `openspec/changes/`**: Para la organización y trazabilidad de todos los cambios
-- **Next.js + TypeScript**: Stack tecnológico para la implementación
-- **Supabase (PostgreSQL)**: Persistencia y almacenamiento de datos
+- **Next.js 16 + React 19 + TypeScript 5**: Stack tecnológico para la implementación
+- **Supabase (PostgreSQL) + Zod 4**: Persistencia, autenticación y validación de datos
 - **Markdown**: Formato de los artefactos SDD (especificaciones, reportes, diseños)
 
 **Fuente**: Elaboración propia (2026), basado en el flujo de trabajo Specification-Driven Development implementado en el repositorio del proyecto.

@@ -1081,9 +1081,7 @@ El diseño de procesos se aborda desde dos perspectivas complementarias. Por un 
 
 ## 4.7 Resumen del Capítulo
 
-Este capítulo presentó el análisis completo de requerimientos y el diseño técnico del sistema de información para la Ferretería "El Imperio Doña María". Se documentaron 5 requerimientos funcionales y 5 no funcionales, se modelaron 15 casos de uso organizados por actor, se diseñó el modelo entidad-relación con 10 tablas y sus constraints correspondentes, se estableció la arquitectura de software cliente-servidor basada en Next.js y Supabase, y se definieron los wireframes descriptivos y flujos de procesos para las operaciones críticas del negocio.
-
-El siguiente capítulo (V) presentará los resultados de la implementación, las pruebas realizadas y la evaluación del impacto del sistema en el entorno operativo de la ferretería.
+Este capítulo documentó el análisis de requerimientos (5 funcionales, 5 no funcionales) y el diseño técnico del sistema: 15 casos de uso, modelo entidad-relación con 10 tablas, esquema DDL con constraints y RLS, arquitectura cliente-servidor con Next.js 16 + Supabase, estructura del proyecto, wireframes descriptivos y 4 flujos de proceso detallados.
 
 ---
 

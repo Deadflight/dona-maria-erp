@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 720" font-family="'Segoe UI', Arial, sans-serif" font-size="13">
+  <!-- Background -->
+  <rect width="1120" height="720" fill="#f8fafc" rx="8"/>
+  
+  <!-- Title -->
+  <text x="560" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#1e293b">Figura 3.2: Diagrama de Gantt del Proyecto</text>
+  <text x="560" y="52" text-anchor="middle" font-size="11" fill="#64748b">Ferretería "El Imperio Doña María" — 40 días hábiles (120 horas) | Elaboración propia (2026)</text>
+  
+  <!-- Timeline header -->
+  <line x1="160" y1="65" x2="1090" y2="65" stroke="#cbd5e1" stroke-width="1"/>
+  
+  <!-- Week labels -->
+  <text x="250" y="80" text-anchor="middle" font-size="10" fill="#64748b">Sem 1-2</text>
+  <text x="430" y="80" text-anchor="middle" font-size="10" fill="#64748b">Sem 3-4</text>
+  <text x="610" y="80" text-anchor="middle" font-size="10" fill="#64748b">Sem 5-6</text>
+  <text x="790" y="80" text-anchor="middle" font-size="10" fill="#64748b">Sem 7-8</text>
+  <text x="970" y="80" text-anchor="middle" font-size="10" fill="#64748b">Sem 8-9</text>
+  
+  <!-- Phase separators -->
+  <line x1="340" y1="65" x2="340" y2="700" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="520" y1="65" x2="520" y2="700" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="700" y1="65" x2="700" y2="700" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="880" y1="65" x2="880" y2="700" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4"/>
+
+  <!-- ============ FASE I ============ -->
+  <text x="10" y="110" font-size="12" font-weight="bold" fill="#2563eb">FASE I</text>
+  <text x="10" y="124" font-size="10" fill="#64748b">Diagnóstico</text>
+  
+  <rect x="170" y="98" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="111" font-size="10" fill="white">Auditoría procesos (2h)</text>
+  
+  <rect x="170" y="120" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="133" font-size="10" fill="white">Mapeo comunicación (1h)</text>
+  
+  <rect x="170" y="142" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="155" font-size="10" fill="white">Auditoría conciliación (2h)</text>
+  
+  <rect x="170" y="164" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="177" font-size="10" fill="white">Pérdidas desabast. (1h)</text>
+  
+  <rect x="170" y="186" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="199" font-size="10" fill="white">Reglas negocio (3h)</text>
+  
+  <rect x="170" y="208" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="221" font-size="10" fill="white">Formalizar diagnóstico (3h)</text>
+  
+  <rect x="170" y="230" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="243" font-size="10" fill="white">Objetivos y alcance (2h)</text>
+  
+  <rect x="170" y="252" width="160" height="18" rx="3" fill="#2563eb" opacity="0.85"/>
+  <text x="175" y="265" font-size="10" fill="white">Factibilidad integral (2h)</text>
+  
+  <!-- Milestone 1 -->
+  <polygon points="335,261 345,266 335,271 325,266" fill="#2563eb"/>
+  <text x="350" y="270" font-size="9" fill="#2563eb" font-weight="bold">Diagnóstico validado</text>
+
+  <!-- ============ FASE II ============ -->
+  <text x="10" y="310" font-size="12" font-weight="bold" fill="#059669">FASE II</text>
+  <text x="10" y="324" font-size="10" fill="#64748b">Modelado</text>
+  
+  <rect x="350" y="298" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="311" font-size="10" fill="white">Rediseño flujos (3h)</text>
+  
+  <rect x="350" y="320" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="333" font-size="10" fill="white">Modelado datos (2h)</text>
+  
+  <rect x="350" y="342" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="355" font-size="10" fill="white">Relacional financiero (4h)</text>
+  
+  <rect x="350" y="364" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="377" font-size="10" fill="white">Diagramas UML (1h)</text>
+  
+  <rect x="350" y="386" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="399" font-size="10" fill="white">Entorno cloud Supabase (4h)</text>
+  
+  <rect x="350" y="408" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="421" font-size="10" fill="white">Inicializar Next.js (2h)</text>
+  
+  <rect x="350" y="430" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="443" font-size="10" fill="white">Setup Tailwind/shadcn (2h)</text>
+  
+  <rect x="350" y="452" width="160" height="18" rx="3" fill="#059669" opacity="0.85"/>
+  <text x="355" y="465" font-size="10" fill="white">Pruebas Server Actions (6h)</text>
+  
+  <!-- Milestone 2 -->
+  <polygon points="515,461 525,466 515,471 505,466" fill="#059669"/>
+  <text x="530" y="470" font-size="9" fill="#059669" font-weight="bold">Arquitectura aprobada</text>
+
+  <!-- ============ FASE III ============ -->
+  <text x="10" y="510" font-size="12" font-weight="bold" fill="#d97706">FASE III</text>
+  <text x="10" y="524" font-size="10" fill="#64748b">Inventario</text>
+  
+  <rect x="530" y="498" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="511" font-size="10" fill="white">Panel gestión admin (8h)</text>
+  
+  <rect x="530" y="520" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="533" font-size="10" fill="white">Alertas stock crítico (2h)</text>
+  
+  <rect x="530" y="542" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="555" font-size="10" fill="white">Actualización precios (2h)</text>
+  
+  <rect x="530" y="564" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="577" font-size="10" fill="white">Recepción mercancía (4h)</text>
+  
+  <rect x="530" y="586" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="599" font-size="10" fill="white">Validaciones server (3h)</text>
+  
+  <rect x="530" y="608" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="621" font-size="10" fill="white">Numérico fraccionado (1h)</text>
+  
+  <rect x="530" y="630" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="643" font-size="10" fill="white">Simulación datos (2h)</text>
+  
+  <rect x="530" y="652" width="160" height="18" rx="3" fill="#d97706" opacity="0.85"/>
+  <text x="535" y="665" font-size="10" fill="white">Documentación técnica (2h)</text>
+  
+  <!-- Milestone 3 -->
+  <polygon points="695,661 705,666 695,671 685,666" fill="#d97706"/>
+  <text x="710" y="670" font-size="9" fill="#d97706" font-weight="bold">Inventario operativo</text>
+
+  <!-- ============ FASE IV ============ -->
+  <text x="10" y="710" font-size="12" font-weight="bold" fill="#dc2626">FASE IV</text>
+  <text x="10" y="724" font-size="10" fill="#64748b">Mostrador</text>
+  
+  <rect x="710" y="698" width="160" height="18" rx="3" fill="#dc2626" opacity="0.85"/>
+  <text x="715" y="711" font-size="10" fill="white">Terminal ventas (10h)</text>
+  
+  <rect x="710" y="720" width="160" height="18" rx="3" fill="#dc2626" opacity="0.85"/>
+  <text x="715" y="733" font-size="10" fill="white">Búsqueda predictiva (3h)</text>
+  
+  <rect x="710" y="742" width="160" height="18" rx="3" fill="#dc2626" opacity="0.85"/>
+  <text x="715" y="755" font-size="10" fill="white">Venta express (3h)</text>
+  
+  <!-- Milestone 4 -->
+  <polygon points="875,751 885,756 875,761 865,756" fill="#dc2626"/>
+  <text x="890" y="760" font-size="9" fill="#dc2626" font-weight="bold">Motor estabilizado</text>
+
+  <!-- ============ FASE V ============ -->
+  <text x="10" y="770" font-size="12" font-weight="bold" fill="#7c3aed">FASE V</text>
+  <text x="10" y="784" font-size="10" fill="#64748b">Validación</text>
+  
+  <rect x="890" y="758" width="180" height="18" rx="3" fill="#7c3aed" opacity="0.85"/>
+  <text x="895" y="771" font-size="10" fill="white">Pruebas concurrencia (3h)</text>
+  
+  <rect x="890" y="780" width="180" height="18" rx="3" fill="#7c3aed" opacity="0.85"/>
+  <text x="895" y="793" font-size="10" fill="white">Despliegue Vercel (2h)</text>
+  
+  <rect x="890" y="802" width="180" height="18" rx="3" fill="#7c3aed" opacity="0.85"/>
+  <text x="895" y="815" font-size="10" fill="white">Capacitación y cierre (3h)</text>
+  
+  <!-- Milestone 5 -->
+  <polygon points="1075,811 1085,816 1075,821 1065,816" fill="#7c3aed"/>
+  <text x="1090" y="820" font-size="9" fill="#7c3aed" font-weight="bold">Sistema implantado</text>
+
+  <!-- Legend -->
+  <rect x="170" y="690" width="12" height="12" rx="2" fill="#2563eb" opacity="0.85"/>
+  <text x="186" y="700" font-size="10" fill="#475569">Fase I: Diagnóstico</text>
+  <rect x="310" y="690" width="12" height="12" rx="2" fill="#059669" opacity="0.85"/>
+  <text x="326" y="700" font-size="10" fill="#475569">Fase II: Modelado</text>
+  <rect x="450" y="690" width="12" height="12" rx="2" fill="#d97706" opacity="0.85"/>
+  <text x="466" y="700" font-size="10" fill="#475569">Fase III: Inventario</text>
+  <rect x="600" y="690" width="12" height="12" rx="2" fill="#dc2626" opacity="0.85"/>
+  <text x="616" y="700" font-size="10" fill="#475569">Fase IV: Mostrador</text>
+  <rect x="750" y="690" width="12" height="12" rx="2" fill="#7c3aed" opacity="0.85"/>
+  <text x="766" y="700" font-size="10" fill="#475569">Fase V: Validación</text>
+  <polygon points="910,690 918,694 910,698 902,694" fill="#475569"/>
+  <text x="924" y="700" font-size="10" fill="#475569">Hito de validación</text>
+</svg>

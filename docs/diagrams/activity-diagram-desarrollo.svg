@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 900" font-family="'Segoe UI', Arial, sans-serif" font-size="12">
+  <!-- Background -->
+  <rect width="1120" height="900" fill="#f8fafc" rx="8"/>
+  
+  <!-- Title -->
+  <text x="560" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e293b">Figura 3.1: Diagrama de Actividades del Proceso de Desarrollo</text>
+  <text x="560" y="47" text-anchor="middle" font-size="10" fill="#64748b">Alineado al Método Científico y al proceso SDD | Elaboración propia (2026)</text>
+  
+  <!-- Swimlane headers -->
+  <rect x="0" y="60" width="373" height="28" fill="#dbeafe" rx="0"/>
+  <text x="186" y="79" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">Investigador (Tesista)</text>
+  
+  <rect x="373" y="60" width="374" height="28" fill="#dcfce7" rx="0"/>
+  <text x="560" y="79" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">Tutor Académico</text>
+  
+  <rect x="747" y="60" width="373" height="28" fill="#fef3c7" rx="0"/>
+  <text x="933" y="79" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">Propietaria / Usuario</text>
+  
+  <!-- Vertical lane dividers -->
+  <line x1="373" y1="60" x2="373" y2="870" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="747" y1="60" x2="747" y2="870" stroke="#cbd5e1" stroke-width="1.5"/>
+  
+  <!-- ===== START NODE ===== -->
+  <circle cx="186" cy="105" r="10" fill="#1e293b"/>
+  
+  <!-- ===== FASE I: DIAGNÓSTICO ===== -->
+  <text x="560" y="130" text-anchor="middle" font-size="11" font-weight="bold" fill="#2563eb">── FASE I: Diagnóstico Operativo (Obs. → Definición del Problema) ──</text>
+  
+  <!-- Investigador activities -->
+  <rect x="60" y="145" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="164" text-anchor="middle" font-size="10" fill="#1e40af">Auditoría de procesos en mostrador</text>
+  
+  <line x1="186" y1="175" x2="186" y2="195" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="195" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="214" text-anchor="middle" font-size="10" fill="#1e40af">Mapeo canales de comunicación</text>
+  
+  <line x1="186" y1="225" x2="186" y2="245" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="245" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="264" text-anchor="middle" font-size="10" fill="#1e40af">Modelado reglas de negocio</text>
+  
+  <line x1="186" y1="275" x2="186" y2="295" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <!-- Decision: Problema identificado? -->
+  <polygon points="186,295 260,325 186,355 112,325" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="186" y="328" text-anchor="middle" font-size="9" fill="#92400e">Problema</text>
+  <text x="186" y="339" text-anchor="middle" font-size="9" fill="#92400e">identificado?</text>
+  
+  <!-- Yes path -->
+  <text x="198" y="312" font-size="9" fill="#16a34a">Sí</text>
+  
+  <rect x="60" y="360" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="379" text-anchor="middle" font-size="10" fill="#1e40af">Formalizar diagnóstico situacional</text>
+  
+  <line x1="186" y1="390" x2="186" y2="410" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <!-- Tutor review -->
+  <rect x="440" y="360" width="240" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+  <text x="560" y="379" text-anchor="middle" font-size="10" fill="#166534">Validar diagnóstico y objetivos</text>
+  
+  <!-- Propietaria validates -->
+  <rect x="810" y="360" width="240" height="30" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="930" y="379" text-anchor="middle" font-size="10" fill="#92400e">Confirmar alcance MVP</text>
+  
+  <!-- Cross-lane arrows -->
+  <line x1="310" y1="375" x2="440" y2="375" stroke="#475569" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+  <line x1="680" y1="375" x2="810" y2="375" stroke="#475569" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+  
+  <!-- Milestone 1 -->
+  <line x1="186" y1="410" x2="186" y2="430" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="80" y="430" width="212" height="24" rx="12" fill="#2563eb"/>
+  <text x="186" y="446" text-anchor="middle" font-size="10" font-weight="bold" fill="white">◆ Diagnóstico validado</text>
+  
+  <!-- ===== FASE II: MODELADO ===== -->
+  <text x="560" y="475" text-anchor="middle" font-size="11" font-weight="bold" fill="#059669">── FASE II: Modelado Lógico (Formulación de Hipótesis) ──</text>
+  
+  <line x1="186" y1="454" x2="186" y2="490" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="490" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="509" text-anchor="middle" font-size="10" fill="#1e40af">Diseñar arquitectura (Next.js + Supabase)</text>
+  
+  <line x1="186" y1="520" x2="186" y2="540" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="540" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="559" text-anchor="middle" font-size="10" fill="#1e40af">Modelar datos (DER + Casos de UML)</text>
+  
+  <line x1="186" y1="570" x2="186" y2="590" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="440" y="540" width="240" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+  <text x="560" y="559" text-anchor="middle" font-size="10" fill="#166534">Revisar diseño y aprobar</text>
+  
+  <line x1="310" y1="555" x2="440" y2="555" stroke="#475569" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="590" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="609" text-anchor="middle" font-size="10" fill="#1e40af">Configurar stack tecnológico</text>
+  
+  <!-- Milestone 2 -->
+  <line x1="186" y1="620" x2="186" y2="640" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="80" y="640" width="212" height="24" rx="12" fill="#059669"/>
+  <text x="186" y="656" text-anchor="middle" font-size="10" font-weight="bold" fill="white">◆ Arquitectura aprobada</text>
+  
+  <!-- ===== FASE III-IV: IMPLEMENTACIÓN ===== -->
+  <text x="560" y="685" text-anchor="middle" font-size="11" font-weight="bold" fill="#d97706">── FASE III-IV: Implementación (Experimentación) ──</text>
+  
+  <line x1="186" y1="664" x2="186" y2="700" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="700" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="719" text-anchor="middle" font-size="10" fill="#1e40af">Desarrollar módulos (SDD c.c.)</text>
+  
+  <line x1="186" y1="730" x2="186" y2="750" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="750" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="769" text-anchor="middle" font-size="10" fill="#1e40af">Ejecutar pruebas y verificación</text>
+  
+  <!-- Decision: Tests pass? -->
+  <polygon points="186,780 250,810 186,840 122,810" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="186" y="813" text-anchor="middle" font-size="9" fill="#92400e">Tests OK?</text>
+  
+  <!-- Yes path -->
+  <text x="198" y="798" font-size="9" fill="#16a34a">Sí</text>
+  
+  <rect x="440" y="750" width="240" height="30" rx="6" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+  <text x="560" y="769" text-anchor="middle" font-size="10" fill="#166534">Revisar e integrar cambios</text>
+  
+  <rect x="810" y="750" width="240" height="30" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="930" y="769" text-anchor="middle" font-size="10" fill="#92400e">Validar funcionalidad</text>
+  
+  <line x1="310" y1="765" x2="440" y2="765" stroke="#475569" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+  <line x1="680" y1="765" x2="810" y2="765" stroke="#475569" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+  
+  <!-- No loop back -->
+  <text x="105" y="808" font-size="9" fill="#dc2626">No</text>
+  <path d="M 122,810 L 40,810 L 40,725 L 60,725" fill="none" stroke="#dc2626" stroke-width="1.2" marker-end="url(#arrow-red)"/>
+  
+  <!-- ===== FASE V: IMPLANTACIÓN ===== -->
+  <line x1="186" y1="840" x2="186" y2="860" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="60" y="860" width="250" height="30" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="186" y="879" text-anchor="middle" font-size="10" fill="#1e40af">Despliegue, capacitación e implantación</text>
+  
+  <!-- End node -->
+  <circle cx="186" cy="895" r="10" fill="white" stroke="#1e293b" stroke-width="2"/>
+  <circle cx="186" cy="895" r="6" fill="#1e293b"/>
+  
+  <!-- Arrow marker definitions -->
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#475569"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#dc2626"/>
+    </marker>
+  </defs>
+</svg>
