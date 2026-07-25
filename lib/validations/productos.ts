@@ -20,7 +20,8 @@ export const productCreateSchema = z
       .string()
       .min(1, "El SKU es requerido")
       .max(50, "Máximo 50 caracteres")
-      .regex(/^[a-zA-Z0-9-]+$/, "Solo letras, números y guiones"),
+      .regex(/^[a-zA-Z0-9-]+$/, "Solo letras, números y guiones")
+      .optional(),
     nombre: z
       .string()
       .min(1, "El nombre es requerido")

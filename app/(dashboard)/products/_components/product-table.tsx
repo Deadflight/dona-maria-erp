@@ -81,21 +81,8 @@ interface ProductTableProps {
   error: string | null
   searchParams: Record<string, string>
   session: Session
+  categorias?: Array<{ id: string; nombre: string }>
 }
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const CATEGORIES = [
-  "Pernos",
-  "Tuercas",
-  "Arandelas",
-  "Herramientas",
-  "Electricidad",
-  "Pinturas",
-  "Ferretería General",
-]
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -118,6 +105,7 @@ export function ProductTable({
   error,
   searchParams,
   session,
+  categorias = [],
 }: ProductTableProps) {
   const router = useRouter()
   const isAdminOrSeller =
@@ -299,9 +287,9 @@ export function ProductTable({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas</SelectItem>
-              {CATEGORIES.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
+              {categorias.map((cat) => (
+                <SelectItem key={cat.id} value={cat.nombre}>
+                  {cat.nombre}
                 </SelectItem>
               ))}
             </SelectContent>

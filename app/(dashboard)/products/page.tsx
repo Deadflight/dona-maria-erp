@@ -1,5 +1,6 @@
 import { getSession } from "@/actions/auth"
 import { listProducts } from "@/lib/supabase/actions/productos"
+import { listCategorias } from "@/lib/supabase/actions/categorias"
 import { ProductTable } from "./_components/product-table"
 
 // ---------------------------------------------------------------------------
@@ -24,13 +25,16 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const { data: session } = await getSession()
 
-  const result = await listProducts({
-    search: sp.search,
-    categoria: sp.categoria,
-    page: sp.page ? parseInt(sp.page, 10) : 1,
-    pageSize: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
-    activo: sp.incluirInactivos === "true" ? false : undefined,
-  })
+  const [result, categoriasResult] = await Promise.all([
+    listProducts({
+      search: sp.search,
+      categoria: sp.categoria,
+      page: sp.page ? parseInt(sp.page, 10) : 1,
+      pageSize: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
+      activo: sp.incluirInactivos === "true" ? false : undefined,
+    }),
+    listCategorias(),
+  ])
 
   return (
     <ProductTable
@@ -38,6 +42,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       error={result.error}
       searchParams={sp}
       session={session}
+      categorias={categoriasResult.data?.map((c) => ({ id: c.id, nombre: c.nombre })) ?? []}
     />
   )
 }

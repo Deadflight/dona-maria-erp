@@ -5,11 +5,12 @@
 // ---------------------------------------------------------------------------
 
 import { useActionState, useEffect, useState } from "react"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, Settings2 } from "lucide-react"
 
 import type { Database } from "@/types/database"
 import { UNIDAD_CONFIG, getStep } from "@/lib/constants/unidad-config"
 import type { TipoUnidad, UnidadBase } from "@/lib/constants/unidad-config"
+import { listCategorias } from "@/lib/supabase/actions/categorias"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,6 +34,7 @@ import {
   updateProduct,
 } from "@/lib/supabase/actions/productos"
 import type { ProductFormState } from "@/lib/supabase/actions/productos"
+import { CategoryManager } from "./category-manager"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -49,16 +51,6 @@ type ProductFormDialogProps = {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-const CATEGORIES = [
-  "Pernos",
-  "Tuercas",
-  "Arandelas",
-  "Herramientas",
-  "Electricidad",
-  "Pinturas",
-  "Ferretería General",
-]
 
 const UNIDADES = ["Pieza", "Kg", "Lt", "M", "M²", "M³", "Caja", "Paquete", "Rollo", "Bolsa"]
 
@@ -113,6 +105,10 @@ export function ProductFormDialog({
   const [unidadBase, setUnidadBase] = useState<UnidadBase>(
     (fieldValue("unidad_base") as UnidadBase) ?? "und",
   )
+
+  // --- Category Manager state ---
+  const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // When tipoUnidad changes, reset unidad_base if current value is not in new options
   const handleTipoUnidadChange = (newTipo: TipoUnidad) => {
@@ -216,6 +212,8 @@ export function ProductFormDialog({
               <CategorySelect
                 defaultValue={fieldValue("categoria")}
                 error={state.errors?.categoria?.[0]}
+                onOpenManager={() => setCategoryManagerOpen(true)}
+                refreshKey={refreshKey}
               />
             </div>
 
@@ -385,6 +383,18 @@ export function ProductFormDialog({
           </div>
         </form>
       </DialogContent>
+
+      {/* Category Manager (admin only) */}
+      {categoryManagerOpen && (
+        <CategoryManager
+          open={categoryManagerOpen}
+          onClose={() => {
+            setCategoryManagerOpen(false)
+            setRefreshKey((k) => k + 1)
+          }}
+          role="admin"
+        />
+      )}
     </Dialog>
   )
 }
@@ -396,11 +406,28 @@ export function ProductFormDialog({
 function CategorySelect({
   defaultValue,
   error,
+  onOpenManager,
+  refreshKey,
 }: {
   defaultValue?: string
   error?: string
+  onOpenManager?: () => void
+  refreshKey?: number
 }) {
   const [value, setValue] = useState(defaultValue ?? "")
+  const [categorias, setCategorias] = useState<Array<{ id: string; nombre: string }>>([])
+
+  useEffect(() => {
+    listCategorias()
+      .then((result) => {
+        if (result.data) {
+          setCategorias(result.data.map((c) => ({ id: c.id, nombre: c.nombre })))
+        }
+      })
+      .catch(() => {
+        // Silently ignore — unmocked tests or server action unavailable
+      })
+  }, [refreshKey])
 
   return (
     <>
@@ -414,14 +441,24 @@ function CategorySelect({
           <SelectValue placeholder="Seleccionar" />
         </SelectTrigger>
         <SelectContent>
-          {CATEGORIES.map((cat) => (
-            <SelectItem key={cat} value={cat}>
-              {cat}
+          {categorias.map((cat) => (
+            <SelectItem key={cat.id} value={cat.nombre}>
+              {cat.nombre}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
       <input type="hidden" name="categoria" value={value} />
+      <Button
+        type="button"
+        variant="link"
+        size="sm"
+        className="h-auto p-0 text-xs"
+        onClick={onOpenManager}
+      >
+        <Settings2 className="mr-1 size-3" />
+        Gestionar categorías
+      </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </>
   )

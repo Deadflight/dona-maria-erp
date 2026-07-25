@@ -165,6 +165,54 @@ export async function searchProducts(
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Generates a unique SKU in the format PROD-YYYYMMDD-NNN.
+ * Queries the max existing SKU for today's date prefix and increments.
+ */
+export async function generateSku(): Promise<{
+  data: string | null
+  error: string | null
+}> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  const supabase = await createClient()
+
+  const today = new Date()
+  const yyyy = today.getFullYear()
+  const mm = String(today.getMonth() + 1).padStart(2, "0")
+  const dd = String(today.getDate()).padStart(2, "0")
+  const prefix = `PROD-${yyyy}${mm}${dd}-`
+
+  const { data, error } = await supabase
+    .from("productos")
+    .select("sku")
+    .like("sku", `${prefix}%`)
+    .order("sku", { ascending: false })
+    .limit(1)
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  let sequence = 1
+  if (data && data.length > 0 && data[0].sku) {
+    const lastPart = data[0].sku.split("-").pop()
+    if (lastPart) {
+      sequence = parseInt(lastPart, 10) + 1
+    }
+  }
+
+  const sku = `${prefix}${String(sequence).padStart(3, "0")}`
+  return { data: sku, error: null }
+}
+
+// ---------------------------------------------------------------------------
 // Mutation Actions
 // ---------------------------------------------------------------------------
 
@@ -204,9 +252,19 @@ export async function createProduct(
 
   const supabase = await createClient()
 
+  // Auto-generate SKU if not provided
+  let sku = validated.data.sku
+  if (!sku) {
+    const skuResult = await generateSku()
+    if (skuResult.error || !skuResult.data) {
+      return { message: skuResult.error ?? "Error al generar SKU" }
+    }
+    sku = skuResult.data
+  }
+
   const { data, error } = await supabase
     .from("productos")
-    .insert(validated.data)
+    .insert({ ...validated.data, sku })
     .select("id")
     .single()
 
