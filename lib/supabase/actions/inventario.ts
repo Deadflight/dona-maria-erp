@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { getSession } from "@/actions/auth"
 import { bulkUpdatePricesSchema } from "@/lib/validations/productos"
+import { initialStockSchema } from "@/lib/validations/inventario"
 import type { Database } from "@/types/database"
 import { listReceipts } from "@/lib/supabase/actions/compras"
 import type { ReceiptListResult } from "@/lib/supabase/actions/compras"
@@ -235,6 +236,121 @@ export async function bulkUpdatePrices(
 
   return {
     data: { affected: result.affected ?? 0 },
+    error: null,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Load Initial Stock
+// ---------------------------------------------------------------------------
+
+export type LoadInitialStockResult = {
+  data: {
+    loaded: number
+    excluded: Array<{ producto_id: string; reason: string }>
+    errors: Array<{ producto_id: string; error: string }>
+  } | null
+  error: string | null
+}
+
+/**
+ * Loads initial stock for products with stock_actual = 0 by creating
+ * ajuste inventory movements via the record_inventory_movement RPC.
+ * Products with stock_actual > 0 are excluded from processing.
+ * Admin only.
+ */
+export async function loadInitialStock(
+  _prevState: LoadInitialStockResult,
+  formData: FormData,
+): Promise<LoadInitialStockResult> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  if (session.data.role !== "admin") {
+    return { data: null, error: "FORBIDDEN" }
+  }
+
+  // -- Parse indexed FormData ------------------------------------------------
+  const itemsRaw: Array<{ producto_id: string; cantidad: string; costo_unitario: string }> = []
+  let i = 0
+  while (formData.has(`items[${i}].producto_id`)) {
+    itemsRaw.push({
+      producto_id: formData.get(`items[${i}].producto_id`) as string,
+      cantidad: formData.get(`items[${i}].cantidad`) as string,
+      costo_unitario: formData.get(`items[${i}].costo_unitario`) as string,
+    })
+    i++
+  }
+
+  // -- Zod validation --------------------------------------------------------
+  const parsed = initialStockSchema.safeParse({ items: itemsRaw })
+  if (!parsed.success) {
+    const messages = parsed.error.issues.map((e) => e.message)
+    return { data: null, error: messages.join("; ") || "Datos inválidos" }
+  }
+
+  const supabase = await createClient()
+
+  // -- Safety check: query current stock for submitted IDs -------------------
+  const productIds = parsed.data.items.map((item) => item.producto_id)
+  const { data: productos, error: queryError } = await supabase
+    .from("productos")
+    .select("id, stock_actual")
+    .in("id", productIds)
+
+  if (queryError) {
+    return { data: null, error: queryError.message }
+  }
+
+  const stockMap = new Map<string, number>(
+    (productos ?? []).map((p: { id: string; stock_actual: number }) => [p.id, Number(p.stock_actual)]),
+  )
+
+  // -- Split eligible vs excluded --------------------------------------------
+  const excluded: Array<{ producto_id: string; reason: string }> = []
+  const eligible: Array<{
+    producto_id: string
+    cantidad: number
+    costo_unitario: number
+  }> = []
+
+  for (const item of parsed.data.items) {
+    const currentStock = stockMap.get(item.producto_id) ?? 0
+    if (currentStock > 0) {
+      excluded.push({
+        producto_id: item.producto_id,
+        reason: "Stock actual > 0",
+      })
+    } else {
+      eligible.push(item)
+    }
+  }
+
+  // -- Process eligible items via RPC ----------------------------------------
+  const errors: Array<{ producto_id: string; error: string }> = []
+  let loaded = 0
+
+  for (const item of eligible) {
+    const { error: rpcError } = await supabase.rpc("record_inventory_movement", {
+      p_producto_id: item.producto_id,
+      p_cantidad: item.cantidad,
+      p_costo_unitario: item.costo_unitario,
+      p_tipo_movimiento: "adjust",
+      p_referencia_tipo: "initial_stock",
+      p_referencia_id: undefined,
+    })
+
+    if (rpcError) {
+      errors.push({ producto_id: item.producto_id, error: rpcError.message })
+    } else {
+      loaded++
+    }
+  }
+
+  return {
+    data: { loaded, excluded, errors },
     error: null,
   }
 }

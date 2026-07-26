@@ -11,6 +11,7 @@ import {
   AlertCircle,
   RotateCcw,
   TriangleAlert,
+  PackagePlus,
 } from "lucide-react"
 
 import type { Database } from "@/types/database"
@@ -36,6 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { BulkPriceDialog } from "./bulk-price-dialog"
+import { InitialStockDialog } from "./initial-stock-dialog"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -175,6 +177,12 @@ export function StockAlertTable({
   // --- Bulk price dialog ---
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false)
 
+  // --- Initial stock dialog ---
+  const [initialStockDialogOpen, setInitialStockDialogOpen] = useState(false)
+  const hasZeroStock = initialData?.rows.some(
+    (r) => Number(r.stock_actual) === 0,
+  )
+
   const selectedProducts = initialData
     ? initialData.rows.filter((r) => selectedIds.has(r.id))
     : []
@@ -282,6 +290,17 @@ export function StockAlertTable({
               Ajustar Precios
             </Button>
           </div>
+        )}
+
+        {/* Initial stock button */}
+        {isAdminOrSeller && hasZeroStock && (
+          <Button
+            variant="outline"
+            onClick={() => setInitialStockDialogOpen(true)}
+          >
+            <PackagePlus className="mr-2 size-4" />
+            Cargar Stock Inicial
+          </Button>
         )}
       </div>
 
@@ -475,6 +494,16 @@ export function StockAlertTable({
             setBulkDialogOpen(false)
             clearSelection()
           }}
+        />
+      )}
+
+      {/* ---- Initial Stock Dialog ---- */}
+      {initialStockDialogOpen && initialData && (
+        <InitialStockDialog
+          products={initialData.rows.filter(
+            (r) => Number(r.stock_actual) === 0,
+          )}
+          onClose={() => setInitialStockDialogOpen(false)}
         />
       )}
     </div>

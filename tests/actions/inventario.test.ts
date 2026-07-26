@@ -22,6 +22,7 @@ import {
   bulkUpdatePrices,
   getStockAlertCount,
   getDashboardKPIs,
+  loadInitialStock,
 } from "@/lib/supabase/actions/inventario"
 
 // ---------------------------------------------------------------------------
@@ -645,6 +646,218 @@ describe("inventario Server Actions", () => {
       const result = await getDashboardKPIs()
 
       expect(result).toEqual({ data: null, error: "Value query failed" })
+    })
+  })
+
+  describe("loadInitialStock", () => {
+    const validProductId = crypto.randomUUID()
+    const validProductId2 = crypto.randomUUID()
+
+    function buildFormData(
+      items: Array<{
+        producto_id: string
+        cantidad: number
+        costo_unitario: number
+      }>,
+    ): FormData {
+      const fd = new FormData()
+      items.forEach((item, i) => {
+        fd.set(`items[${i}].producto_id`, item.producto_id)
+        fd.set(`items[${i}].cantidad`, String(item.cantidad))
+        fd.set(`items[${i}].costo_unitario`, String(item.costo_unitario))
+      })
+      return fd
+    }
+
+    /** Override mockProductosChain to return stock_actual for .in() queries */
+    function mockProductosStock(
+      rows: Array<{ id: string; stock_actual: number }>,
+    ) {
+      // Override the .select().in() chain
+      mockProductosChain.select = vi.fn(() => ({
+        in: vi.fn(() => ({
+          then: (resolve: (v: unknown) => void) =>
+            resolve({ data: rows, error: null }),
+        })),
+      })) as unknown as typeof mockProductosChain.select
+    }
+
+    it("returns UNAUTHORIZED when no session", async () => {
+      mockNoSession()
+      const fd = buildFormData([
+        { producto_id: validProductId, cantidad: 10, costo_unitario: 5 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("returns FORBIDDEN for viewer role", async () => {
+      mockSession("viewer")
+      const fd = buildFormData([
+        { producto_id: validProductId, cantidad: 10, costo_unitario: 5 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("returns validation error for empty items", async () => {
+      mockSession("admin")
+      const fd = new FormData()
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result.error).toContain("Debe seleccionar al menos un producto")
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("returns validation error for invalid uuid", async () => {
+      mockSession("admin")
+      const fd = buildFormData([
+        { producto_id: "not-a-uuid", cantidad: 10, costo_unitario: 5 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result.error).toContain("ID de producto inválido")
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
+    it("loads stock successfully when stock is 0", async () => {
+      mockSession("admin")
+      mockProductosStock([
+        { id: validProductId, stock_actual: 0 },
+        { id: validProductId2, stock_actual: 0 },
+      ])
+      rpcResolveValue = { data: null, error: null }
+
+      const fd = buildFormData([
+        { producto_id: validProductId, cantidad: 100, costo_unitario: 5.5 },
+        { producto_id: validProductId2, cantidad: 50, costo_unitario: 12 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result.error).toBeNull()
+      expect(result.data).toEqual({
+        loaded: 2,
+        excluded: [],
+        errors: [],
+      })
+      expect(mockRpc).toHaveBeenCalledTimes(2)
+      expect(mockRpc).toHaveBeenCalledWith("record_inventory_movement", {
+        p_producto_id: validProductId,
+        p_cantidad: 100,
+        p_costo_unitario: 5.5,
+        p_tipo_movimiento: "adjust",
+        p_referencia_tipo: "initial_stock",
+        p_referencia_id: undefined,
+      })
+    })
+
+    it("excludes products with stock_actual > 0", async () => {
+      mockSession("admin")
+      mockProductosStock([
+        { id: validProductId, stock_actual: 0 },
+        { id: validProductId2, stock_actual: 10 },
+      ])
+      rpcResolveValue = { data: null, error: null }
+
+      const fd = buildFormData([
+        { producto_id: validProductId, cantidad: 100, costo_unitario: 5 },
+        { producto_id: validProductId2, cantidad: 50, costo_unitario: 12 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result.error).toBeNull()
+      expect(result.data?.loaded).toBe(1)
+      expect(result.data?.excluded).toEqual([
+        { producto_id: validProductId2, reason: "Stock actual > 0" },
+      ])
+      expect(mockRpc).toHaveBeenCalledTimes(1)
+    })
+
+    it("reports RPC errors per item", async () => {
+      mockSession("admin")
+      mockProductosStock([
+        { id: validProductId, stock_actual: 0 },
+        { id: validProductId2, stock_actual: 0 },
+      ])
+      // First call succeeds, second fails
+      let callCount = 0
+      mockRpc.mockImplementation(() => ({
+        then: (resolve: (v: typeof rpcResolveValue) => void) => {
+          callCount++
+          if (callCount === 1) {
+            resolve({ data: null, error: null })
+          } else {
+            resolve({ data: null, error: { message: "RPC failed" } })
+          }
+        },
+      }))
+
+      const fd = buildFormData([
+        { producto_id: validProductId, cantidad: 100, costo_unitario: 5 },
+        { producto_id: validProductId2, cantidad: 50, costo_unitario: 12 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result.error).toBeNull()
+      expect(result.data?.loaded).toBe(1)
+      expect(result.data?.errors).toEqual([
+        { producto_id: validProductId2, error: "RPC failed" },
+      ])
+    })
+
+    it("returns query error when productos fetch fails", async () => {
+      mockSession("admin")
+      // Override productos chain to return error
+      mockProductosChain.select = vi.fn(() => ({
+        in: vi.fn(() => ({
+          then: (resolve: (v: unknown) => void) =>
+            resolve({ data: null, error: { message: "Query failed" } }),
+        })),
+      })) as unknown as typeof mockProductosChain.select
+
+      const fd = buildFormData([
+        { producto_id: validProductId, cantidad: 10, costo_unitario: 5 },
+      ])
+
+      const result = await loadInitialStock(
+        { data: null, error: null },
+        fd,
+      )
+
+      expect(result).toEqual({ data: null, error: "Query failed" })
+      expect(mockRpc).not.toHaveBeenCalled()
     })
   })
 })
