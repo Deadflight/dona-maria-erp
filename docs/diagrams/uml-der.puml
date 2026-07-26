@@ -44,8 +44,11 @@ package "Inventario" {
     precio_venta: NUMERIC(12,2)
     precio_compra: NUMERIC(12,2)
     stock_actual: NUMERIC(10,2)
-    stock_minimo: INTEGER
+    stock_minimo: NUMERIC(10,2)
     unidad_medida: TEXT
+    tipo_unidad: TEXT
+    unidad_base: TEXT
+    factor_conversion: NUMERIC(10,2)
     codigo_barras: TEXT
     activo: BOOLEAN
     created_at: TIMESTAMPTZ
