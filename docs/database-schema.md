@@ -17,15 +17,15 @@ Catálogo principal de productos con soporte para unidades fraccionadas.
 | `nombre` | TEXT | NOT NULL | — | Nombre del producto |
 | `descripcion` | TEXT | — | — | Descripción detallada |
 | `categoria` | TEXT | — | — | Categoría legacy (texto libre) |
-| `precio_venta` | NUMERIC(12,2) | NOT NULL | — | Precio de venta |
-| `precio_compra` | NUMERIC(12,2) | NOT NULL | — | Precio de compra |
-| `stock_actual` | NUMERIC(10,2) | NOT NULL | `0` | Stock actual (cache actualizado por RPC) |
-| `stock_minimo` | NUMERIC(10,2) | NOT NULL | `0` | Nivel mínimo para alerta |
-| `unidad_medida` | TEXT | — | — | Unidad de medida legacy |
+| `precio_venta` | NUMERIC(12,2) | NOT NULL, CHECK >= 0 | — | Precio de venta |
+| `precio_compra` | NUMERIC(12,2) | CHECK >= 0 | — | Precio de compra (nullable) |
+| `stock_actual` | NUMERIC(10,2) | NOT NULL, CHECK >= 0 | `0` | Stock actual (cache actualizado por RPC) |
+| `stock_minimo` | NUMERIC(10,2) | NOT NULL, CHECK >= 0 | `0` | Nivel mínimo para alerta |
+| `unidad_medida` | TEXT | NOT NULL | `'unidad'` | Unidad de medida legacy |
 | `codigo_barras` | TEXT | — | — | Código de barras |
-| `activo` | BOOLEAN | NOT NULL | `true` | Habilitado para venta |
-| `created_at` | TIMESTAMPTZ | NOT NULL | `now()` | Fecha de creación |
-| `updated_at` | TIMESTAMPTZ | NOT NULL | `now()` | Última actualización |
+| `activo` | BOOLEAN | — | `true` | Habilitado para venta (nullable) |
+| `created_at` | TIMESTAMPTZ | — | `now()` | Fecha de creación |
+| `updated_at` | TIMESTAMPTZ | — | `now()` | Última actualización |
 | `tipo_unidad` | TEXT | NOT NULL, CHECK IN ('unidad','peso','longitud','mixto') | `'unidad'` | Clasificación de unidad |
 | `unidad_base` | TEXT | NOT NULL, CHECK IN ('und','kg','m','cm') | `'und'` | Unidad base |
 | `factor_conversion` | NUMERIC(10,2) | NOT NULL, CHECK > 0 | `1` | Factor de conversión |
