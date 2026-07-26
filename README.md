@@ -137,6 +137,8 @@ src/
 - [Capítulo III - Marco Metodológico](./docs/capitulo-03-marco-metodologico.md)
 - [Capítulo IV - Análisis y Diseño](./docs/capitulo-04-analisis-y-diseno.md)
 - [Documentación API](./docs/API_DOCS.md)
+- [Arquitectura del Sistema de Inventario](./docs/inventory-architecture.md)
+- [Esquema de Base de Datos — Inventario](./docs/database-schema.md)
 - [Decisiones de Arquitectura](./docs/adr/)
 
 ## Estado del Proyecto
