@@ -482,18 +482,20 @@ describe("productos Server Actions", () => {
       expect(mockFrom).not.toHaveBeenCalled()
     })
 
-    it("returns tipo_unidad in search results", async () => {
+    it("returns tipo_unidad, unidad_base, and factor_conversion in search results", async () => {
       const expected = [
-        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001", tipo_unidad: "unidad" },
+        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001", tipo_unidad: "peso", unidad_base: "kg", factor_conversion: 1 },
       ]
       productsResolveValue = { data: expected, error: null, count: undefined }
 
       const result = await searchProducts("Tornillo")
 
       expect(result).toEqual({ data: expected, error: null })
-      expect(result.data![0].tipo_unidad).toBe("unidad")
+      expect(result.data![0].tipo_unidad).toBe("peso")
+      expect(result.data![0].unidad_base).toBe("kg")
+      expect(result.data![0].factor_conversion).toBe(1)
       expect(mockProductsChain.select).toHaveBeenCalledWith(
-        "id, nombre, sku, tipo_unidad",
+        "id, nombre, sku, tipo_unidad, unidad_base, factor_conversion",
       )
       expect(mockProductsChain.or).toHaveBeenCalledWith(
         "nombre.ilike.%Tornillo%,sku.ilike.%Tornillo%",

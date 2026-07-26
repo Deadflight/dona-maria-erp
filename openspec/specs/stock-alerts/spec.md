@@ -58,12 +58,13 @@ Surface products where `stock_actual <= stock_minimo` with bulk price adjustment
 
 ### Requirement: REQ-STOCK-ALERTS-3 — Stock Alerts UI
 
-**Description**: The `/inventory` page MUST render a responsive table with columns SKU, nombre, stock_actual, stock_minimo, precio_venta, acciones. Include search input, category dropdown, pagination (10/page), and bulk selection checkboxes.
+**Description**: The `/inventory` page MUST render a responsive table with columns SKU, nombre, stock_actual, stock_minimo, precio_venta, tipo_unidad (with unidad_base), and acciones. The tipo_unidad column MUST display the human-readable label from `UNIDAD_CONFIG[tipo_unidad].label` plus the unidad_base value. Include search input, category dropdown, pagination (10/page), and bulk selection checkboxes.
 
-#### Scenario: Table renders with data
+#### Scenario: Table renders with unit info
 
-- GIVEN critical products exist, admin navigates to `/inventory`
-- THEN table shows rows with all 6 columns, pagination, search, category filter
+- GIVEN critical products exist with `tipo_unidad = 'peso'`, `unidad_base = 'kg'`
+- WHEN admin navigates to `/inventory`
+- THEN table shows rows with `tipo_unidad` column displaying "Peso (kg)" format
 
 #### Scenario: Bulk price adjustment flow
 
@@ -78,6 +79,25 @@ Surface products where `stock_actual <= stock_minimo` with bulk price adjustment
 - **Pagination**: 10 items/page, server-side offset
 - **TypeScript strict**: All return types MUST be fully typed; no `any`
 - **Index**: Composite index on `(activo, stock_actual, stock_minimo)` for query performance
+
+### Requirement: Product and Dashboard Tables Unit Display
+
+The system MUST display `tipo_unidad` and `unidad_base` information in product-related tables:
+
+1. **product-table** (`app/(dashboard)/products/_components/product-table.tsx`): Replace `unidad_medida` column with `tipo_unidad` label + `unidad_base` from `UNIDAD_CONFIG`.
+2. **stock-level-table** (`app/(dashboard)/dashboard/_components/stock-level-table.tsx`): Add a unit column showing `tipo_unidad` label + `unidad_base`.
+
+#### Scenario: Product table shows unit type
+
+- GIVEN products with various `tipo_unidad` values exist
+- WHEN admin navigates to `/products`
+- THEN product table shows `tipo_unidad` label (e.g., "Peso", "Longitud") instead of legacy `unidad_medida`
+
+#### Scenario: Stock level table includes unit column
+
+- GIVEN products with `tipo_unidad = 'longitud'`, `unidad_base = 'm'`
+- WHEN admin views dashboard
+- THEN stock-level-table shows a unit column with "Longitud (m)" format
 
 ## Test Expectations
 

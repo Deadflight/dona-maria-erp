@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { receiptCreateSchema } from "@/lib/validations/compras"
+import { roundToDecimals } from "@/lib/numeric"
 import type { ReceiptFormState } from "@/lib/validations/compras"
 import type { Database } from "@/types/database"
 
@@ -328,10 +329,14 @@ export async function createReceiptAction(
   while (formData.has(`items[${index}].producto_id`)) {
     items.push({
       producto_id: formData.get(`items[${index}].producto_id`) as string,
-      cantidad_recibida: Number(
-        formData.get(`items[${index}].cantidad_recibida`),
+      cantidad_recibida: roundToDecimals(
+        Number(formData.get(`items[${index}].cantidad_recibida`)),
+        2,
       ),
-      precio_compra: Number(formData.get(`items[${index}].precio_compra`)),
+      precio_compra: roundToDecimals(
+        Number(formData.get(`items[${index}].precio_compra`)),
+        2,
+      ),
     })
     index++
   }

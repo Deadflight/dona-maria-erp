@@ -15,6 +15,7 @@ import {
 
 import type { Database } from "@/types/database"
 import { cn } from "@/lib/utils"
+import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -385,7 +386,12 @@ export function StockAlertTable({
                       <TableCell className="text-right tabular-nums">
                         {formatCurrency(product.precio_venta)}
                       </TableCell>
-                      <TableCell>{product.unidad_medida}</TableCell>
+                      <TableCell>
+                        {(() => {
+                          const cfg = UNIDAD_CONFIG[product.tipo_unidad as TipoUnidad]
+                          return cfg ? `${cfg.label} (${product.unidad_base})` : product.unidad_medida
+                        })()}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

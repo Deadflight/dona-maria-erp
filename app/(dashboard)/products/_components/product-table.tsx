@@ -25,6 +25,7 @@ import {
 
 import type { Database } from "@/types/database"
 import { cn } from "@/lib/utils"
+import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -395,7 +396,12 @@ export function ProductTable({
                     >
                       {product.stock_actual}
                     </TableCell>
-                    <TableCell>{product.unidad_medida}</TableCell>
+                    <TableCell>
+                      {(() => {
+                        const cfg = UNIDAD_CONFIG[product.tipo_unidad as TipoUnidad]
+                        return cfg ? `${cfg.label} (${product.unidad_base})` : product.unidad_medida
+                      })()}
+                    </TableCell>
                     <TableCell>
                       {product.activo !== false ? (
                         <Badge variant="default">

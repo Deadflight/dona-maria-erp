@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { AlertCircle, PackageSearch, RotateCcw } from "lucide-react"
 
 import type { Database } from "@/types/database"
+import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -103,6 +104,7 @@ export function StockLevelTable({
                   <TableHead className="text-right">Stock Actual</TableHead>
                   <TableHead className="text-right">Stock Mínimo</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Unidad</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -128,6 +130,12 @@ export function StockLevelTable({
                         {isCritical && (
                           <Badge variant="destructive">CRÍTICO</Badge>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const cfg = UNIDAD_CONFIG[product.tipo_unidad as TipoUnidad]
+                          return cfg ? `${cfg.label} (${product.unidad_base})` : product.unidad_medida
+                        })()}
                       </TableCell>
                     </TableRow>
                   )

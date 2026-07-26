@@ -571,5 +571,26 @@ describe("compras Server Actions", () => {
       const [, params] = mockRpc.mock.calls[0]
       expect(params.p_items).toHaveLength(2)
     })
+
+    it("rounds cantidad_recibida and precio_compra to 2 decimals before Zod validation", async () => {
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-1" } }, error: null })
+      mockProfilesSingle.mockResolvedValue({ data: { role: "admin" }, error: null })
+      mockRpc.mockResolvedValue({ data: { receipt_id: "rec-3" }, error: null })
+
+      const formData = new FormData()
+      formData.set("proveedor_id", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+      formData.set("numero_recepcion", "REC-003")
+      formData.set("items[0].producto_id", "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22")
+      formData.set("items[0].cantidad_recibida", "1.235")
+      formData.set("items[0].precio_compra", "25.678")
+
+      const result = await createReceiptAction(prevState, formData)
+
+      expect(result).toEqual({ success: true, data: { id: "rec-3" } })
+      const [, params] = mockRpc.mock.calls[0]
+      expect(params.p_items).toEqual([
+        { producto_id: "b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a22", cantidad_recibida: 1.24, precio_compra: 25.68 },
+      ])
+    })
   })
 })
