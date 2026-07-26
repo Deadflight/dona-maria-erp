@@ -25,7 +25,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { ReceiptListItem } from "@/lib/supabase/actions/compras"
+import type { ReceiptListItem, ReceiptDetailResult } from "@/lib/supabase/actions/compras"
+import { getReceiptById } from "@/lib/supabase/actions/compras"
+import { ReceiptDetailDialog } from "./receipt-detail-dialog"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -118,7 +120,25 @@ export function ReceiptList({
   }, [searchInput])
 
   // --- Detail dialog state ---
-  const [, setSelectedReceipt] = useState<ReceiptListItem | null>(null)
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptListItem | null>(null)
+  const [detailData, setDetailData] = useState<ReceiptDetailResult["data"] | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false)
+  const [detailError, setDetailError] = useState<string | null>(null)
+
+  const handleRowClick = useCallback(async (receipt: ReceiptListItem) => {
+    setSelectedReceipt(receipt)
+    setDetailLoading(true)
+    setDetailError(null)
+
+    const { data, error } = await getReceiptById(receipt.id)
+
+    if (error) {
+      setDetailError(error)
+    } else {
+      setDetailData(data)
+    }
+    setDetailLoading(false)
+  }, [])
 
   // --- Pagination ---
   const totalPages = initialData
@@ -255,7 +275,7 @@ export function ReceiptList({
                   <TableRow
                     key={receipt.id}
                     className="cursor-pointer transition-colors hover:bg-muted/50"
-                    onClick={() => setSelectedReceipt(receipt)}
+                    onClick={() => handleRowClick(receipt)}
                   >
                     <TableCell className="font-mono text-xs font-medium">
                       {receipt.numero_recepcion}
@@ -325,6 +345,19 @@ export function ReceiptList({
           </div>
         </div>
       )}
+
+      {/* ---- Detail Dialog ---- */}
+      <ReceiptDetailDialog
+        receipt={detailData ?? null}
+        open={!!selectedReceipt}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedReceipt(null)
+            setDetailData(null)
+            setDetailError(null)
+          }
+        }}
+      />
     </div>
   )
 }

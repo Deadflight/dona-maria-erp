@@ -10,20 +10,19 @@ describe("seed.sql", () => {
     expect(existsSync(SEED_PATH)).toBe(true)
   })
 
-  it("should explain the crypt() -> GoTrue incompatibility", () => {
-    const sql = readFileSync(SEED_PATH, "utf-8")
-
-    expect(sql).toContain("crypt()")
-    expect(sql).toContain("GoTrue")
-    expect(sql).toContain("base64 encoding")
-    expect(sql).toContain("create-admin.ts")
-  })
-
-  it("should reference the setup script as the admin creation mechanism", () => {
+  it("should reference the TypeScript seed script for admin and suppliers", () => {
     const sql = readFileSync(SEED_PATH, "utf-8")
 
     expect(sql).toContain("scripts/create-admin.ts")
-    expect(sql).toContain("GoTrue's API")
+    expect(sql).toContain("auth.users")
+  })
+
+  it("should seed categories and products", () => {
+    const sql = readFileSync(SEED_PATH, "utf-8")
+
+    expect(sql).toContain("INSERT INTO public.categorias")
+    expect(sql).toContain("INSERT INTO public.productos")
+    expect(sql).toContain("tipo_unidad")
   })
 })
 
@@ -46,5 +45,20 @@ describe("scripts/create-admin.ts", () => {
     const script = readFileSync(SETUP_SCRIPT_PATH, "utf-8")
 
     expect(script).toContain("already exists")
+  })
+
+  it("should create seller user for role testing", () => {
+    const script = readFileSync(SETUP_SCRIPT_PATH, "utf-8")
+
+    expect(script).toContain("vendedor@ferreteria.com")
+    expect(script).toContain("seller")
+  })
+
+  it("should create test purchase receipts", () => {
+    const script = readFileSync(SETUP_SCRIPT_PATH, "utf-8")
+
+    expect(script).toContain("purchase_receipts")
+    expect(script).toContain("receipt_items")
+    expect(script).toContain("record_inventory_movement")
   })
 })
