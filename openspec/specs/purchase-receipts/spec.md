@@ -139,7 +139,7 @@ Each receipt item MUST create one `entrada` movement via `record_inventory_movem
 
 ### REQ-7: Supplier and Product Query Actions
 
-The system MUST provide `listProveedores()` and `searchProducts(query)` in `lib/supabase/actions/compras.ts`. `listProveedores` MUST return all active suppliers (id, nombre, ruc). `searchProducts` MUST return products matching nombre or SKU (id, nombre, sku) with a limit of 20 results. Both MUST return `UNAUTHORIZED` if not authenticated.
+The system MUST provide `listProveedores()` and `searchProducts(query)` in `lib/supabase/actions/compras.ts`. `listProveedores` MUST return all active suppliers (id, nombre, ruc). `searchProducts` MUST return products matching nombre or SKU (id, nombre, sku, tipo_unidad, unidad_base, factor_conversion) with a limit of 20 results. Both MUST return `UNAUTHORIZED` if not authenticated.
 
 #### ESC-1: listProveedores returns active suppliers
 - GIVEN 3 suppliers exist (2 active)
@@ -160,6 +160,11 @@ The system MUST provide `listProveedores()` and `searchProducts(query)` in `lib/
 - GIVEN no active session
 - WHEN calling `listProveedores()`
 - THEN returns `UNAUTHORIZED`
+
+#### ESC-5: searchProducts returns unit fields
+- GIVEN product with `tipo_unidad = 'peso'`, `unidad_base = 'kg'`, `factor_conversion = 1`
+- WHEN calling `searchProducts("Tornillo")`
+- THEN returned product includes `tipo_unidad`, `unidad_base`, and `factor_conversion`
 
 ### REQ-8: Receipt Number Generation
 
@@ -198,3 +203,29 @@ The system MUST export `receiptCreateSchema` from `lib/validations/compras.ts` v
 - GIVEN item with `cantidad = 0`
 - WHEN parsing with `receiptCreateSchema`
 - THEN `success = false`, error on `items[0].cantidad`
+
+### REQ-10: Server-Side Precision Enforcement
+
+The system MUST apply `roundToDecimals(value, 2)` to `cantidad` and `precio_compra` fields in `createReceipt()` before passing them to `receiptCreateSchema.safeParse()`. This is defense-in-depth: Zod validation catches invalid precision, but direct callers of `createReceipt()` may bypass Zod.
+
+#### ESC-1: Quantity rounded before validation
+- GIVEN admin calls `createReceipt()` with item `cantidad = 1.235` (3 decimals)
+- WHEN `createReceipt()` processes the form data
+- THEN `cantidad` is rounded to `1.24` before Zod validation
+- AND receipt is created successfully with `cantidad = 1.24`
+
+#### ESC-2: Price rounded before validation
+- GIVEN admin calls `createReceipt()` with item `precio_compra = 25.678`
+- WHEN `createReceipt()` processes the form data
+- THEN `precio_compra` is rounded to `25.68` before Zod validation
+- AND receipt is created successfully
+
+#### ESC-3: Exact 2 decimals passes through unchanged
+- GIVEN admin calls `createReceipt()` with item `cantidad = 1.23`
+- WHEN `createReceipt()` processes the form data
+- THEN `cantidad` remains `1.23` (no rounding needed)
+
+#### ESC-4: Zero quantity still rejected
+- GIVEN admin calls `createReceipt()` with item `cantidad = 0`
+- WHEN `createReceipt()` processes the form data
+- THEN Zod validation rejects with error on `cantidad`
