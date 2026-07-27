@@ -201,7 +201,7 @@ describe("ventas Server Actions", () => {
         p_impuesto: 0,
         p_total: 100,
         p_items: [
-          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50 },
+          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50, descuento: 0 },
         ],
       })
     })

@@ -28,7 +28,7 @@ export default async function SalesPage({ searchParams }: PageProps) {
     listSales({
       desde: sp.desde,
       hasta: sp.hasta,
-      metodo_pago: sp.metodo_pago,
+      metodo_pago: sp.metodo_pago as "efectivo" | "pago_movil" | "transferencia" | "divisa" | "mixto" | "credito" | undefined,
       search: sp.search,
       page: sp.page ? parseInt(sp.page, 10) : 1,
       pageSize: sp.pageSize ? parseInt(sp.pageSize, 10) : 20,

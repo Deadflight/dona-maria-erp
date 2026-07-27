@@ -20,8 +20,9 @@ import { UNIDAD_CONFIG } from "@/lib/constants/unidad-config"
 
 type ReceiptState = {
   invoiceNumber: string
-  items: { nombre: string; cantidad: number; precio_venta: number; subtotal: number }[]
+  items: { nombre: string; cantidad: number; precio_venta: number; subtotal: number; descuento: number }[]
   subtotal: number
+  descuentoTotal: number
   impuesto: number
   total: number
   paymentMethod: string
@@ -156,6 +157,7 @@ export default function POSPage() {
           producto_id: i.product.id,
           cantidad: i.cantidad,
           precio_venta: i.precio_venta,
+          descuento: i.descuento,
         })),
       })
 
@@ -173,8 +175,10 @@ export default function POSPage() {
             cantidad: i.cantidad,
             precio_venta: i.precio_venta,
             subtotal: i.subtotal,
+            descuento: i.descuento,
           })),
           subtotal: cart.totals.subtotal,
+          descuentoTotal: cart.totals.descuentoTotal,
           impuesto: cart.totals.impuesto,
           total: cart.totals.total,
           paymentMethod: cart.paymentMethod,
@@ -236,6 +240,7 @@ export default function POSPage() {
               onUpdateQuantity={cart.updateQuantity}
               onUpdateQuantityByStep={cart.updateQuantityByStep}
               onRemoveItem={cart.removeItem}
+              onSetDiscount={cart.setDiscount}
               onClearCart={cart.clearCart}
               selectedIndex={selectedIndex}
               onSelectItem={setSelectedIndex}
@@ -283,6 +288,7 @@ export default function POSPage() {
           invoiceNumber={receipt.invoiceNumber}
           items={receipt.items}
           subtotal={receipt.subtotal}
+          descuentoTotal={receipt.descuentoTotal}
           impuesto={receipt.impuesto}
           total={receipt.total}
           paymentMethod={receipt.paymentMethod}

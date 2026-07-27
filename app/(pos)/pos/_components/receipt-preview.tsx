@@ -13,12 +13,14 @@ type ReceiptItem = {
   cantidad: number
   precio_venta: number
   subtotal: number
+  descuento: number
 }
 
 type ReceiptPreviewProps = {
   invoiceNumber: string
   items: ReceiptItem[]
   subtotal: number
+  descuentoTotal: number
   impuesto: number
   total: number
   paymentMethod: string
@@ -35,6 +37,7 @@ export function ReceiptPreview({
   invoiceNumber,
   items,
   subtotal,
+  descuentoTotal,
   impuesto,
   total,
   paymentMethod,
@@ -103,19 +106,36 @@ export function ReceiptPreview({
             {/* Items */}
             <div className="mb-2">
               <p className="mb-1 font-bold">ARTÍCULOS</p>
-              {items.map((item, i) => (
-                <div key={i} className="mb-1.5">
-                  <p className="font-medium">{item.nombre}</p>
-                  <div className="flex justify-between pl-2">
-                    <span>
-                      {item.cantidad} x ${item.precio_venta.toFixed(2)}
-                    </span>
-                    <span className="font-medium">
-                      ${item.subtotal.toFixed(2)}
-                    </span>
+              {items.map((item, i) => {
+                const lineTotal = item.cantidad * item.precio_venta
+                const hasDiscount = item.descuento > 0
+                return (
+                  <div key={i} className="mb-1.5">
+                    <p className="font-medium">{item.nombre}</p>
+                    <div className="flex justify-between pl-2">
+                      <span>
+                        {item.cantidad} x ${item.precio_venta.toFixed(2)}
+                      </span>
+                      <span className="font-medium">
+                        {hasDiscount ? (
+                          <>
+                            <span className="line-through">${lineTotal.toFixed(2)}</span>
+                            {" "}
+                            ${item.subtotal.toFixed(2)}
+                          </>
+                        ) : (
+                          <>${item.subtotal.toFixed(2)}</>
+                        )}
+                      </span>
+                    </div>
+                    {hasDiscount && (
+                      <div className="pl-2 text-xs">
+                        Descuento: -${item.descuento.toFixed(2)}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             <p className="my-1">--------------------------------</p>
@@ -126,8 +146,14 @@ export function ReceiptPreview({
                 <span>Subtotal:</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
+              {descuentoTotal > 0 && (
+                <div className="flex justify-between">
+                  <span>Descuento:</span>
+                  <span>-${descuentoTotal.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
-                <span>Impuesto:</span>
+                <span>IVA (16%):</span>
                 <span>${impuesto.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm font-bold">

@@ -1,12 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import { Trash2, ShoppingCart, Minus, Plus } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { roundToDecimals } from "@/lib/numeric"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
-import type { CartItem as CartItemType } from "../_hooks/use-cart"
+import type { CartItem as CartItemType, DescuentoTipo } from "../_hooks/use-cart"
 
 // ---------------------------------------------------------------------------
 // Props
@@ -14,10 +16,11 @@ import type { CartItem as CartItemType } from "../_hooks/use-cart"
 
 type CartProps = {
   items: CartItemType[]
-  totals: { subtotal: number; impuesto: number; total: number }
+  totals: { subtotal: number; descuentoTotal: number; impuesto: number; total: number }
   onUpdateQuantity: (productId: string, cantidad: number) => void
   onUpdateQuantityByStep: (productId: string, step: number) => void
   onRemoveItem: (productId: string) => void
+  onSetDiscount: (productId: string, descuento: number, descuentoTipo: DescuentoTipo) => void
   onClearCart: () => void
   selectedIndex?: number
   onSelectItem?: (index: number) => void
@@ -34,6 +37,7 @@ export function Cart({
   onUpdateQuantity,
   onUpdateQuantityByStep,
   onRemoveItem,
+  onSetDiscount,
   onClearCart,
   selectedIndex,
   onSelectItem,
@@ -73,6 +77,17 @@ export function Cart({
                   <p className="text-xs text-muted-foreground">
                     SKU: {item.product.sku} · ${item.precio_venta.toFixed(2)}/{cfg?.label ?? "und"}
                   </p>
+                  {/* Discount input */}
+                  <div className="mt-1 flex items-center gap-1">
+                    <DiscountInput
+                      lineTotal={roundToDecimals(item.cantidad * item.precio_venta, 2)}
+                      descuento={item.descuento}
+                      descuentoTipo={item.descuento_tipo}
+                      onChange={(descuento, tipo) =>
+                        onSetDiscount(item.product.id, descuento, tipo)
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-1.5">
@@ -141,7 +156,16 @@ export function Cart({
                   </div>
 
                   <span className="ml-1 w-20 text-right text-sm font-semibold tabular-nums">
-                    ${item.subtotal.toFixed(2)}
+                    {item.descuento > 0 ? (
+                      <span className="flex flex-col items-end leading-tight">
+                        <span className="text-xs text-muted-foreground line-through">
+                          ${(roundToDecimals(item.cantidad * item.precio_venta, 2)).toFixed(2)}
+                        </span>
+                        <span>${item.subtotal.toFixed(2)}</span>
+                      </span>
+                    ) : (
+                      <span>${item.subtotal.toFixed(2)}</span>
+                    )}
                   </span>
 
                   <Button
@@ -166,8 +190,14 @@ export function Cart({
           <span>Subtotal</span>
           <span className="tabular-nums">${totals.subtotal.toFixed(2)}</span>
         </div>
+        {totals.descuentoTotal > 0 && (
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>Descuento</span>
+            <span className="tabular-nums text-destructive">-${totals.descuentoTotal.toFixed(2)}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Impuesto (16%)</span>
+          <span>IVA (16%)</span>
           <span className="tabular-nums">${totals.impuesto.toFixed(2)}</span>
         </div>
         <div className="flex items-center justify-between text-base font-bold">
@@ -188,6 +218,68 @@ export function Cart({
           Vaciar carrito ({items.length})
         </Button>
       </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// DiscountInput — inline %/fixed discount toggle per cart item
+// ---------------------------------------------------------------------------
+
+function DiscountInput({
+  lineTotal,
+  descuento,
+  descuentoTipo,
+  onChange,
+}: {
+  lineTotal: number
+  descuento: number
+  descuentoTipo: DescuentoTipo
+  onChange: (descuento: number, tipo: DescuentoTipo) => void
+}) {
+  const [tipo, setTipo] = useState<DescuentoTipo>(descuentoTipo)
+  const [value, setValue] = useState(descuento === 0 ? "" : String(descuento))
+
+  function handleToggle() {
+    const newTipo: DescuentoTipo = tipo === "%" ? "fixed" : "%"
+    setTipo(newTipo)
+    setValue("")
+    onChange(0, newTipo)
+  }
+
+  function handleBlur() {
+    const parsed = parseFloat(value)
+    if (isNaN(parsed) || parsed <= 0) {
+      setValue("")
+      onChange(0, tipo)
+      return
+    }
+    const clamped = tipo === "%" ? Math.min(parsed, 100) : Math.min(parsed, lineTotal)
+    setValue(String(clamped))
+    onChange(clamped, tipo)
+  }
+
+  return (
+    <div className="flex items-center gap-0.5">
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="rounded border bg-muted px-1 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-muted/80"
+        aria-label={`Cambiar a descuento ${tipo === "%" ? "fijo" : "porcentaje"}`}
+      >
+        {tipo}
+      </button>
+      <Input
+        type="number"
+        value={value}
+        min={0}
+        max={tipo === "%" ? 100 : lineTotal}
+        step={tipo === "%" ? 1 : 0.01}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="0"
+        className="h-6 w-14 text-center text-[10px] tabular-nums"
+      />
     </div>
   )
 }
