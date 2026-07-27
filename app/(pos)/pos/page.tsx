@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ShoppingCart, LogOut } from "lucide-react"
 import Link from "next/link"
 
@@ -12,6 +12,7 @@ import { ClientSelector } from "./_components/client-selector"
 import { ReceiptPreview } from "./_components/receipt-preview"
 import { useCart, type CartProduct } from "./_hooks/use-cart"
 import { createSale } from "@/lib/supabase/actions/ventas"
+import { UNIDAD_CONFIG } from "@/lib/constants/unidad-config"
 
 // ---------------------------------------------------------------------------
 // Receipt state
@@ -38,6 +39,8 @@ export default function POSPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [receipt, setReceipt] = useState<ReceiptState | null>(null)
   const [sellerName, setSellerName] = useState<string>("Vendedor")
+  const [selectedIndex, setSelectedIndex] = useState<number>(0)
+  const cartRef = useRef<HTMLDivElement>(null)
 
   // Get seller name from session (runs once)
   useEffect(() => {
@@ -54,10 +57,31 @@ export default function POSPage() {
     fetchSession()
   }, [])
 
+  // Clamp selected index when cart changes
+  useEffect(() => {
+    if (cart.items.length === 0) {
+      setSelectedIndex(0)
+    } else if (selectedIndex >= cart.items.length) {
+      setSelectedIndex(cart.items.length - 1)
+    }
+  }, [cart.items.length, selectedIndex])
+
+  const selectedItem = useMemo(
+    () => (cart.items.length > 0 ? cart.items[Math.min(selectedIndex, cart.items.length - 1)] : null),
+    [cart.items, selectedIndex],
+  )
+
   // F2 = focus cart area (scroll to cart)
   // F3 = trigger confirm
+  // Arrow Up/Down = navigate cart items
+  // Arrow Left/Right = decrease/increase quantity by step
+  // Number keys 1-9 = set quantity to N × step
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      // Ignore if typing in an input
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return
+
       if (e.key === "F2") {
         e.preventDefault()
         const cartEl = document.getElementById("pos-cart")
@@ -68,6 +92,43 @@ export default function POSPage() {
         if (!cart.isEmpty && cart.paymentMethod && !cart.isCreditoWithoutClient) {
           handleConfirmSale()
         }
+        return
+      }
+      if (cart.items.length === 0) return
+
+      // Arrow navigation
+      if (e.key === "ArrowUp") {
+        e.preventDefault()
+        setSelectedIndex((i) => Math.max(0, i - 1))
+        return
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault()
+        setSelectedIndex((i) => Math.min(cart.items.length - 1, i + 1))
+        return
+      }
+
+      if (!selectedItem) return
+      const cfg = UNIDAD_CONFIG[selectedItem.product.tipo_unidad]
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault()
+        cart.updateQuantityByStep(selectedItem.product.id, -cfg.step)
+        return
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault()
+        cart.updateQuantityByStep(selectedItem.product.id, cfg.step)
+        return
+      }
+
+      // Number keys 1-9 → set quantity to N × step
+      const num = parseInt(e.key, 10)
+      if (num >= 1 && num <= 9) {
+        e.preventDefault()
+        const newQty = num * cfg.step
+        cart.updateQuantity(selectedItem.product.id, newQty)
+        return
       }
     }
     window.addEventListener("keydown", handleKeyDown)
@@ -177,9 +238,12 @@ export default function POSPage() {
               items={cart.items}
               totals={cart.totals}
               onUpdateQuantity={cart.updateQuantity}
+              onUpdateQuantityByStep={cart.updateQuantityByStep}
               onRemoveItem={cart.removeItem}
               onSetDiscount={cart.setDiscount}
               onClearCart={cart.clearCart}
+              selectedIndex={selectedIndex}
+              onSelectItem={setSelectedIndex}
             />
           </div>
         </div>
@@ -210,6 +274,7 @@ export default function POSPage() {
               change={cart.change}
               onSetPaymentMethod={cart.setPaymentMethod}
               onSetAmountReceived={cart.setAmountReceived}
+              onSetAmountToExact={cart.setAmountToExact}
               onConfirm={handleConfirmSale}
               isSubmitting={isSubmitting}
             />

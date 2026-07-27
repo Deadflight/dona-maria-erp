@@ -24,6 +24,7 @@ export type CartProduct = {
   tipo_unidad: TipoUnidad
   unidad_base: string
   factor_conversion: number
+  categoria: string
 }
 
 export type CartItem = {
@@ -164,6 +165,27 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ),
       }
     }
+    case "UPDATE_QUANTITY_BY_STEP": {
+      const item = state.items.find((i) => i.product.id === action.productId)
+      if (!item) return state
+      const cfg = UNIDAD_CONFIG[item.product.tipo_unidad]
+      const raw = item.cantidad + action.step
+      const newQty = roundToDecimals(Math.max(cfg.min, raw), cfg.maxDecimals)
+      if (newQty <= 0) {
+        return {
+          ...state,
+          items: state.items.filter((i) => i.product.id !== action.productId),
+        }
+      }
+      return {
+        ...state,
+        items: state.items.map((i) =>
+          i.product.id === action.productId
+            ? { ...i, cantidad: newQty, subtotal: computeLineTotal(newQty, i.precio_venta) }
+            : i,
+        ),
+      }
+    }
     case "SET_PAYMENT_METHOD":
       return { ...state, paymentMethod: action.method }
     case "SET_CLIENT":
@@ -223,6 +245,11 @@ export function useCart() {
       dispatch({ type: "UPDATE_QUANTITY", productId, cantidad }),
     [],
   )
+  const updateQuantityByStep = useCallback(
+    (productId: string, step: number) =>
+      dispatch({ type: "UPDATE_QUANTITY_BY_STEP", productId, step }),
+    [],
+  )
   const clearCart = useCallback(() => dispatch({ type: "CLEAR_CART" }), [])
   const setPaymentMethod = useCallback(
     (method: CartState["paymentMethod"]) =>
@@ -238,10 +265,8 @@ export function useCart() {
     (amount: number | null) => dispatch({ type: "SET_AMOUNT_RECEIVED", amount }),
     [],
   )
-
-  const updateQuantityByStep = useCallback(
-    (productId: string, step: number) =>
-      dispatch({ type: "UPDATE_QUANTITY_BY_STEP", productId, step }),
+  const setAmountToExact = useCallback(
+    () => dispatch({ type: "SET_AMOUNT_TO_EXACT" }),
     [],
   )
 
@@ -250,11 +275,6 @@ export function useCart() {
       const clamped = Math.max(0, descuento)
       dispatch({ type: "SET_DISCOUNT", productId, descuento: clamped, descuentoTipo })
     },
-    [],
-  )
-
-  const setAmountToExact = useCallback(
-    () => dispatch({ type: "SET_AMOUNT_TO_EXACT" }),
     [],
   )
 

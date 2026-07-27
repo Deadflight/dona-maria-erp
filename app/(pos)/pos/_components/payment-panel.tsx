@@ -33,6 +33,7 @@ type PaymentPanelProps = {
   change: number | null
   onSetPaymentMethod: (method: PaymentMethod) => void
   onSetAmountReceived: (amount: number | null) => void
+  onSetAmountToExact: () => void
   onConfirm: () => void
   isSubmitting?: boolean
   className?: string
@@ -52,6 +53,7 @@ export function PaymentPanel({
   change,
   onSetPaymentMethod,
   onSetAmountReceived,
+  onSetAmountToExact,
   onConfirm,
   isSubmitting = false,
   className,
@@ -127,6 +129,16 @@ export function PaymentPanel({
               Faltan ${Math.abs(change).toFixed(2)}
             </p>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onSetAmountToExact}
+            className="mt-2 w-full text-xs text-primary hover:text-primary"
+            disabled={isEmpty}
+          >
+            <DollarSign className="mr-1 size-3" />
+            Monto exacto — ${total.toFixed(2)}
+          </Button>
         </div>
       )}
 
