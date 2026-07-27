@@ -15,6 +15,7 @@ const unidadProduct: CartProduct = {
   tipo_unidad: "unidad",
   unidad_base: "und",
   factor_conversion: 1,
+  categoria: "Ferretería",
 }
 
 const pesoProduct: CartProduct = {
@@ -26,6 +27,7 @@ const pesoProduct: CartProduct = {
   tipo_unidad: "peso",
   unidad_base: "kg",
   factor_conversion: 1,
+  categoria: "Electricidad",
 }
 
 const longitudProduct: CartProduct = {
@@ -37,6 +39,7 @@ const longitudProduct: CartProduct = {
   tipo_unidad: "longitud",
   unidad_base: "m",
   factor_conversion: 1,
+  categoria: "Plomería",
 }
 
 // ---------------------------------------------------------------------------
