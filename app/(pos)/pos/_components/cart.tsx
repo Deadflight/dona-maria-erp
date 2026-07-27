@@ -16,8 +16,11 @@ type CartProps = {
   items: CartItemType[]
   totals: { subtotal: number; impuesto: number; total: number }
   onUpdateQuantity: (productId: string, cantidad: number) => void
+  onUpdateQuantityByStep: (productId: string, step: number) => void
   onRemoveItem: (productId: string) => void
   onClearCart: () => void
+  selectedIndex?: number
+  onSelectItem?: (index: number) => void
   className?: string
 }
 
@@ -29,8 +32,11 @@ export function Cart({
   items,
   totals,
   onUpdateQuantity,
+  onUpdateQuantityByStep,
   onRemoveItem,
   onClearCart,
+  selectedIndex,
+  onSelectItem,
   className,
 }: CartProps) {
   if (items.length === 0) {
@@ -48,12 +54,17 @@ export function Cart({
       {/* Items list */}
       <div className="flex-1 overflow-y-auto px-4">
         <ul className="space-y-2 py-2">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const cfg = UNIDAD_CONFIG[item.product.tipo_unidad as TipoUnidad]
+            const isSelected = selectedIndex === index
             return (
               <li
                 key={item.product.id}
-                className="flex items-start justify-between gap-2 rounded-lg border bg-background px-3 py-2"
+                onClick={() => onSelectItem?.(index)}
+                className={cn(
+                  "flex items-start justify-between gap-2 rounded-lg border bg-background px-3 py-2 cursor-pointer transition-colors",
+                  isSelected && "border-primary/50 bg-primary/5",
+                )}
               >
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">
@@ -65,19 +76,30 @@ export function Cart({
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <Button
-                    variant="outline"
-                    size="icon-xs"
-                    onClick={() =>
-                      onUpdateQuantity(
-                        item.product.id,
-                        Math.max(0, item.cantidad - cfg.step),
-                      )
-                    }
-                    aria-label="Disminuir cantidad"
-                  >
-                    <Minus className="size-3" />
-                  </Button>
+                  {/* Preset step buttons */}
+                  <div className="flex gap-0.5">
+                    <Button
+                      variant="outline"
+                      size="icon-xs"
+                      onClick={() => onUpdateQuantityByStep(item.product.id, -cfg.step)}
+                      aria-label="Disminuir un paso"
+                    >
+                      <Minus className="size-3" />
+                    </Button>
+                    {cfg.step === 1 && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon-xs"
+                          onClick={() => onUpdateQuantityByStep(item.product.id, -5)}
+                          aria-label="Disminuir 5"
+                          className="text-[10px] font-bold"
+                        >
+                          -5
+                        </Button>
+                      </>
+                    )}
+                  </div>
 
                   <Input
                     type="number"
@@ -94,19 +116,29 @@ export function Cart({
                     className="h-7 w-16 text-center text-xs tabular-nums"
                   />
 
-                  <Button
-                    variant="outline"
-                    size="icon-xs"
-                    onClick={() =>
-                      onUpdateQuantity(
-                        item.product.id,
-                        Math.min(item.product.stock_actual, item.cantidad + cfg.step),
-                      )
-                    }
-                    aria-label="Aumentar cantidad"
-                  >
-                    <Plus className="size-3" />
-                  </Button>
+                  <div className="flex gap-0.5">
+                    {cfg.step === 1 && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon-xs"
+                          onClick={() => onUpdateQuantityByStep(item.product.id, 5)}
+                          aria-label="Aumentar 5"
+                          className="text-[10px] font-bold"
+                        >
+                          +5
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="icon-xs"
+                      onClick={() => onUpdateQuantityByStep(item.product.id, cfg.step)}
+                      aria-label="Aumentar un paso"
+                    >
+                      <Plus className="size-3" />
+                    </Button>
+                  </div>
 
                   <span className="ml-1 w-20 text-right text-sm font-semibold tabular-nums">
                     ${item.subtotal.toFixed(2)}

@@ -28,6 +28,7 @@ const defaultProps = {
   change: null,
   onSetPaymentMethod: vi.fn(),
   onSetAmountReceived: vi.fn(),
+  onSetAmountToExact: vi.fn(),
   onConfirm: vi.fn(),
   isSubmitting: false,
 }
