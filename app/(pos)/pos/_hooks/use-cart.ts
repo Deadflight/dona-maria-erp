@@ -38,9 +38,11 @@ type CartAction =
   | { type: "ADD_ITEM"; product: CartProduct }
   | { type: "REMOVE_ITEM"; productId: string }
   | { type: "UPDATE_QUANTITY"; productId: string; cantidad: number }
+  | { type: "UPDATE_QUANTITY_BY_STEP"; productId: string; step: number }
   | { type: "SET_PAYMENT_METHOD"; method: CartState["paymentMethod"] }
   | { type: "SET_CLIENT"; id: string | null; nombre: string | null }
   | { type: "SET_AMOUNT_RECEIVED"; amount: number | null }
+  | { type: "SET_AMOUNT_TO_EXACT" }
   | { type: "CLEAR_CART" }
 
 // ---------------------------------------------------------------------------
@@ -104,12 +106,41 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ),
       }
     }
+    case "UPDATE_QUANTITY_BY_STEP": {
+      const item = state.items.find((i) => i.product.id === action.productId)
+      if (!item) return state
+      const cfg = UNIDAD_CONFIG[item.product.tipo_unidad]
+      const raw = item.cantidad + action.step
+      const newQty = roundToDecimals(Math.max(cfg.min, raw), cfg.maxDecimals)
+      if (newQty <= 0) {
+        return {
+          ...state,
+          items: state.items.filter((i) => i.product.id !== action.productId),
+        }
+      }
+      return {
+        ...state,
+        items: state.items.map((i) =>
+          i.product.id === action.productId
+            ? { ...i, cantidad: newQty, subtotal: computeLineTotal(newQty, i.precio_venta) }
+            : i,
+        ),
+      }
+    }
     case "SET_PAYMENT_METHOD":
       return { ...state, paymentMethod: action.method }
     case "SET_CLIENT":
       return { ...state, clienteId: action.id, clienteNombre: action.nombre }
     case "SET_AMOUNT_RECEIVED":
       return { ...state, amountReceived: action.amount }
+    case "SET_AMOUNT_TO_EXACT": {
+      if (state.paymentMethod !== "efectivo") return state
+      const subtotal = roundToDecimals(
+        state.items.reduce((sum, i) => sum + i.subtotal, 0),
+        2,
+      )
+      return { ...state, amountReceived: subtotal }
+    }
     case "CLEAR_CART":
       return {
         items: [],
@@ -151,6 +182,11 @@ export function useCart() {
       dispatch({ type: "UPDATE_QUANTITY", productId, cantidad }),
     [],
   )
+  const updateQuantityByStep = useCallback(
+    (productId: string, step: number) =>
+      dispatch({ type: "UPDATE_QUANTITY_BY_STEP", productId, step }),
+    [],
+  )
   const clearCart = useCallback(() => dispatch({ type: "CLEAR_CART" }), [])
   const setPaymentMethod = useCallback(
     (method: CartState["paymentMethod"]) =>
@@ -164,6 +200,10 @@ export function useCart() {
   )
   const setAmountReceived = useCallback(
     (amount: number | null) => dispatch({ type: "SET_AMOUNT_RECEIVED", amount }),
+    [],
+  )
+  const setAmountToExact = useCallback(
+    () => dispatch({ type: "SET_AMOUNT_TO_EXACT" }),
     [],
   )
 
@@ -201,9 +241,11 @@ export function useCart() {
     addItem,
     removeItem,
     updateQuantity,
+    updateQuantityByStep,
     clearCart,
     setPaymentMethod,
     setClient,
     setAmountReceived,
+    setAmountToExact,
   }
 }
