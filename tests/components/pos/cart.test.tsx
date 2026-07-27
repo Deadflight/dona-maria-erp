@@ -189,7 +189,7 @@ describe("useCart", () => {
     it("returns zero totals for empty cart", () => {
       const { result } = renderHook(() => useCart())
 
-      expect(result.current.totals).toEqual({ subtotal: 0, impuesto: 0, total: 0 })
+      expect(result.current.totals).toEqual({ subtotal: 0, descuentoTotal: 0, impuesto: 0, total: 0 })
     })
 
     it("calculates correct totals for single item", () => {
@@ -199,8 +199,8 @@ describe("useCart", () => {
       act(() => result.current.updateQuantity("prod-1", 3))
 
       expect(result.current.totals.subtotal).toBe(15.0)
-      expect(result.current.totals.impuesto).toBe(0) // IVA deferred
-      expect(result.current.totals.total).toBe(15.0)
+      expect(result.current.totals.impuesto).toBe(2.4) // 15 × 0.16
+      expect(result.current.totals.total).toBe(17.4) // 15 + 2.4
     })
 
     it("calculates correct totals for multiple items", () => {
@@ -213,7 +213,8 @@ describe("useCart", () => {
       act(() => result.current.updateQuantity("prod-2", 1.5)) // 1.5 × $2.5 = $3.75
 
       expect(result.current.totals.subtotal).toBeCloseTo(13.75, 2)
-      expect(result.current.totals.total).toBeCloseTo(13.75, 2)
+      expect(result.current.totals.impuesto).toBeCloseTo(2.2, 1) // 13.75 × 0.16 = 2.2
+      expect(result.current.totals.total).toBeCloseTo(15.95, 1) // 13.75 + 2.2
     })
 
     it("recalculates totals after removing an item", () => {
@@ -298,11 +299,11 @@ describe("useCart", () => {
       const { result } = renderHook(() => useCart())
 
       act(() => result.current.addItem(unidadProduct))
-      act(() => result.current.updateQuantity("prod-1", 2)) // total = $10
+      act(() => result.current.updateQuantity("prod-1", 2)) // subtotal = $10, total = $11.60 (IVA 16%)
       act(() => result.current.setPaymentMethod("efectivo"))
       act(() => result.current.setAmountReceived(15))
 
-      expect(result.current.change).toBeCloseTo(5.0, 2)
+      expect(result.current.change).toBeCloseTo(3.4, 1) // 15 - 11.60
     })
 
     it("returns null change for non-efectivo payment", () => {
@@ -328,11 +329,86 @@ describe("useCart", () => {
       const { result } = renderHook(() => useCart())
 
       act(() => result.current.addItem(unidadProduct))
-      act(() => result.current.updateQuantity("prod-1", 2)) // total = $10
+      act(() => result.current.updateQuantity("prod-1", 2)) // subtotal = $10, total = $11.60 (IVA 16%)
       act(() => result.current.setPaymentMethod("efectivo"))
       act(() => result.current.setAmountReceived(5))
 
-      expect(result.current.change).toBeCloseTo(-5.0, 2)
+      expect(result.current.change).toBeCloseTo(-6.6, 1) // 5 - 11.60
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // setDiscount
+  // ---------------------------------------------------------------------------
+  describe("setDiscount", () => {
+    it("sets percentage discount on an item", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantity("prod-1", 3)) // 3 × $5 = $15
+      act(() => result.current.setDiscount("prod-1", 20, "%"))
+
+      // 15 × 0.80 = 12
+      expect(result.current.items[0].subtotal).toBe(12)
+      expect(result.current.items[0].descuento).toBe(20)
+      expect(result.current.items[0].descuento_tipo).toBe("%")
+    })
+
+    it("sets fixed discount on an item", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantity("prod-1", 2)) // 2 × $5 = $10
+      act(() => result.current.setDiscount("prod-1", 3, "fixed"))
+
+      // 10 - 3 = 7
+      expect(result.current.items[0].subtotal).toBe(7)
+      expect(result.current.items[0].descuento_tipo).toBe("fixed")
+    })
+
+    it("clamps discount to line total", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantity("prod-1", 1)) // 1 × $5 = $5
+      act(() => result.current.setDiscount("prod-1", 10, "fixed"))
+
+      // 5 - 10 → clamped → 0
+      expect(result.current.items[0].subtotal).toBe(0)
+    })
+
+    it("clamps negative discount to 0", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setDiscount("prod-1", -5, "%"))
+
+      // Clamped to 0, no discount applied
+      expect(result.current.items[0].subtotal).toBe(5)
+      expect(result.current.items[0].descuento).toBe(0)
+    })
+
+    it("recomputes totals after discount", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantity("prod-1", 3)) // 3 × $5 = $15
+      act(() => result.current.setDiscount("prod-1", 20, "%"))
+
+      // subtotal = 12 (after 20% off)
+      expect(result.current.totals.subtotal).toBe(12)
+      expect(result.current.totals.descuentoTotal).toBe(3) // 15 - 12
+      expect(result.current.totals.impuesto).toBeCloseTo(1.92, 2) // 12 × 0.16
+      expect(result.current.totals.total).toBeCloseTo(13.92, 2) // 12 + 1.92
+    })
+
+    it("sets default descuento fields when adding item", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+
+      expect(result.current.items[0].descuento).toBe(0)
+      expect(result.current.items[0].descuento_tipo).toBe("%")
     })
   })
 })

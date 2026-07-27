@@ -14,6 +14,12 @@ const saleItemSchema = z.object({
     .number()
     .positive("El precio de venta debe ser mayor a 0")
     .multipleOf(0.01, "Máximo 2 decimales"),
+  descuento: z.coerce
+    .number()
+    .min(0, "El descuento no puede ser negativo")
+    .multipleOf(0.01, "Máximo 2 decimales")
+    .optional()
+    .default(0),
 })
 
 export const saleCreateSchema = z
@@ -53,9 +59,9 @@ export const saleCreateSchema = z
   )
   .refine(
     (data) => {
-      // Verify total matches sum of items
+      // Verify total matches sum of items (with discounts)
       const itemsTotal = data.items.reduce(
-        (sum, item) => sum + item.cantidad * item.precio_venta,
+        (sum, item) => sum + (item.cantidad * item.precio_venta) - (item.descuento ?? 0),
         0,
       )
       return Math.abs(itemsTotal - data.total) < 0.02
@@ -66,7 +72,7 @@ export const saleCreateSchema = z
     },
   )
 
-export type SaleCreateInput = z.infer<typeof saleCreateSchema>
+export type SaleCreateInput = z.input<typeof saleCreateSchema>
 
 export type SaleFormState = {
   errors?: Record<string, string[]>

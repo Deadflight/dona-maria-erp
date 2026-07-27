@@ -3,6 +3,13 @@
 import { useReducer, useCallback, useMemo } from "react"
 import { roundToDecimals } from "@/lib/numeric"
 import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
+import {
+  calculateLineTotal,
+  calculateCartTotals,
+  type DescuentoTipo,
+} from "@/lib/calculators/venta-calculator"
+
+export type { DescuentoTipo }
 
 // ---------------------------------------------------------------------------
 // Types
@@ -24,6 +31,8 @@ export type CartItem = {
   cantidad: number
   precio_venta: number
   subtotal: number
+  descuento: number
+  descuento_tipo: DescuentoTipo
 }
 
 type CartState = {
@@ -38,17 +47,25 @@ type CartAction =
   | { type: "ADD_ITEM"; product: CartProduct }
   | { type: "REMOVE_ITEM"; productId: string }
   | { type: "UPDATE_QUANTITY"; productId: string; cantidad: number }
+  | { type: "UPDATE_QUANTITY_BY_STEP"; productId: string; step: number }
+  | { type: "SET_DISCOUNT"; productId: string; descuento: number; descuentoTipo: DescuentoTipo }
   | { type: "SET_PAYMENT_METHOD"; method: CartState["paymentMethod"] }
   | { type: "SET_CLIENT"; id: string | null; nombre: string | null }
   | { type: "SET_AMOUNT_RECEIVED"; amount: number | null }
+  | { type: "SET_AMOUNT_TO_EXACT" }
   | { type: "CLEAR_CART" }
 
 // ---------------------------------------------------------------------------
 // Reducer
 // ---------------------------------------------------------------------------
 
-function computeLineTotal(cantidad: number, precio_venta: number): number {
-  return roundToDecimals(cantidad * precio_venta, 2)
+function computeLineTotal(
+  cantidad: number,
+  precio_venta: number,
+  descuento: number = 0,
+  descuentoTipo: DescuentoTipo = "%",
+): number {
+  return calculateLineTotal(cantidad, precio_venta, descuento, descuentoTipo)
 }
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -64,7 +81,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ...state,
           items: state.items.map((i) =>
             i.product.id === action.product.id
-              ? { ...i, cantidad: newQty, subtotal: computeLineTotal(newQty, i.precio_venta) }
+              ? { ...i, cantidad: newQty, subtotal: computeLineTotal(newQty, i.precio_venta, i.descuento, i.descuento_tipo) }
               : i,
           ),
         }
@@ -79,6 +96,8 @@ function cartReducer(state: CartState, action: CartAction): CartState {
             cantidad: step,
             precio_venta: action.product.precio_venta,
             subtotal: computeLineTotal(step, action.product.precio_venta),
+            descuento: 0,
+            descuento_tipo: "%" as DescuentoTipo,
           },
         ],
       }
@@ -99,7 +118,48 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ...state,
         items: state.items.map((i) =>
           i.product.id === action.productId
-            ? { ...i, cantidad: action.cantidad, subtotal: computeLineTotal(action.cantidad, i.precio_venta) }
+            ? { ...i, cantidad: action.cantidad, subtotal: computeLineTotal(action.cantidad, i.precio_venta, i.descuento, i.descuento_tipo) }
+            : i,
+        ),
+      }
+    }
+    case "UPDATE_QUANTITY_BY_STEP": {
+      const item = state.items.find((i) => i.product.id === action.productId)
+      if (!item) return state
+      const cfg = UNIDAD_CONFIG[item.product.tipo_unidad]
+      const raw = item.cantidad + action.step
+      const newQty = roundToDecimals(Math.max(cfg.min, raw), cfg.maxDecimals)
+      if (newQty <= 0) {
+        return {
+          ...state,
+          items: state.items.filter((i) => i.product.id !== action.productId),
+        }
+      }
+      return {
+        ...state,
+        items: state.items.map((i) =>
+          i.product.id === action.productId
+            ? { ...i, cantidad: newQty, subtotal: computeLineTotal(newQty, i.precio_venta, i.descuento, i.descuento_tipo) }
+            : i,
+        ),
+      }
+    }
+    case "SET_DISCOUNT": {
+      return {
+        ...state,
+        items: state.items.map((i) =>
+          i.product.id === action.productId
+            ? {
+                ...i,
+                descuento: action.descuento,
+                descuento_tipo: action.descuentoTipo,
+                subtotal: computeLineTotal(
+                  i.cantidad,
+                  i.precio_venta,
+                  action.descuento,
+                  action.descuentoTipo,
+                ),
+              }
             : i,
         ),
       }
@@ -110,6 +170,18 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return { ...state, clienteId: action.id, clienteNombre: action.nombre }
     case "SET_AMOUNT_RECEIVED":
       return { ...state, amountReceived: action.amount }
+    case "SET_AMOUNT_TO_EXACT": {
+      if (state.paymentMethod !== "efectivo") return state
+      const { total } = calculateCartTotals(
+        state.items.map((i) => ({
+          cantidad: i.cantidad,
+          precio_venta: i.precio_venta,
+          descuento: i.descuento,
+          descuento_tipo: i.descuento_tipo,
+        })),
+      )
+      return { ...state, amountReceived: total }
+    }
     case "CLEAR_CART":
       return {
         items: [],
@@ -167,14 +239,34 @@ export function useCart() {
     [],
   )
 
+  const updateQuantityByStep = useCallback(
+    (productId: string, step: number) =>
+      dispatch({ type: "UPDATE_QUANTITY_BY_STEP", productId, step }),
+    [],
+  )
+
+  const setDiscount = useCallback(
+    (productId: string, descuento: number, descuentoTipo: DescuentoTipo) => {
+      const clamped = Math.max(0, descuento)
+      dispatch({ type: "SET_DISCOUNT", productId, descuento: clamped, descuentoTipo })
+    },
+    [],
+  )
+
+  const setAmountToExact = useCallback(
+    () => dispatch({ type: "SET_AMOUNT_TO_EXACT" }),
+    [],
+  )
+
   const totals = useMemo(() => {
-    const subtotal = roundToDecimals(
-      state.items.reduce((sum, i) => sum + i.subtotal, 0),
-      2,
+    return calculateCartTotals(
+      state.items.map((i) => ({
+        cantidad: i.cantidad,
+        precio_venta: i.precio_venta,
+        descuento: i.descuento,
+        descuento_tipo: i.descuento_tipo,
+      })),
     )
-    const impuesto = 0 // IVA deferred
-    const total = roundToDecimals(subtotal + impuesto, 2)
-    return { subtotal, impuesto, total }
   }, [state.items])
 
   const isEmpty = state.items.length === 0
@@ -201,9 +293,12 @@ export function useCart() {
     addItem,
     removeItem,
     updateQuantity,
+    updateQuantityByStep,
+    setDiscount,
     clearCart,
     setPaymentMethod,
     setClient,
     setAmountReceived,
+    setAmountToExact,
   }
 }
