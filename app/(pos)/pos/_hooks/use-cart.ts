@@ -17,6 +17,7 @@ export type CartProduct = {
   tipo_unidad: TipoUnidad
   unidad_base: string
   factor_conversion: number
+  categoria: string
 }
 
 export type CartItem = {
