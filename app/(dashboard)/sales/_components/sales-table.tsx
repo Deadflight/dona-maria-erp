@@ -282,7 +282,7 @@ export function SalesTable({
           <Select
             value={currentMetodoPago || "all"}
             onValueChange={(val) =>
-              pushParams({ metodo_pago: val === "all" ? "" : val, page: "1" })
+              pushParams({ metodo_pago: val === "all" ? "" : (val ?? ""), page: "1" })
             }
           >
             <SelectTrigger className="w-44">
