@@ -482,9 +482,9 @@ describe("productos Server Actions", () => {
       expect(mockFrom).not.toHaveBeenCalled()
     })
 
-    it("returns tipo_unidad, unidad_base, and factor_conversion in search results", async () => {
+    it("returns tipo_unidad, unidad_base, factor_conversion, precio_venta, and stock_actual in search results", async () => {
       const expected = [
-        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001", tipo_unidad: "peso", unidad_base: "kg", factor_conversion: 1 },
+        { id: "prod-1", nombre: "Tornillo 1/2", sku: "TOR-001", tipo_unidad: "peso", unidad_base: "kg", factor_conversion: 1, precio_venta: 2.50, stock_actual: 100 },
       ]
       productsResolveValue = { data: expected, error: null, count: undefined }
 
@@ -494,8 +494,10 @@ describe("productos Server Actions", () => {
       expect(result.data![0].tipo_unidad).toBe("peso")
       expect(result.data![0].unidad_base).toBe("kg")
       expect(result.data![0].factor_conversion).toBe(1)
+      expect(result.data![0].precio_venta).toBe(2.50)
+      expect(result.data![0].stock_actual).toBe(100)
       expect(mockProductsChain.select).toHaveBeenCalledWith(
-        "id, nombre, sku, tipo_unidad, unidad_base, factor_conversion",
+        "id, nombre, sku, tipo_unidad, unidad_base, factor_conversion, precio_venta, stock_actual",
       )
       expect(mockProductsChain.or).toHaveBeenCalledWith(
         "nombre.ilike.%Tornillo%,sku.ilike.%Tornillo%",
