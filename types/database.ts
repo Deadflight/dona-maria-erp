@@ -492,6 +492,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cierres_diarios: {
+        Row: {
+          cerrado_by: string
+          created_at: string | null
+          discrepancia: number
+          fecha: string
+          id: string
+          monto_fisico: number
+          monto_sistema: number
+          observaciones: string | null
+          totales_json: Record<string, unknown>
+        }
+        Insert: {
+          cerrado_by: string
+          created_at?: string | null
+          discrepancia?: number
+          fecha: string
+          id?: string
+          monto_fisico?: number
+          monto_sistema?: number
+          observaciones?: string | null
+          totales_json?: Record<string, unknown>
+        }
+        Update: {
+          cerrado_by?: string
+          created_at?: string | null
+          discrepancia?: number
+          fecha?: string
+          id?: string
+          monto_fisico?: number
+          monto_sistema?: number
+          observaciones?: string | null
+          totales_json?: Record<string, unknown>
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cierres_diarios_cerrado_by_fkey"
+            columns: ["cerrado_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       productos: {
         Row: {
           activo: boolean | null
