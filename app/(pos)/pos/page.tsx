@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ShoppingCart, LogOut } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { ProductSearch } from "./_components/product-search"
@@ -162,7 +163,7 @@ export default function POSPage() {
       })
 
       if (result.error) {
-        alert(`Error: ${result.error}`)
+        toast.error(result.error)
         return
       }
 
@@ -188,7 +189,7 @@ export default function POSPage() {
         cart.clearCart()
       }
     } catch {
-      alert("Error de conexión. Intente de nuevo.")
+      toast.error("Error de conexión. Intente de nuevo.")
     } finally {
       setIsSubmitting(false)
     }
