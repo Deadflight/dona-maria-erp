@@ -497,7 +497,7 @@ describe("productos Server Actions", () => {
       expect(result.data![0].precio_venta).toBe(2.50)
       expect(result.data![0].stock_actual).toBe(100)
       expect(mockProductsChain.select).toHaveBeenCalledWith(
-        "id, nombre, sku, tipo_unidad, unidad_base, factor_conversion, precio_venta, stock_actual, categoria",
+        "id, nombre, sku, tipo_unidad, unidad_base, factor_conversion, precio_venta, stock_actual, stock_minimo, categoria",
       )
       expect(mockProductsChain.or).toHaveBeenCalledWith(
         "nombre.ilike.%Tornillo%,sku.ilike.%Tornillo%",

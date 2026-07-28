@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { SearchIcon, PackageX, X } from "lucide-react"
+import { SearchIcon, PackageX, X, EyeOff, Eye } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -50,11 +50,28 @@ export function ProductSearch({
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(true)
   const [inputFocused, setInputFocused] = useState(false)
+  const [hideOutOfStock, setHideOutOfStock] = useState(() => {
+    if (typeof window === "undefined") return false
+    try {
+      return window.localStorage.getItem("pos-hide-out-of-stock") === "true"
+    } catch {
+      return false
+    }
+  })
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const isQueryEmpty = !query.trim()
   const showEmptyState = isQueryEmpty && inputFocused
+
+  // Persist hideOutOfStock to localStorage
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("pos-hide-out-of-stock", String(hideOutOfStock))
+    } catch {
+      // ignore
+    }
+  }, [hideOutOfStock])
 
   // F1 keyboard shortcut
   useEffect(() => {
@@ -138,9 +155,12 @@ export function ProductSearch({
     [],
   )
 
-  // Group results by category
-  const groupedResults = groupByCategory(results)
-  const totalResults = results.length
+  // Group results by category, filtering out-of-stock if toggle is active
+  const filteredResults = hideOutOfStock
+    ? results.filter((r) => r.stock_actual > 0)
+    : results
+  const groupedResults = groupByCategory(filteredResults)
+  const totalResults = filteredResults.length
 
   return (
     <div className={cn("relative", className)}>
@@ -203,9 +223,9 @@ export function ProductSearch({
                 </CommandGroup>
               )}
 
-              {popularProducts.length > 0 && (
+              {popularProducts.filter((p) => !hideOutOfStock || p.stock_actual > 0).length > 0 && (
                 <CommandGroup heading="Productos frecuentes">
-                  {popularProducts.slice(0, 5).map((product) => {
+                  {popularProducts.filter((p) => !hideOutOfStock || p.stock_actual > 0).slice(0, 5).map((product) => {
                     const outOfStock = product.stock_actual <= 0
                     const unitLabel =
                       UNIDAD_CONFIG[product.tipo_unidad as TipoUnidad]?.label ??
@@ -328,13 +348,29 @@ export function ProductSearch({
           )}
         </CommandList>
       </Command>
-      <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-        <SearchIcon className="size-3" />
-        <span>
-          {!isQueryEmpty && totalResults > 0
-            ? `${totalResults} resultado${totalResults === 1 ? "" : "s"}`
-            : "F1 para buscar · Enter para agregar · Esc para limpiar"}
-        </span>
+      <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <SearchIcon className="size-3" />
+          <span>
+            {!isQueryEmpty && totalResults > 0
+              ? `${totalResults} resultado${totalResults === 1 ? "" : "s"}`
+              : "F1 para buscar · Enter para agregar · Esc para limpiar"}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setHideOutOfStock((v) => !v)}
+          className={cn(
+            "inline-flex items-center gap-1 rounded border px-1.5 py-0.5 transition-colors hover:bg-muted/50",
+            hideOutOfStock
+              ? "border-primary/30 bg-primary/5 text-primary"
+              : "border-transparent text-muted-foreground",
+          )}
+          title={hideOutOfStock ? "Mostrar productos sin stock" : "Ocultar productos sin stock"}
+        >
+          {hideOutOfStock ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+          {hideOutOfStock ? "Ocultando sin stock" : "Sin stock"}
+        </button>
       </div>
     </div>
   )
