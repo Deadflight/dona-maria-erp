@@ -11,6 +11,7 @@ const navItems = [
   { label: "Clientes", href: "/clients" },
   { label: "Recepción", href: "/receipts", icon: Package },
   { label: "Inventario", href: "/inventory" },
+  { label: "Cierre diario", href: "/daily-close", adminOnly: true },
 ]
 
 export default async function DashboardLayout({
@@ -36,6 +37,8 @@ export default async function DashboardLayout({
         <nav className="flex-1 space-y-1 p-2">
           {navItems.map((item) => {
             const Icon = "icon" in item ? item.icon : null
+            const isAdminOnly = "adminOnly" in item && item.adminOnly
+            if (isAdminOnly && session.role !== "admin") return null
             return (
               <Link
                 key={item.href}
