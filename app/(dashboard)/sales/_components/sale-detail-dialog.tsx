@@ -4,7 +4,7 @@
 // Imports
 // ---------------------------------------------------------------------------
 
-import { Printer, ReceiptText, Loader2 } from "lucide-react"
+import { FileDown, Printer, ReceiptText, Loader2 } from "lucide-react"
 
 import type { SaleDetail } from "@/lib/supabase/actions/ventas"
 import { Badge } from "@/components/ui/badge"
@@ -212,6 +212,14 @@ export function SaleDetailDialog({
 
             {/* ---- Actions ---- */}
             <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => window.open(`/sales/print/${sale.id}`, "_blank")}
+              >
+                <FileDown data-icon="inline-start" />
+                Descargar PDF
+              </Button>
               <Button
                 type="button"
                 variant="outline"

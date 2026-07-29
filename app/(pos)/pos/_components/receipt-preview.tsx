@@ -1,6 +1,6 @@
 "use client"
 
-import { Printer, X } from "lucide-react"
+import { FileDown, Printer, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
@@ -17,6 +17,7 @@ type ReceiptItem = {
 }
 
 type ReceiptPreviewProps = {
+  saleId: string
   invoiceNumber: string
   items: ReceiptItem[]
   subtotal: number
@@ -34,6 +35,7 @@ type ReceiptPreviewProps = {
 // ---------------------------------------------------------------------------
 
 export function ReceiptPreview({
+  saleId,
   invoiceNumber,
   items,
   subtotal,
@@ -74,6 +76,14 @@ export function ReceiptPreview({
           <div className="no-print flex items-center justify-between border-b px-4 py-2 print:hidden">
             <span className="text-sm font-medium">Vista previa del recibo</span>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/sales/print/${saleId}`, "_blank")}
+              >
+                <FileDown className="mr-1.5 size-3.5" />
+                Descargar PDF
+              </Button>
               <Button variant="outline" size="sm" onClick={handlePrint}>
                 <Printer className="mr-1.5 size-3.5" />
                 Imprimir

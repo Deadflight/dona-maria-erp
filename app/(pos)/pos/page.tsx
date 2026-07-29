@@ -20,6 +20,7 @@ import { UNIDAD_CONFIG } from "@/lib/constants/unidad-config"
 // ---------------------------------------------------------------------------
 
 type ReceiptState = {
+  saleId: string
   invoiceNumber: string
   items: { nombre: string; cantidad: number; precio_venta: number; subtotal: number; descuento: number }[]
   subtotal: number
@@ -170,6 +171,7 @@ export default function POSPage() {
       if (result.data) {
         // Show receipt
         setReceipt({
+          saleId: result.data.venta_id,
           invoiceNumber: result.data.numero_factura,
           items: cart.items.map((i) => ({
             nombre: i.product.nombre,
@@ -286,6 +288,7 @@ export default function POSPage() {
       {/* Receipt preview overlay */}
       {receipt && (
         <ReceiptPreview
+          saleId={receipt.saleId}
           invoiceNumber={receipt.invoiceNumber}
           items={receipt.items}
           subtotal={receipt.subtotal}
