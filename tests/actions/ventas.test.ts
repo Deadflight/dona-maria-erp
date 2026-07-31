@@ -168,6 +168,29 @@ describe("ventas Server Actions", () => {
       expect(result).toEqual({ data: null, error: "FORBIDDEN" })
     })
 
+    it("handles 10 concurrent calls with expired sessions — all UNAUTHORIZED", async () => {
+      vi.mocked(getSession).mockResolvedValue({ data: null })
+
+      const calls = Array.from({ length: 10 }, () =>
+        createSale({
+          metodo_pago: "efectivo",
+          subtotal: 100,
+          impuesto: 0,
+          total: 100,
+          items: [
+            { producto_id: "00000000-0000-0000-0000-000000000001", cantidad: 1, precio_venta: 100 },
+          ],
+        }),
+      )
+
+      const results = await Promise.all(calls)
+
+      expect(results).toHaveLength(10)
+      results.forEach((r) => {
+        expect(r).toEqual({ data: null, error: "UNAUTHORIZED" })
+      })
+    })
+
     it("calls RPC with valid data and returns venta_id + numero_factura", async () => {
       // createSale calls getSession() twice (role check + vendedor_id)
       vi.mocked(getSession)

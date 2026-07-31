@@ -51,10 +51,14 @@ let cierresResolveValue: { data: unknown; error: unknown } = {
   error: null,
 }
 
+const mockCierresSingle = vi.fn()
+
 const mockCierresChain: Record<string, unknown> = {
   select: vi.fn(() => mockCierresChain),
   order: vi.fn(() => mockCierresChain),
   limit: vi.fn(() => mockCierresChain),
+  insert: vi.fn(() => mockCierresChain),
+  single: mockCierresSingle,
   then: (resolve: (v: unknown) => void) => resolve(cierresResolveValue),
 }
 
@@ -164,6 +168,25 @@ describe("closeDay", () => {
       monto_fisico: 1000,
     })
     expect(result.error).toBe("UNAUTHORIZED")
+  })
+
+  it("returns Ya existe un cierre on duplicate fecha (23505)", async () => {
+    // Arrange: ventas query returns some data so the function reaches the insert
+    ventasResolveValue = { data: [{ total: 1000 }], error: null }
+    mockCierresSingle.mockResolvedValue({
+      data: null,
+      error: { code: "23505", message: "duplicate key value violates unique constraint" },
+    })
+
+    const result = await closeDay({
+      fecha: "2026-01-15",
+      monto_fisico: 1000,
+    })
+
+    expect(result).toEqual({
+      data: null,
+      error: "Ya existe un cierre para esta fecha",
+    })
   })
 })
 
