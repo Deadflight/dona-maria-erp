@@ -17,10 +17,13 @@ export const DB_URL =
   process.env.SUPABASE_DB_URL ||
   "postgresql://postgres:postgres@localhost:54322/postgres"
 
-// Synchronous guard — only attempt PG connections when the env var is set.
-// Users set SUPABASE_DB_URL when running integration concurrency tests.
+// Synchronous guard — only attempt PG connections when a URL is available.
+// Users can set SUPABASE_DB_URL or fall back to the default local Supabase.
 // Unit tests that don't import this file are unaffected.
-export const hasPg = !!process.env.SUPABASE_DB_URL
+export const hasPg = !!(
+  process.env.SUPABASE_DB_URL ||
+  process.env.CI !== "true" // skip by default in CI; opt in locally
+)
 
 // Skip all tests in a describe block when PG is unavailable.
 // Uses vitest's built-in describe.skipIf pattern.
@@ -35,6 +38,13 @@ export interface ProductSeed {
   nombre: string
   precio_venta: number
   stock_actual: number
+  sku?: string
+  categoria?: string
+  stock_minimo?: number
+  unidad_medida?: string
+  tipo_unidad?: string
+  unidad_base?: string
+  factor_conversion?: number
 }
 
 // ---------------------------------------------------------------------------
@@ -49,16 +59,23 @@ export async function seedProduct(
   client: Client,
   overrides?: Partial<ProductSeed>,
 ): Promise<ProductSeed> {
-  const defaults: ProductSeed = {
+  const defaults = {
     id: crypto.randomUUID(),
     nombre: `Test Product ${Date.now()}`,
     precio_venta: 100,
     stock_actual: 1,
+    sku: `TEST-${crypto.randomUUID().slice(0, 8)}`,
+    categoria: "Test",
+    stock_minimo: 0,
+    unidad_medida: "unidad",
+    tipo_unidad: "unidad",
+    unidad_base: "und",
+    factor_conversion: 1,
   }
   const data = { ...defaults, ...overrides }
   await client.query(
-    `INSERT INTO productos (id, nombre, precio_venta, stock_actual) VALUES ($1, $2, $3, $4)`,
-    [data.id, data.nombre, data.precio_venta, data.stock_actual],
+    `INSERT INTO productos (id, nombre, precio_venta, stock_actual, sku, categoria, stock_minimo, unidad_medida, tipo_unidad, unidad_base, factor_conversion) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    [data.id, data.nombre, data.precio_venta, data.stock_actual, data.sku, data.categoria, data.stock_minimo, data.unidad_medida, data.tipo_unidad, data.unidad_base, data.factor_conversion],
   )
   return data
 }
