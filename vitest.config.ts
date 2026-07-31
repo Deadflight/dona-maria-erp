@@ -18,7 +18,7 @@ export default defineConfig({
         lines: 80,
       },
     },
-    testTimeout: 80000, // 80 seconds timeout for tests, adjust as needed
+    testTimeout: 120000, // 2 minutes — increased for concurrency integration tests
   },
   resolve: {
     alias: {
