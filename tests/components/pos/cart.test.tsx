@@ -12,7 +12,6 @@ const unidadProduct: CartProduct = {
   sku: "TOR-001",
   precio_venta: 5.0,
   stock_actual: 100,
-  stock_minimo: 10,
   tipo_unidad: "unidad",
   unidad_base: "und",
   factor_conversion: 1,
@@ -25,7 +24,6 @@ const pesoProduct: CartProduct = {
   sku: "CAB-001",
   precio_venta: 2.5,
   stock_actual: 50,
-  stock_minimo: 5,
   tipo_unidad: "peso",
   unidad_base: "kg",
   factor_conversion: 1,
@@ -38,7 +36,6 @@ const longitudProduct: CartProduct = {
   sku: "MAN-001",
   precio_venta: 10.0,
   stock_actual: 30,
-  stock_minimo: 5,
   tipo_unidad: "longitud",
   unidad_base: "m",
   factor_conversion: 1,
@@ -414,6 +411,72 @@ describe("useCart", () => {
       act(() => result.current.addItem(unidadProduct))
 
       expect(result.current.items[0].descuento).toBe(0)
+      expect(result.current.items[0].descuento_tipo).toBe("%")
+    })
+  })
+
+  describe("updateQuantityByStep", () => {
+    it("increments quantity by the step value for unidad product", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      // Initial quantity should be 1 (default step)
+      expect(result.current.items[0].cantidad).toBe(1)
+
+      act(() => result.current.updateQuantityByStep("prod-1", 1))
+      expect(result.current.items[0].cantidad).toBe(2)
+    })
+
+    it("increments multiple times", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantityByStep("prod-1", 1))
+      act(() => result.current.updateQuantityByStep("prod-1", 1))
+      act(() => result.current.updateQuantityByStep("prod-1", 1))
+
+      expect(result.current.items[0].cantidad).toBe(4)
+    })
+
+    it("accepts larger step increments", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantityByStep("prod-1", 5))
+
+      expect(result.current.items[0].cantidad).toBe(6)
+    })
+
+    it("clamps to minimum when step would go below min for peso product", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(pesoProduct))
+      // peso min=0.001, initial=1 → step -1 → Math.max(0.001, 0) = 0.001
+      act(() => result.current.updateQuantityByStep("prod-2", -1))
+      expect(result.current.items.length).toBe(1)
+      expect(result.current.items[0].cantidad).toBe(0.001)
+    })
+
+    it("does nothing for non-existent product", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantityByStep("nonexistent", 1))
+
+      expect(result.current.items.length).toBe(1)
+      expect(result.current.items[0].cantidad).toBe(1)
+    })
+
+    it("preserves discount when stepping quantity", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.updateQuantity("prod-1", 3))
+      act(() => result.current.setDiscount("prod-1", 20, "%"))
+      act(() => result.current.updateQuantityByStep("prod-1", 1))
+
+      expect(result.current.items[0].cantidad).toBe(4)
+      expect(result.current.items[0].descuento).toBe(20)
       expect(result.current.items[0].descuento_tipo).toBe("%")
     })
   })
