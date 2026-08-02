@@ -165,27 +165,6 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ),
       }
     }
-    case "UPDATE_QUANTITY_BY_STEP": {
-      const item = state.items.find((i) => i.product.id === action.productId)
-      if (!item) return state
-      const cfg = UNIDAD_CONFIG[item.product.tipo_unidad]
-      const raw = item.cantidad + action.step
-      const newQty = roundToDecimals(Math.max(cfg.min, raw), cfg.maxDecimals)
-      if (newQty <= 0) {
-        return {
-          ...state,
-          items: state.items.filter((i) => i.product.id !== action.productId),
-        }
-      }
-      return {
-        ...state,
-        items: state.items.map((i) =>
-          i.product.id === action.productId
-            ? { ...i, cantidad: newQty, subtotal: computeLineTotal(newQty, i.precio_venta) }
-            : i,
-        ),
-      }
-    }
     case "SET_PAYMENT_METHOD":
       return { ...state, paymentMethod: action.method }
     case "SET_CLIENT":
