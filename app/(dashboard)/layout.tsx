@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Package } from "lucide-react"
 import { getSession } from "@/actions/auth"
 import { getStockAlertCount } from "@/lib/supabase/actions/inventario"
+import { LogoutButton } from "@/components/logout-button"
 
 const navItems = [
   { label: "Inicio", href: "/dashboard" },
@@ -56,6 +57,9 @@ export default async function DashboardLayout({
             )
           })}
         </nav>
+        <div className="border-t p-2">
+          <LogoutButton />
+        </div>
       </aside>
       <main className="flex-1 p-6">{children}</main>
     </div>

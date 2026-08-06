@@ -1,11 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { ShoppingCart, LogOut } from "lucide-react"
-import Link from "next/link"
+import { ShoppingCart } from "lucide-react"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import { LogoutButton } from "@/components/logout-button"
 import { ProductSearch } from "./_components/product-search"
 import { Cart } from "./_components/cart"
 import { PaymentPanel } from "./_components/payment-panel"
@@ -93,6 +92,7 @@ export default function POSPage() {
           cantidad: i.cantidad,
           precio_venta: i.precio_venta,
           descuento: i.descuento,
+          descuento_tipo: i.descuento_tipo,
         })),
       })
 
@@ -235,11 +235,7 @@ export default function POSPage() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">{sellerName}</span>
-          <Link href="/dashboard">
-            <Button variant="ghost" size="icon-xs">
-              <LogOut className="size-3.5" />
-            </Button>
-          </Link>
+          <LogoutButton variant="ghost" size="icon-xs" showLabel={false} />
         </div>
       </header>
 

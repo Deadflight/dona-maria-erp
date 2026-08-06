@@ -10,6 +10,7 @@ vi.mock("@/actions/auth", () => ({
 
 vi.mock("next/navigation", () => ({
   redirect: mockRedirect,
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }))
 
 vi.mock("@/lib/supabase/actions/inventario", () => ({

@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { calculateLineTotal } from "@/lib/calculators/venta-calculator"
+
 // ---------------------------------------------------------------------------
 // Sale Create Schema
 // ---------------------------------------------------------------------------
@@ -20,6 +22,7 @@ const saleItemSchema = z.object({
     .multipleOf(0.01, "Máximo 2 decimales")
     .optional()
     .default(0),
+  descuento_tipo: z.enum(["%", "fixed"]).optional().default("%"),
 })
 
 export const saleCreateSchema = z
@@ -59,16 +62,23 @@ export const saleCreateSchema = z
   )
   .refine(
     (data) => {
-      // Verify total matches sum of items (with discounts)
+      // Verify subtotal matches sum of discounted line totals (before IVA)
       const itemsTotal = data.items.reduce(
-        (sum, item) => sum + (item.cantidad * item.precio_venta) - (item.descuento ?? 0),
+        (sum, item) =>
+          sum +
+          calculateLineTotal(
+            item.cantidad,
+            item.precio_venta,
+            item.descuento ?? 0,
+            item.descuento_tipo,
+          ),
         0,
       )
-      return Math.abs(itemsTotal - data.total) < 0.02
+      return Math.abs(itemsTotal - data.subtotal) < 0.02
     },
     {
-      message: "El total no coincide con la suma de los productos",
-      path: ["total"],
+      message: "El subtotal no coincide con la suma de los productos",
+      path: ["subtotal"],
     },
   )
 

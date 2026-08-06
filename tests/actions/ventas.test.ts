@@ -224,7 +224,7 @@ describe("ventas Server Actions", () => {
         p_impuesto: 0,
         p_total: 100,
         p_items: [
-          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50, descuento: 0 },
+          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50, descuento: 0, descuento_tipo: "%" },
         ],
       })
     })
@@ -291,6 +291,91 @@ describe("ventas Server Actions", () => {
 
       expect(result.data).not.toBeNull()
       expect(result.error).toBeNull()
+    })
+
+    it("allows sales with IVA (impuesto > 0) matching subtotal against items", async () => {
+      // Regression: previously the refine compared itemsTotal against data.total,
+      // which includes IVA, so any sale with impuesto > 0 was rejected.
+      vi.mocked(getSession)
+        .mockResolvedValueOnce(sellerSession)
+        .mockResolvedValueOnce(sellerSession)
+
+      mockRpc.mockResolvedValue({
+        data: { venta_id: "venta-3", numero_factura: "VT-20260726-0003" },
+        error: null,
+      })
+
+      const result = await createSale({
+        metodo_pago: "efectivo",
+        subtotal: 100,
+        impuesto: 16,
+        total: 116,
+        items: [
+          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50 },
+        ],
+      })
+
+      expect(result.error).toBeNull()
+      expect(result.data).toEqual({
+        venta_id: "venta-3",
+        numero_factura: "VT-20260726-0003",
+      })
+      expect(mockRpc).toHaveBeenCalledWith("create_sale_with_movements", {
+        p_cliente_id: null,
+        p_vendedor_id: "seller-1",
+        p_metodo_pago: "efectivo",
+        p_subtotal: 100,
+        p_impuesto: 16,
+        p_total: 116,
+        p_items: [
+          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50, descuento: 0, descuento_tipo: "%" },
+        ],
+      })
+    })
+
+    it("accepts percentage discounts when validating subtotal", async () => {
+      // Regression: 10% discount on 1×100 → line total 90, subtotal must be 90.
+      vi.mocked(getSession)
+        .mockResolvedValueOnce(sellerSession)
+        .mockResolvedValueOnce(sellerSession)
+
+      mockRpc.mockResolvedValue({
+        data: { venta_id: "venta-4", numero_factura: "VT-20260726-0004" },
+        error: null,
+      })
+
+      const result = await createSale({
+        metodo_pago: "efectivo",
+        subtotal: 90,
+        impuesto: 14.4,
+        total: 104.4,
+        items: [
+          {
+            producto_id: "550e8400-e29b-41d4-a716-446655440001",
+            cantidad: 1,
+            precio_venta: 100,
+            descuento: 10,
+            descuento_tipo: "%",
+          },
+        ],
+      })
+
+      expect(result.error).toBeNull()
+      expect(result.data).toEqual({
+        venta_id: "venta-4",
+        numero_factura: "VT-20260726-0004",
+      })
+      expect(mockRpc).toHaveBeenCalledWith("create_sale_with_movements", {
+        p_cliente_id: null,
+        p_vendedor_id: "seller-1",
+        p_metodo_pago: "efectivo",
+        p_subtotal: 90,
+        p_impuesto: 14.4,
+        p_total: 104.4,
+        p_items: [
+          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 1, precio_venta: 100, descuento: 10, descuento_tipo: "%" },
+        ],
+      })
     })
   })
 

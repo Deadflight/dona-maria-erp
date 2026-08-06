@@ -810,12 +810,12 @@ describe("A32: POS Stress Tests", () => {
       expect(result.success).toBe(true)
     })
 
-    it("rejects total that does not match items sum", () => {
+    it("rejects subtotal that does not match items sum", () => {
       const result = saleCreateSchema.safeParse({
         metodo_pago: "efectivo",
-        subtotal: 100,
+        subtotal: 99,
         impuesto: 16,
-        total: 999,
+        total: 115,
         items: [
           {
             producto_id: UUIDs[0],
