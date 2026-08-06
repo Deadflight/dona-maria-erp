@@ -247,14 +247,22 @@ export async function getSaleById(
 /**
  * Searches active clients by name or RIF/cédula.
  * All authenticated roles (viewer+) can access.
+ * Includes credit fields (`limite_credito`, `saldo_actual`) so the POS can
+ * block over-limit credit sales client-side (REQ-CREDIT-SALES-4).
  *
  * @param query - Search term for nombre/rif_cedula ILIKE match
- * @returns `{ data: Array<{ id, nombre, rif_cedula }> }` on success
+ * @returns `{ data: Array<{ id, nombre, rif_cedula, limite_credito, saldo_actual }> }` on success
  */
 export async function listClients(
   query: string,
 ): Promise<{
-  data: Array<{ id: string; nombre: string; rif_cedula: string | null }> | null
+  data: Array<{
+    id: string
+    nombre: string
+    rif_cedula: string | null
+    limite_credito: number | null
+    saldo_actual: number | null
+  }> | null
   error: string | null
 }> {
   const session = await getSession()
@@ -270,7 +278,7 @@ export async function listClients(
 
   const { data, error } = await supabase
     .from("clientes")
-    .select("id, nombre, rif_cedula")
+    .select("id, nombre, rif_cedula, limite_credito, saldo_actual")
     .eq("activo", true)
     .or(`nombre.ilike.%${query}%,rif_cedula.ilike.%${query}%`)
     .order("nombre", { ascending: true })
@@ -281,7 +289,13 @@ export async function listClients(
   }
 
   return {
-    data: data as Array<{ id: string; nombre: string; rif_cedula: string | null }>,
+    data: data as Array<{
+      id: string
+      nombre: string
+      rif_cedula: string | null
+      limite_credito: number | null
+      saldo_actual: number | null
+    }>,
     error: null,
   }
 }
