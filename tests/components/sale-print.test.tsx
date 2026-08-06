@@ -111,7 +111,7 @@ const saleWithDiscountItems = {
       cantidad: 2,
       precio_unitario: 100,
       descuento: 10,
-      subtotal: 200,
+      subtotal: 190,
       created_at: "2026-07-15T14:30:00Z",
       productos: { nombre: "Producto con descuento", sku: "DTO-001" },
     },
@@ -215,12 +215,11 @@ describe("SalePrint", () => {
     expect(screen.getByText("Bs. 30.00")).toBeInTheDocument()
   })
 
-  it("renders item subtotals in Bs.", () => {
-    render(<SalePrint sale={fullSale} />)
+  it("renders persisted net item subtotals instead of recomputing gross totals", () => {
+    const { container } = render(<SalePrint sale={saleWithDiscountItems} />)
 
-    // 10 × 25.50 = 255.00, 5 × 30.00 = 150.00
-    expect(screen.getByText("Bs. 255.00")).toBeInTheDocument()
-    expect(screen.getByText("Bs. 150.00")).toBeInTheDocument()
+    expect(container.querySelector(".sp-td-total")).toHaveTextContent("Bs. 190.00")
+    expect(container.querySelector(".sp-td-total")).not.toHaveTextContent("Bs. 200.00")
   })
 
   it("renders discount amounts for items with discount", () => {
@@ -367,5 +366,3 @@ describe("SalePrint error state", () => {
     expect(window.print).not.toHaveBeenCalled()
   })
 })
-
-

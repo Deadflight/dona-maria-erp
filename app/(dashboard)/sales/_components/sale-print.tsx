@@ -118,7 +118,7 @@ export function SalePrint({ sale }: SalePrintProps) {
                     : "—"}
                 </td>
                 <td className="sp-td sp-td-amount sp-td-total">
-                  {formatBs(item.cantidad * item.precio_unitario)}
+                  {formatBs(item.subtotal)}
                 </td>
               </tr>
             ))}

@@ -168,6 +168,7 @@ export function SaleDetailDialog({
                           <TableHead>SKU</TableHead>
                           <TableHead className="text-right">Cantidad</TableHead>
                           <TableHead className="text-right">Precio</TableHead>
+                          <TableHead className="text-right">Descuento</TableHead>
                           <TableHead className="text-right">Subtotal</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -186,8 +187,11 @@ export function SaleDetailDialog({
                             <TableCell className="text-right tabular-nums">
                               {formatCurrency(item.precio_unitario)}
                             </TableCell>
+                            <TableCell className="text-right tabular-nums">
+                              {formatCurrency(item.descuento ?? 0)}
+                            </TableCell>
                             <TableCell className="text-right tabular-nums font-medium">
-                              {formatCurrency(item.cantidad * item.precio_unitario)}
+                              {formatCurrency(item.subtotal)}
                             </TableCell>
                           </TableRow>
                         ))}
