@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-// AbonoDialog is imported and wired to the selected credit in T14.
+import { AbonoDialog } from "./abono-dialog"
 
 type Session = {
   id: string
@@ -58,7 +58,7 @@ const formatDate = (iso: string) => {
 
 export function CreditsTable({ data, error, session }: Props) {
   const canWrite = session?.role === "admin" || session?.role === "seller"
-  const [, setAbonoCredit] = useState<CreditListItem | null>(null)
+  const [abonoCredit, setAbonoCredit] = useState<CreditListItem | null>(null)
 
   return (
     <div className="space-y-4">
@@ -137,7 +137,10 @@ export function CreditsTable({ data, error, session }: Props) {
           </div>
         </Card>
       )}
-      {/* T14 renders <AbonoDialog credit={...} onClose={...} /> here */}
+
+      {abonoCredit && (
+        <AbonoDialog credit={abonoCredit} onClose={() => setAbonoCredit(null)} />
+      )}
     </div>
   )
 }
