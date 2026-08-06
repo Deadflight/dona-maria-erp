@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache"
 import {
   listCreditos,
   registerAbono,
-  resolveCreditEstado,
 } from "@/lib/supabase/actions/creditos"
+import { resolveCreditEstado } from "@/lib/creditos"
 
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
