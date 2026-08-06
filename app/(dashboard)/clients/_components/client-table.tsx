@@ -32,12 +32,8 @@ export function ClientTable({ initialData, error, searchParams, session }: Props
   const [formMode, setFormMode] = useState<"create" | "edit" | null>(null)
   const [editingClient, setEditingClient] = useState<ClientRow | undefined>()
   const [confirmClient, setConfirmClient] = useState<ClientRow | null>(null)
-  const [toggleState, toggleAction, togglePending] = useActionState<ClientFormState, FormData>(toggleClientActive, {})
 
   useEffect(() => () => { if (debounceRef.current) clearTimeout(debounceRef.current) }, [])
-  useEffect(() => {
-    if (toggleState.success) toast.success("Estado del cliente actualizado")
-  }, [toggleState.success])
 
   const navigate = (overrides: Record<string, string | undefined>) => {
     const params = new URLSearchParams()
@@ -73,7 +69,25 @@ export function ClientTable({ initialData, error, searchParams, session }: Props
     {!error && initialData?.rows.length === 0 && <Card><CardContent className="flex flex-col items-center py-16 text-center"><UsersRound className="mb-4 size-14 text-muted-foreground/40" /><p className="text-lg font-medium">No se encontraron clientes</p><p className="mt-1 text-sm text-muted-foreground">{search || includeInactive ? "Intenta ajustar los filtros de búsqueda." : "Aún no hay clientes registrados."}</p>{isAdmin && !search && <Button className="mt-6" onClick={() => setFormMode("create")}>+ Crear primer cliente</Button>}</CardContent></Card>}
     {!error && initialData && initialData.rows.length > 0 && <Card><div className="overflow-x-auto"><Table><TableHeader><TableRow><TableHead>Nombre</TableHead><TableHead>RIF/Cédula</TableHead><TableHead>Teléfono</TableHead><TableHead>Tipo</TableHead><TableHead className="text-right">Límite de crédito</TableHead><TableHead className="text-right">Saldo actual</TableHead><TableHead>Estado</TableHead>{isAdmin && <TableHead>Acciones</TableHead>}</TableRow></TableHeader><TableBody>{initialData.rows.map((client) => <TableRow key={client.id}><TableCell className="font-medium">{client.nombre}</TableCell><TableCell>{client.rif_cedula ?? "-"}</TableCell><TableCell>{client.telefono ?? "-"}</TableCell><TableCell className="capitalize">{client.tipo}</TableCell><TableCell className="text-right tabular-nums">{money(client.limite_credito)}</TableCell><TableCell className="text-right tabular-nums">{money(client.saldo_actual)}</TableCell><TableCell>{client.activo !== false ? <Badge><CheckCircle2 />Activo</Badge> : <Badge variant="secondary"><XCircle />Inactivo</Badge>}</TableCell>{isAdmin && <TableCell><div className="flex gap-1"><Button variant="ghost" size="sm" onClick={() => { setEditingClient(client); setFormMode("edit") }}>Editar</Button><Button variant="ghost" size="sm" onClick={() => setConfirmClient(client)}>{client.activo !== false ? "Desactivar" : "Activar"}</Button></div></TableCell>}</TableRow>)}</TableBody></Table></div></Card>}
     {initialData && initialData.rows.length > 0 && <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground"><p>Mostrando {from}-{to} de {initialData.total} clientes</p><div className="flex gap-2"><Button variant="outline" size="sm" disabled={page <= 1} onClick={() => navigate({ page: String(page - 1) })}>Anterior</Button><span className="flex items-center px-2">Página {page} de {totalPages}</span><Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => navigate({ page: String(page + 1) })}>Siguiente</Button></div></div>}
-    <Dialog open={Boolean(confirmClient)} onOpenChange={(open) => { if (!open && !togglePending) setConfirmClient(null) }}><DialogContent><DialogHeader><DialogTitle>Confirmar cambio de estado</DialogTitle><DialogDescription>Esta acción no elimina el cliente ni su historial.</DialogDescription></DialogHeader><p className="text-sm">¿Deseas {confirmClient?.activo !== false ? "desactivar" : "activar"} a <strong>{confirmClient?.nombre}</strong>?</p>{toggleState.message && <p className="text-sm text-destructive" role="alert">{toggleState.message}</p>}<form action={toggleAction} className="flex justify-end gap-2"><input type="hidden" name="id" value={confirmClient?.id ?? ""} /><input type="hidden" name="activo" value={String(confirmClient?.activo === false)} /><Button type="button" variant="outline" disabled={togglePending} onClick={() => setConfirmClient(null)}>Cancelar</Button><Button type="submit" disabled={togglePending} variant={confirmClient?.activo !== false ? "destructive" : "default"}>{togglePending ? "Guardando..." : confirmClient?.activo !== false ? "Sí, desactivar" : "Sí, activar"}</Button></form></DialogContent></Dialog>
+    {confirmClient && <ClientStatusDialog client={confirmClient} onClose={() => setConfirmClient(null)} />}
     {formMode && <ClientFormDialog mode={formMode} client={editingClient} onClose={() => { setFormMode(null); setEditingClient(undefined) }} />}
   </div>
+}
+
+type ClientStatusDialogProps = {
+  client: ClientRow
+  onClose: () => void
+}
+
+function ClientStatusDialog({ client, onClose }: ClientStatusDialogProps) {
+  const [state, action, isPending] = useActionState<ClientFormState, FormData>(toggleClientActive, {})
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success("Estado del cliente actualizado")
+      onClose()
+    }
+  }, [state.success, onClose])
+
+  return <Dialog open onOpenChange={(open) => { if (!open && !isPending) onClose() }}><DialogContent><DialogHeader><DialogTitle>Confirmar cambio de estado</DialogTitle><DialogDescription>Esta acción no elimina el cliente ni su historial.</DialogDescription></DialogHeader><p className="text-sm">¿Deseas {client.activo !== false ? "desactivar" : "activar"} a <strong>{client.nombre}</strong>?</p>{state.message && <p className="text-sm text-destructive" role="alert">{state.message}</p>}<form action={action} className="flex justify-end gap-2"><input type="hidden" name="id" value={client.id} /><input type="hidden" name="activo" value={String(client.activo === false)} /><Button type="button" variant="outline" disabled={isPending} onClick={onClose}>Cancelar</Button><Button type="submit" disabled={isPending} variant={client.activo !== false ? "destructive" : "default"}>{isPending ? "Guardando..." : client.activo !== false ? "Sí, desactivar" : "Sí, activar"}</Button></form></DialogContent></Dialog>
 }

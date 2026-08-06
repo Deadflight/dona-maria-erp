@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 const mockGetSession = vi.hoisted(() => vi.fn())
@@ -114,5 +114,23 @@ describe("DashboardLayout", () => {
     expect(recepcionIndex).toBeGreaterThanOrEqual(0)
     expect(inventarioIndex).toBeGreaterThanOrEqual(0)
     expect(recepcionIndex).toBeLessThan(inventarioIndex)
+  })
+
+  it("should render the POS terminal nav link for an admin", async () => {
+    mockGetSession.mockResolvedValue({
+      data: {
+        id: "user-1",
+        email: "admin@donamaria.com",
+        role: "admin",
+        fullName: "Admin",
+        isActive: true,
+      },
+    })
+
+    render(
+      await DashboardLayout({ children: <div>Content</div> }) as unknown as React.ReactElement,
+    )
+
+    expect(screen.getByRole("link", { name: "Terminal de ventas" })).toHaveAttribute("href", "/pos")
   })
 })

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { Package } from "lucide-react"
+import { Package, ShoppingCart } from "lucide-react"
 import { getSession } from "@/actions/auth"
 import { getStockAlertCount } from "@/lib/supabase/actions/inventario"
 import { LogoutButton } from "@/components/logout-button"
@@ -9,6 +9,7 @@ const navItems = [
   { label: "Inicio", href: "/dashboard" },
   { label: "Productos", href: "/products" },
   { label: "Ventas", href: "/sales" },
+  { label: "Terminal de ventas", href: "/pos", icon: ShoppingCart },
   { label: "Clientes", href: "/clients" },
   { label: "Recepción", href: "/receipts", icon: Package },
   { label: "Inventario", href: "/inventory" },
