@@ -7,12 +7,12 @@ import { abonoSchema } from "@/lib/validations/creditos"
 
 const VALID_CREDITO_ID = "550e8400-e29b-41d4-a716-446655440001"
 
-function fieldIssues(result: {
-  success: boolean
-  error?: { issues: Array<{ path: (string | number)[] }> }
-}, field: string) {
+function fieldIssues(
+  result: ReturnType<typeof abonoSchema.safeParse>,
+  field: string,
+) {
   if (result.success) return []
-  return result.error!.issues.filter((i) => i.path.includes(field))
+  return result.error.issues.filter((i) => i.path.includes(field))
 }
 
 describe("abonoSchema", () => {
