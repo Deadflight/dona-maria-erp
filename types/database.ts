@@ -756,6 +756,15 @@ export type Database = {
         }
         Returns: Json
       }
+      register_abono: {
+        Args: {
+          p_credito_id: string
+          p_monto: number
+          p_metodo_pago: string
+          p_referencia?: string | null
+        }
+        Returns: Json
+      }
     }
     Enums: {
       TipoUnidad: TipoUnidad
