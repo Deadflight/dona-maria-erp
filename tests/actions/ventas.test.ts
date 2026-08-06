@@ -518,7 +518,13 @@ describe("ventas Server Actions", () => {
 
     it("searches clients by name using ILIKE", async () => {
       const expectedClients = [
-        { id: "client-1", nombre: "María González", rif_cedula: "V-12345678" },
+        {
+          id: "client-1",
+          nombre: "María González",
+          rif_cedula: "V-12345678",
+          limite_credito: 5000,
+          saldo_actual: 1200.5,
+        },
       ]
       clientesResolveValue = { data: expectedClients, error: null }
 
@@ -529,6 +535,42 @@ describe("ventas Server Actions", () => {
       expect(mockClientesChain.or).toHaveBeenCalledWith(
         "nombre.ilike.%María%,rif_cedula.ilike.%María%",
       )
+    })
+
+    it("selects credit fields (limite_credito, saldo_actual) alongside client identity", async () => {
+      clientesResolveValue = { data: [], error: null }
+
+      await listClients("María")
+
+      expect(mockClientesChain.select).toHaveBeenCalledWith(
+        "id, nombre, rif_cedula, limite_credito, saldo_actual",
+      )
+    })
+
+    it("passes credit limit and balance through in the result", async () => {
+      const expectedClients = [
+        {
+          id: "client-2",
+          nombre: "Carlos Pérez",
+          rif_cedula: "J-87654321",
+          limite_credito: 10000,
+          saldo_actual: 2500,
+        },
+      ]
+      clientesResolveValue = { data: expectedClients, error: null }
+
+      const result = await listClients("Carlos")
+
+      expect(result.data).toEqual([
+        {
+          id: "client-2",
+          nombre: "Carlos Pérez",
+          rif_cedula: "J-87654321",
+          limite_credito: 10000,
+          saldo_actual: 2500,
+        },
+      ])
+      expect(result.error).toBeNull()
     })
 
     it("returns empty array for empty query", async () => {
