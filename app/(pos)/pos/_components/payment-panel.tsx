@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { formatCurrency } from "@/lib/money"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -27,6 +28,9 @@ type PaymentPanelProps = {
   total: number
   paymentMethod: PaymentMethod | null
   clienteNombre: string | null
+  clienteLimiteCredito: number | null
+  clienteSaldoActual: number | null
+  isCreditoOverLimit: boolean
   isCreditoWithoutClient: boolean
   isEmpty: boolean
   amountReceived: number | null
@@ -47,6 +51,9 @@ export function PaymentPanel({
   total,
   paymentMethod,
   clienteNombre,
+  clienteLimiteCredito,
+  clienteSaldoActual,
+  isCreditoOverLimit,
   isCreditoWithoutClient,
   isEmpty,
   amountReceived,
@@ -62,6 +69,7 @@ export function PaymentPanel({
     !isEmpty &&
     paymentMethod !== null &&
     !isCreditoWithoutClient &&
+    !(paymentMethod === "credito" && isCreditoOverLimit) &&
     !isSubmitting
 
   return (
@@ -147,6 +155,20 @@ export function PaymentPanel({
         <div className="rounded-lg bg-muted px-3 py-2 text-xs">
           <span className="text-muted-foreground">Cliente: </span>
           <span className="font-medium">{clienteNombre}</span>
+        </div>
+      )}
+
+      {/* Over-limit credit warning (CR4) */}
+      {paymentMethod === "credito" && isCreditoOverLimit && (
+        <div
+          role="alert"
+          className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive"
+        >
+          <p className="font-semibold">El cliente excede su límite de crédito</p>
+          <p className="mt-1">
+            Saldo actual: {formatCurrency(clienteSaldoActual ?? 0)} · Total:{" "}
+            {formatCurrency(total)} · Límite: {formatCurrency(clienteLimiteCredito ?? 0)}
+          </p>
         </div>
       )}
 

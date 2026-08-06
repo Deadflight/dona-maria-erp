@@ -245,7 +245,7 @@ describe("useCart", () => {
       act(() => result.current.addItem(unidadProduct))
       act(() => result.current.addItem(pesoProduct))
       act(() => result.current.setPaymentMethod("efectivo"))
-      act(() => result.current.setClient("c-1", "María"))
+      act(() => result.current.setClient("c-1", "María", null, null))
 
       act(() => result.current.clearCart())
 
@@ -271,7 +271,7 @@ describe("useCart", () => {
     it("sets client", () => {
       const { result } = renderHook(() => useCart())
 
-      act(() => result.current.setClient("c-1", "María González"))
+      act(() => result.current.setClient("c-1", "María González", null, null))
       expect(result.current.clienteId).toBe("c-1")
       expect(result.current.clienteNombre).toBe("María González")
     })
@@ -282,7 +282,7 @@ describe("useCart", () => {
       act(() => result.current.setPaymentMethod("credito"))
       expect(result.current.isCreditoWithoutClient).toBe(true)
 
-      act(() => result.current.setClient("c-1", "María"))
+      act(() => result.current.setClient("c-1", "María", null, null))
       expect(result.current.isCreditoWithoutClient).toBe(false)
     })
 
@@ -478,6 +478,104 @@ describe("useCart", () => {
       expect(result.current.items[0].cantidad).toBe(4)
       expect(result.current.items[0].descuento).toBe(20)
       expect(result.current.items[0].descuento_tipo).toBe("%")
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // cliente credito fields (CR4: limite_credito / saldo_actual)
+  // ---------------------------------------------------------------------------
+  describe("cliente credito fields", () => {
+    it("carries limite and saldo through setClient", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.setClient("c-1", "María González", 1000, 250))
+      expect(result.current.clienteLimiteCredito).toBe(1000)
+      expect(result.current.clienteSaldoActual).toBe(250)
+    })
+
+    it("resets credit fields when client is cleared", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.setClient("c-1", "María", 1000, 250))
+      act(() => result.current.setClient(null, null, null, null))
+
+      expect(result.current.clienteLimiteCredito).toBeNull()
+      expect(result.current.clienteSaldoActual).toBeNull()
+    })
+
+    it("resets credit fields on clearCart", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.setClient("c-1", "María", 1000, 250))
+      act(() => result.current.clearCart())
+
+      expect(result.current.clienteLimiteCredito).toBeNull()
+      expect(result.current.clienteSaldoActual).toBeNull()
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // isCreditoOverLimit (CR4: saldo + total > limite blocks credit)
+  // one unidadProduct → subtotal 5.00 + IVA 0.80 → total 5.80
+  // ---------------------------------------------------------------------------
+  describe("isCreditoOverLimit", () => {
+    it("is true when saldo + total > limite", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setPaymentMethod("credito"))
+      act(() => result.current.setClient("c-1", "María", 10, 6)) // 6 + 5.80 > 10
+
+      expect(result.current.isCreditoOverLimit).toBe(true)
+    })
+
+    it("is false when saldo + total equals the limite (equality allowed)", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setPaymentMethod("credito"))
+      act(() => result.current.setClient("c-1", "María", 10, 4.2)) // 4.2 + 5.80 = 10
+
+      expect(result.current.isCreditoOverLimit).toBe(false)
+    })
+
+    it("is true for a client with limite 0 (no credit habilitado)", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setPaymentMethod("credito"))
+      act(() => result.current.setClient("c-1", "María", 0, 0)) // 0 + 5.80 > 0
+
+      expect(result.current.isCreditoOverLimit).toBe(true)
+    })
+
+    it("is false for non-credito payment even when over limit", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setPaymentMethod("efectivo"))
+      act(() => result.current.setClient("c-1", "María", 10, 6))
+
+      expect(result.current.isCreditoOverLimit).toBe(false)
+    })
+
+    it("is false when no client is selected", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setPaymentMethod("credito"))
+
+      expect(result.current.isCreditoOverLimit).toBe(false)
+    })
+
+    it("is false when limite or saldo is unknown (null)", () => {
+      const { result } = renderHook(() => useCart())
+
+      act(() => result.current.addItem(unidadProduct))
+      act(() => result.current.setPaymentMethod("credito"))
+      act(() => result.current.setClient("c-1", "María", null, null))
+
+      expect(result.current.isCreditoOverLimit).toBe(false)
     })
   })
 })

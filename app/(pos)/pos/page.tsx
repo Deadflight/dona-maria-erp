@@ -62,6 +62,7 @@ export default function POSPage() {
     isEmpty,
     paymentMethod,
     isCreditoWithoutClient,
+    isCreditoOverLimit,
     clienteId,
     clienteNombre,
     items,
@@ -77,7 +78,13 @@ export default function POSPage() {
   )
 
   const handleConfirmSale = useCallback(async () => {
-    if (isEmpty || !paymentMethod || isCreditoWithoutClient) return
+    if (
+      isEmpty ||
+      !paymentMethod ||
+      isCreditoWithoutClient ||
+      isCreditoOverLimit
+    )
+      return
 
     setIsSubmitting(true)
     try {
@@ -134,6 +141,7 @@ export default function POSPage() {
     clearCart,
     isEmpty,
     isCreditoWithoutClient,
+    isCreditoOverLimit,
     items,
     paymentMethod,
     sellerName,
@@ -172,7 +180,12 @@ export default function POSPage() {
       }
       if (e.key === "F3") {
         e.preventDefault()
-        if (!cart.isEmpty && cart.paymentMethod && !cart.isCreditoWithoutClient) {
+        if (
+          !cart.isEmpty &&
+          cart.paymentMethod &&
+          !cart.isCreditoWithoutClient &&
+          !cart.isCreditoOverLimit
+        ) {
           handleConfirmSale()
         }
         return
@@ -284,6 +297,9 @@ export default function POSPage() {
               total={cart.totals.total}
               paymentMethod={cart.paymentMethod}
               clienteNombre={cart.clienteNombre}
+              clienteLimiteCredito={cart.clienteLimiteCredito}
+              clienteSaldoActual={cart.clienteSaldoActual}
+              isCreditoOverLimit={cart.isCreditoOverLimit}
               isCreditoWithoutClient={cart.isCreditoWithoutClient}
               isEmpty={cart.isEmpty}
               amountReceived={cart.amountReceived}

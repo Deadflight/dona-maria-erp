@@ -41,6 +41,8 @@ type CartState = {
   paymentMethod: "efectivo" | "transferencia" | "credito" | null
   clienteId: string | null
   clienteNombre: string | null
+  clienteLimiteCredito: number | null
+  clienteSaldoActual: number | null
   amountReceived: number | null
 }
 
@@ -51,7 +53,13 @@ type CartAction =
   | { type: "UPDATE_QUANTITY_BY_STEP"; productId: string; step: number }
   | { type: "SET_DISCOUNT"; productId: string; descuento: number; descuentoTipo: DescuentoTipo }
   | { type: "SET_PAYMENT_METHOD"; method: CartState["paymentMethod"] }
-  | { type: "SET_CLIENT"; id: string | null; nombre: string | null }
+  | {
+      type: "SET_CLIENT"
+      id: string | null
+      nombre: string | null
+      limiteCredito: number | null
+      saldoActual: number | null
+    }
   | { type: "SET_AMOUNT_RECEIVED"; amount: number | null }
   | { type: "SET_AMOUNT_TO_EXACT" }
   | { type: "CLEAR_CART" }
@@ -168,7 +176,13 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "SET_PAYMENT_METHOD":
       return { ...state, paymentMethod: action.method }
     case "SET_CLIENT":
-      return { ...state, clienteId: action.id, clienteNombre: action.nombre }
+      return {
+        ...state,
+        clienteId: action.id,
+        clienteNombre: action.nombre,
+        clienteLimiteCredito: action.limiteCredito,
+        clienteSaldoActual: action.saldoActual,
+      }
     case "SET_AMOUNT_RECEIVED":
       return { ...state, amountReceived: action.amount }
     case "SET_AMOUNT_TO_EXACT": {
@@ -189,6 +203,8 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         paymentMethod: null,
         clienteId: null,
         clienteNombre: null,
+        clienteLimiteCredito: null,
+        clienteSaldoActual: null,
         amountReceived: null,
       }
     default:
@@ -201,6 +217,8 @@ const initialState: CartState = {
   paymentMethod: null,
   clienteId: null,
   clienteNombre: null,
+  clienteLimiteCredito: null,
+  clienteSaldoActual: null,
   amountReceived: null,
 }
 
@@ -236,8 +254,13 @@ export function useCart() {
     [],
   )
   const setClient = useCallback(
-    (id: string | null, nombre: string | null) =>
-      dispatch({ type: "SET_CLIENT", id, nombre }),
+    (
+      id: string | null,
+      nombre: string | null,
+      limiteCredito: number | null,
+      saldoActual: number | null,
+    ) =>
+      dispatch({ type: "SET_CLIENT", id, nombre, limiteCredito, saldoActual }),
     [],
   )
   const setAmountReceived = useCallback(
@@ -272,6 +295,16 @@ export function useCart() {
   const isCreditoWithoutClient =
     state.paymentMethod === "credito" && !state.clienteId
 
+  // CR4: block credit client-side when saldo_actual + total > limite_credito
+  // (server RPC check remains authoritative). limite = 0 means no credit
+  // habilitado, so any positive total is over the limit.
+  const isCreditoOverLimit =
+    state.paymentMethod === "credito" &&
+    state.clienteId !== null &&
+    state.clienteLimiteCredito !== null &&
+    state.clienteSaldoActual !== null &&
+    state.clienteSaldoActual + totals.total > state.clienteLimiteCredito
+
   const change = useMemo(() => {
     if (state.paymentMethod !== "efectivo" || state.amountReceived === null) {
       return null
@@ -284,10 +317,13 @@ export function useCart() {
     paymentMethod: state.paymentMethod,
     clienteId: state.clienteId,
     clienteNombre: state.clienteNombre,
+    clienteLimiteCredito: state.clienteLimiteCredito,
+    clienteSaldoActual: state.clienteSaldoActual,
     amountReceived: state.amountReceived,
     totals,
     isEmpty,
     isCreditoWithoutClient,
+    isCreditoOverLimit,
     change,
     addItem,
     removeItem,
