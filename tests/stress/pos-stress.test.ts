@@ -190,7 +190,7 @@ describe("A32: POS Stress Tests", () => {
         },
       })
 
-      let callCount = 0
+      const callCount = 0
       mockRpc.mockImplementation(() => ({
         data: {
           venta_id: `v-${callCount}`,

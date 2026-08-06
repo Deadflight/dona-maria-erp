@@ -46,7 +46,7 @@ export function ProductSearch({
 }: ProductSearchProps) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<RankedProduct<CartProduct>[]>([])
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => getRecentSearches())
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(true)
   const [inputFocused, setInputFocused] = useState(false)
@@ -85,13 +85,6 @@ export function ProductSearch({
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
-
-  // Load recent searches on mount and when empty state is shown
-  useEffect(() => {
-    if (showEmptyState) {
-      setRecentSearches(getRecentSearches())
-    }
-  }, [showEmptyState])
 
   // Search with debounce
   const handleSearch = useCallback(

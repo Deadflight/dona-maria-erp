@@ -59,18 +59,99 @@ export default function POSPage() {
     fetchSession()
   }, [])
 
-  // Clamp selected index when cart changes
-  useEffect(() => {
-    if (cart.items.length === 0) {
-      setSelectedIndex(0)
-    } else if (selectedIndex >= cart.items.length) {
-      setSelectedIndex(cart.items.length - 1)
+  const {
+    isEmpty,
+    paymentMethod,
+    isCreditoWithoutClient,
+    clienteId,
+    clienteNombre,
+    items,
+    totals,
+    clearCart,
+  } = cart
+
+  const handleAddProduct = useCallback(
+    (product: CartProduct) => {
+      cart.addItem(product)
+    },
+    [cart.addItem],
+  )
+
+  const handleConfirmSale = useCallback(async () => {
+    if (isEmpty || !paymentMethod || isCreditoWithoutClient) return
+
+    setIsSubmitting(true)
+    try {
+      const result = await createSale({
+        cliente_id: clienteId,
+        metodo_pago: paymentMethod,
+        subtotal: totals.subtotal,
+        impuesto: totals.impuesto,
+        total: totals.total,
+        items: items.map((i) => ({
+          producto_id: i.product.id,
+          cantidad: i.cantidad,
+          precio_venta: i.precio_venta,
+          descuento: i.descuento,
+        })),
+      })
+
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+
+      if (result.data) {
+        // Show receipt
+        setReceipt({
+          saleId: result.data.venta_id,
+          invoiceNumber: result.data.numero_factura,
+          items: items.map((i) => ({
+            nombre: i.product.nombre,
+            cantidad: i.cantidad,
+            precio_venta: i.precio_venta,
+            subtotal: i.subtotal,
+            descuento: i.descuento,
+          })),
+          subtotal: totals.subtotal,
+          descuentoTotal: totals.descuentoTotal,
+          impuesto: totals.impuesto,
+          total: totals.total,
+          paymentMethod,
+          sellerName,
+          clientName: clienteNombre,
+        })
+        clearCart()
+      }
+    } catch {
+      toast.error("Error de conexión. Intente de nuevo.")
+    } finally {
+      setIsSubmitting(false)
     }
-  }, [cart.items.length, selectedIndex])
+  }, [
+    clienteId,
+    clienteNombre,
+    clearCart,
+    isEmpty,
+    isCreditoWithoutClient,
+    items,
+    paymentMethod,
+    sellerName,
+    totals,
+  ])
+
+  const handleCloseReceipt = useCallback(() => {
+    setReceipt(null)
+  }, [])
+
+  const effectiveSelectedIndex = Math.min(
+    selectedIndex,
+    Math.max(0, cart.items.length - 1),
+  )
 
   const selectedItem = useMemo(
-    () => (cart.items.length > 0 ? cart.items[Math.min(selectedIndex, cart.items.length - 1)] : null),
-    [cart.items, selectedIndex],
+    () => (cart.items.length > 0 ? cart.items[effectiveSelectedIndex] : null),
+    [cart.items, effectiveSelectedIndex],
   )
 
   // F2 = focus cart area (scroll to cart)
@@ -101,12 +182,12 @@ export default function POSPage() {
       // Arrow navigation
       if (e.key === "ArrowUp") {
         e.preventDefault()
-        setSelectedIndex((i) => Math.max(0, i - 1))
+        setSelectedIndex(Math.max(0, effectiveSelectedIndex - 1))
         return
       }
       if (e.key === "ArrowDown") {
         e.preventDefault()
-        setSelectedIndex((i) => Math.min(cart.items.length - 1, i + 1))
+        setSelectedIndex(Math.min(cart.items.length - 1, effectiveSelectedIndex + 1))
         return
       }
 
@@ -136,70 +217,6 @@ export default function POSPage() {
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   })
-
-  const handleAddProduct = useCallback(
-    (product: CartProduct) => {
-      cart.addItem(product)
-    },
-    [cart.addItem],
-  )
-
-  const handleConfirmSale = useCallback(async () => {
-    if (cart.isEmpty || !cart.paymentMethod || cart.isCreditoWithoutClient) return
-
-    setIsSubmitting(true)
-    try {
-      const result = await createSale({
-        cliente_id: cart.clienteId,
-        metodo_pago: cart.paymentMethod,
-        subtotal: cart.totals.subtotal,
-        impuesto: cart.totals.impuesto,
-        total: cart.totals.total,
-        items: cart.items.map((i) => ({
-          producto_id: i.product.id,
-          cantidad: i.cantidad,
-          precio_venta: i.precio_venta,
-          descuento: i.descuento,
-        })),
-      })
-
-      if (result.error) {
-        toast.error(result.error)
-        return
-      }
-
-      if (result.data) {
-        // Show receipt
-        setReceipt({
-          saleId: result.data.venta_id,
-          invoiceNumber: result.data.numero_factura,
-          items: cart.items.map((i) => ({
-            nombre: i.product.nombre,
-            cantidad: i.cantidad,
-            precio_venta: i.precio_venta,
-            subtotal: i.subtotal,
-            descuento: i.descuento,
-          })),
-          subtotal: cart.totals.subtotal,
-          descuentoTotal: cart.totals.descuentoTotal,
-          impuesto: cart.totals.impuesto,
-          total: cart.totals.total,
-          paymentMethod: cart.paymentMethod,
-          sellerName,
-          clientName: cart.clienteNombre,
-        })
-        cart.clearCart()
-      }
-    } catch {
-      toast.error("Error de conexión. Intente de nuevo.")
-    } finally {
-      setIsSubmitting(false)
-    }
-  }, [cart, sellerName])
-
-  const handleCloseReceipt = useCallback(() => {
-    setReceipt(null)
-  }, [])
 
   return (
     <>
@@ -245,7 +262,7 @@ export default function POSPage() {
               onRemoveItem={cart.removeItem}
               onSetDiscount={cart.setDiscount}
               onClearCart={cart.clearCart}
-              selectedIndex={selectedIndex}
+              selectedIndex={effectiveSelectedIndex}
               onSelectItem={setSelectedIndex}
             />
           </div>
