@@ -11,6 +11,7 @@ const navItems = [
   { label: "Ventas", href: "/sales" },
   { label: "Terminal de ventas", href: "/pos", icon: ShoppingCart },
   { label: "Clientes", href: "/clients" },
+  { label: "Créditos", href: "/credits" },
   { label: "Recepción", href: "/receipts", icon: Package },
   { label: "Inventario", href: "/inventory" },
   { label: "Cierre diario", href: "/daily-close", adminOnly: true },

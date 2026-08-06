@@ -133,4 +133,23 @@ describe("DashboardLayout", () => {
 
     expect(screen.getByRole("link", { name: "Terminal de ventas" })).toHaveAttribute("href", "/pos")
   })
+
+  it("should render the Créditos nav link for any role", async () => {
+    mockGetSession.mockResolvedValue({
+      data: {
+        id: "user-1",
+        email: "viewer@donamaria.com",
+        role: "viewer",
+        fullName: "Viewer",
+        isActive: true,
+      },
+    })
+
+    render(
+      await DashboardLayout({ children: <div>Content</div> }) as unknown as React.ReactElement,
+    )
+
+    // Plain nav item — visible to every role (design decision 8, REQ-CREDITS-UI-3).
+    expect(screen.getByRole("link", { name: "Créditos" })).toHaveAttribute("href", "/credits")
+  })
 })
