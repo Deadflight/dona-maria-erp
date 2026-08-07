@@ -105,3 +105,83 @@ export async function withConnection<T>(
     await client.end()
   }
 }
+
+// ---------------------------------------------------------------------------
+// Client / seller seeds (credit sales and abonos)
+// ---------------------------------------------------------------------------
+
+export interface ClienteSeed {
+  id: string
+  nombre: string
+  tipo: string
+  limite_credito: number
+  saldo_actual: number
+}
+
+/**
+ * Inserts a test client for credit/abono concurrency scenarios.
+ * Returns the full seed data including generated id.
+ */
+export async function seedCliente(
+  client: Client,
+  overrides?: Partial<ClienteSeed>,
+): Promise<ClienteSeed> {
+  const defaults = {
+    id: crypto.randomUUID(),
+    nombre: `Test Client ${Date.now()}`,
+    tipo: "natural",
+    limite_credito: 0,
+    saldo_actual: 0,
+  }
+  const data = { ...defaults, ...overrides }
+  await client.query(
+    `INSERT INTO clientes (id, nombre, tipo, limite_credito, saldo_actual, activo)
+     VALUES ($1, $2, $3, $4, $5, true)`,
+    [data.id, data.nombre, data.tipo, data.limite_credito, data.saldo_actual],
+  )
+  return data
+}
+
+/**
+ * Removes a test client by id. Safe to call even if the client
+ * was already cleaned up (DELETE is idempotent).
+ */
+export async function cleanupCliente(
+  client: Client,
+  id: string,
+): Promise<void> {
+  await client.query("DELETE FROM clientes WHERE id = $1", [id])
+}
+
+/**
+ * Inserts a test seller (auth user + profiles row) and returns the id.
+ * Required because ventas.vendedor_id references profiles.id, and
+ * profiles.id references auth.users.id (ON DELETE CASCADE).
+ * The on_auth_user_created trigger creates the profiles row from
+ * raw_user_meta_data (role defaults to 'seller'); we pass role 'seller'
+ * explicitly. Deleting the auth user cascades to profiles.
+ */
+export async function seedVendedor(client: Client): Promise<string> {
+  const id = crypto.randomUUID()
+  await client.query(
+    `INSERT INTO auth.users (id, aud, role, email, email_confirmed_at, is_sso_user, is_anonymous, raw_user_meta_data)
+     VALUES ($1, 'authenticated', 'authenticated', $2, now(), false, false, $3::jsonb)`,
+    [
+      id,
+      `concurrency-seller-${id}@test.local`,
+      JSON.stringify({ full_name: "Concurrency Seller", role: "seller" }),
+    ],
+  )
+  return id
+}
+
+/**
+ * Removes a test seller by id. Deleting the auth user cascades
+ * to the profiles row. Safe to call even if already cleaned up.
+ */
+export async function cleanupVendedor(
+  client: Client,
+  id: string,
+): Promise<void> {
+  await client.query("DELETE FROM auth.users WHERE id = $1", [id])
+}
