@@ -1,0 +1,56 @@
+# SDD config for dona-maria-erp — initialized 2026-08-06.
+# Existing structure preserved: specs/ (7 domains), changes/ (active + archive/).
+schema: spec-driven
+
+context: |
+  Tech stack: Next.js 16 (App Router, React 19) + TypeScript strict + Supabase (Postgres, RLS)
+  Package manager: pnpm (workspace config present, single root package)
+  Architecture: Server Actions (no API routes), (dashboard) route group, colocated _components/
+  Validation: Zod v4; Auth: Supabase SSR + middleware; DB types: database.types.ts
+  Styling: Tailwind CSS v4 + shadcn/ui (Base UI), lucide-react icons
+  Testing: Vitest 4 (jsdom) + Testing Library; full gate: `pnpm check` (lint + typecheck + test + build)
+  Conventions: Conventional commits (commitlint) + semantic-release; change names A{NN}-{kebab-name}
+
+strict_tdd: true
+
+testing:
+  test_command: "pnpm test"
+  full_check: "pnpm check"
+  runner: "Vitest 4.1.7 (jsdom, globals, setup tests/setup.ts)"
+  layers:
+    unit: { available: true, tool: "vitest" }
+    integration: { available: true, tool: "@testing-library/react + user-event (incl. concurrency/workflow suites)" }
+    e2e: { available: false, tool: "—" }
+  coverage:
+    available: true
+    command: "pnpm exec vitest --run --coverage"
+    thresholds: { statements: 80, branches: 75, functions: 80, lines: 80 }
+  quality:
+    linter: { available: true, command: "pnpm lint" }
+    type_checker: { available: true, command: "pnpm typecheck" }
+    formatter: { available: false, command: "—" }
+
+rules:
+  proposal:
+    - Name changes A{NN}-{kebab-name} to match existing archive convention (A17, A22-A24, A31, ...)
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then scenarios and RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Namespace requirement IDs per domain: REQ-{DOMAIN}-{N}
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    guidelines:
+      - Follow existing code patterns (colocated _components/, Server Actions, Zod schemas)
+    tdd: true
+    test_command: "pnpm test"
+  verify:
+    test_command: "pnpm test"
+    build_command: "pnpm build"
+    coverage_threshold: 75
+  archive:
+    - Warn before merging destructive deltas
