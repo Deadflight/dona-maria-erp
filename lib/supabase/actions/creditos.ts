@@ -122,15 +122,7 @@ export async function registerAbono(
 
   const supabase = await createClient()
 
-  // RPC functions will be typed after migration — cast for now
-  const { data, error } = await (
-    supabase as typeof supabase & {
-      rpc: (
-        fn: string,
-        args?: Record<string, unknown>,
-      ) => Promise<{ data: unknown; error: { message: string } | null }>
-    }
-  ).rpc("register_abono", {
+  const { data, error } = await supabase.rpc("register_abono", {
     p_credito_id: validated.data.credito_id,
     p_monto: validated.data.monto,
     p_metodo_pago: validated.data.metodo_pago,

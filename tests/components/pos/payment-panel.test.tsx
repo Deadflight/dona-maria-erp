@@ -22,6 +22,9 @@ const defaultProps = {
   total: 50.0,
   paymentMethod: null as "efectivo" | "transferencia" | "credito" | null,
   clienteNombre: null,
+  clienteLimiteCredito: null,
+  clienteSaldoActual: null,
+  isCreditoOverLimit: false,
   isCreditoWithoutClient: false,
   isEmpty: false,
   amountReceived: null,
@@ -214,6 +217,38 @@ describe("PaymentPanel", () => {
       expect(btn).not.toBeDisabled()
     })
 
+    it("disables confirm when credit is over the client limit", () => {
+      render(
+        <PaymentPanel
+          {...defaultProps}
+          paymentMethod="credito"
+          clienteNombre="María González"
+          isCreditoWithoutClient={false}
+          isCreditoOverLimit={true}
+          isEmpty={false}
+        />,
+      )
+
+      const btn = screen.getByRole("button", { name: /Confirmar venta/ })
+      expect(btn).toBeDisabled()
+    })
+
+    it("enables confirm for credito within the client limit", () => {
+      render(
+        <PaymentPanel
+          {...defaultProps}
+          paymentMethod="credito"
+          clienteNombre="María González"
+          isCreditoWithoutClient={false}
+          isCreditoOverLimit={false}
+          isEmpty={false}
+        />,
+      )
+
+      const btn = screen.getByRole("button", { name: /Confirmar venta/ })
+      expect(btn).not.toBeDisabled()
+    })
+
     it("calls onConfirm when clicked", async () => {
       const user = userEvent.setup()
       const onConfirm = vi.fn()
@@ -290,6 +325,49 @@ describe("PaymentPanel", () => {
       )
 
       expect(screen.getByText("María González")).toBeInTheDocument()
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // Over-limit credit warning
+  // ---------------------------------------------------------------------------
+  describe("over-limit credit warning", () => {
+    it("shows balance and limit via formatCurrency when over limit", () => {
+      render(
+        <PaymentPanel
+          {...defaultProps}
+          total={100}
+          paymentMethod="credito"
+          clienteNombre="María González"
+          clienteSaldoActual={950}
+          clienteLimiteCredito={1000}
+          isCreditoOverLimit={true}
+        />,
+      )
+
+      expect(
+        screen.getByText("El cliente excede su límite de crédito"),
+      ).toBeInTheDocument()
+      expect(screen.getByText(/Bs\. 950,00/)).toBeInTheDocument()
+      expect(screen.getByText(/Bs\. 100,00/)).toBeInTheDocument()
+      expect(screen.getByText(/Bs\. 1\.000,00/)).toBeInTheDocument()
+    })
+
+    it("does not show over-limit warning when within the client limit", () => {
+      render(
+        <PaymentPanel
+          {...defaultProps}
+          paymentMethod="credito"
+          clienteNombre="María González"
+          clienteSaldoActual={50}
+          clienteLimiteCredito={1000}
+          isCreditoOverLimit={false}
+        />,
+      )
+
+      expect(
+        screen.queryByText("El cliente excede su límite de crédito"),
+      ).not.toBeInTheDocument()
     })
   })
 })

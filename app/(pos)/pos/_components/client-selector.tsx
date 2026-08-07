@@ -16,12 +16,19 @@ type ClientResult = {
   id: string
   nombre: string
   rif_cedula: string | null
+  limite_credito: number | null
+  saldo_actual: number | null
 }
 
 type ClientSelectorProps = {
   selectedClientId: string | null
   selectedClientName: string | null
-  onSelect: (id: string | null, nombre: string | null) => void
+  onSelect: (
+    id: string | null,
+    nombre: string | null,
+    limiteCredito: number | null,
+    saldoActual: number | null,
+  ) => void
   className?: string
 }
 
@@ -63,7 +70,12 @@ export function ClientSelector({
 
   const handleSelect = useCallback(
     (client: ClientResult) => {
-      onSelect(client.id, client.nombre)
+      onSelect(
+        client.id,
+        client.nombre,
+        client.limite_credito,
+        client.saldo_actual,
+      )
       setQuery("")
       setResults([])
       setShowResults(false)
@@ -72,7 +84,7 @@ export function ClientSelector({
   )
 
   const handleClear = useCallback(() => {
-    onSelect(null, null)
+    onSelect(null, null, null, null)
     setQuery("")
     setResults([])
     setShowResults(false)
