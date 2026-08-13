@@ -1,8 +1,33 @@
 # CAPÍTULO IV: ANÁLISIS Y DISEÑO DEL SISTEMA
 
-## 4.1 Análisis de Requerimientos
+## 4.1 Presentación de la Propuesta
 
-### 4.1.1 Requerimientos Funcionales (RF)
+### 4.1.1 Nombre de la Propuesta
+
+Sistema de Información Web para la Gestión de Ventas e Inventario de la Ferretería "El Imperio Doña María".
+
+### 4.1.2 Propósito de la Propuesta
+
+Optimizar los procesos operativos y de control financiero de la Ferretería "El Imperio Doña María", ubicada en Cumaná, Estado Sucre, Venezuela, reemplazando el modelo manual basado en cuadernos físicos que actualmente genera pérdidas de tiempo, quiebres de stock y vulnerabilidad en la conciliación financiera diaria. El sistema digitaliza la atención de mostrador y la gestión de inventarios mediante una aplicación web que garantiza la integridad transaccional de las operaciones de venta, el descuento automático de existencias y la consolidación de los ingresos de la jornada.
+
+### 4.1.3 Alcance de la Propuesta
+
+La propuesta se desarrolla bajo un enfoque de Producto Mínimo Viable (MVP) que contempla los siguientes módulos:
+
+| Módulo | Descripción |
+|--------|-------------|
+| **Inventario Dinámico** | Catálogo de productos con soporte para unidades fraccionadas (kg, m, cm, und), actualización masiva de precios por porcentaje y alertas visuales de stock crítico configurables por producto. |
+| **Mostrador Express (POS)** | Terminal de ventas rápida para "Consumidor Final" con búsqueda predictiva de productos, carrito de compras con cálculo automático de totales, conversión USD→VES en tiempo real según la tasa BCV y registro del método de pago y banco receptor. |
+| **Conciliación Financiera** | Panel de auditoría que consolida los ingresos netos del día indexados por turno, operador, método de pago (Pago Móvil, Efectivo, Débito) y banco receptor (Banesco, Mercantil, Venezuela). |
+| **Créditos y Cobranzas** | Registro digital de clientes con límite de crédito, verificación de saldo disponible en ventas a crédito, registro de abonos y notificación automática de mora. |
+
+Quedan excluidos del alcance del MVP la contabilidad legal-fiscal (libros de compra/venta, declaración de IVA, impresoras fiscales), el módulo de proveedores con órdenes de compra formalizadas y los reportes contables avanzados (estados financieros formales).
+
+---
+
+## 4.2 Análisis de Requerimientos
+
+### 4.2.1 Requerimientos Funcionales (RF)
 
 | Código | Descripción | Prioridad |
 |--------|-------------|-----------|
@@ -12,7 +37,7 @@
 | RF-04 | **Registro Transaccional Indexado**: Cada venta procesada debe asociarse obligatoriamente a un usuario (operador), un método de pago específico (Efectivo, Pago Móvil, Débito) y el banco receptor de los fondos (Banesco, Mercantil, Venezuela). Las ventas a crédito adicionalmente deben asociarse a un cliente registrado. | Alta |
 | RF-05 | **Consolidación Financiera de Caja (Cierre)**: El sistema debe generar reportes instantáneos que agrupen los ingresos netos de la jornada cruzando los métodos de pago contra los bancos, facilitando la conciliación Síncrona a la propietaria. El reporte debe incluir la discriminación por operador y turno (mañana/tarde). | Alta |
 
-### 4.1.2 Requerimientos No Funcionales (RNF)
+### 4.2.2 Requerimientos No Funcionales (RNF)
 
 | Código | Descripción | Criterio de Aceptación |
 |--------|-------------|----------------------|
@@ -24,16 +49,16 @@
 
 ---
 
-## 4.2 Modelo de Casos de Uso
+## 4.3 Modelo de Casos de Uso
 
-### 4.2.1 Actores del Sistema
+### 4.3.1 Actores del Sistema
 
 | Actor | Descripción | Privilegios |
 |-------|-------------|------------|
 | **Operador de Mostrador** | Trabajador operativo del comercio que atiende a los clientes en el punto de venta. Realiza ventas al contado y consulta inventario. | Limitado al plano operativo básico |
 | **Administrador (Propietaria)** | Responsable del comercio con control total sobre el sistema. Gestiona inventario, precios, usuarios, créditos y conciliación financiera. | Plenos privilegios (Full Access) |
 
-### 4.2.2 Casos de Uso del Sistema
+### 4.3.2 Casos de Uso del Sistema
 
 #### Actor: Operador de Mostrador
 
@@ -60,7 +85,7 @@
 | CU-14 | Gestionar Usuarios | Crear, modificar y desactivar cuentas de usuario para los empleados. Solo accesible por el administrador. |
 | CU-15 | Configurar Tasa de Cambio | Actualizar manualmente la tasa USD→VES cuando la actualización automática falla o se requiere override. |
 
-### 4.2.3 Diagrama de Casos de Uso
+### 4.3.3 Diagrama de Casos de Uso
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -161,9 +186,9 @@
 
 ---
 
-## 4.3 Diseño de la Arquitectura de Datos
+## 4.4 Diseño de la Arquitectura de Datos
 
-### 4.3.1 Diagrama Entidad-Relación
+### 4.4.1 Diagrama Entidad-Relación
 
 ```
 ┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
@@ -220,7 +245,7 @@
 └─────────────────┘
 ```
 
-### 4.3.2 Esquema de Tablas (SQL DDL)
+### 4.4.2 Esquema de Tablas (SQL DDL)
 
 ```sql
 -- ============================================
@@ -387,7 +412,7 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-### 4.3.3 Reglas de Negocio Implementadas en Constraints
+### 4.4.3 Reglas de Negocio Implementadas en Constraints
 
 | Regla de Negocio | Implementación |
 |------------------|----------------|
@@ -403,9 +428,9 @@ $$ LANGUAGE plpgsql;
 
 ---
 
-## 4.4 Diseño de la Arquitectura de Software
+## 4.5 Diseño de la Arquitectura de Software
 
-### 4.4.1 Arquitectura General (Cliente-Servidor)
+### 4.5.1 Arquitectura General (Cliente-Servidor)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -444,7 +469,7 @@ $$ LANGUAGE plpgsql;
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.4.2 Diagrama de Despliegue
+### 4.5.2 Diagrama de Despliegue
 
 ```
 ┌─────────────────┐        ┌─────────────────┐        ┌─────────────────┐
@@ -469,7 +494,7 @@ $$ LANGUAGE plpgsql;
 └─────────────────────────┴─────────────────┴────────└─────────────────┘
 ```
 
-### 4.4.3 Estructura del Proyecto Next.js
+### 4.5.3 Estructura del Proyecto Next.js
 
 ```
 src/
@@ -550,9 +575,9 @@ src/
 
 ---
 
-## 4.5 Diseño de Interfaces
+## 4.6 Diseño de Interfaces
 
-### 4.5.1 Terminal de Ventas (POS) — Wireframe Descriptivo
+### 4.6.1 Terminal de Ventas (POS) — Wireframe Descriptivo
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -607,7 +632,7 @@ src/
 - Atajo `F1` para abrir selector de método de pago
 - Números decimales con punto (formato americano)
 
-### 4.5.2 Panel de Inventario — Wireframe Descriptivo
+### 4.6.2 Panel de Inventario — Wireframe Descriptivo
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -640,7 +665,7 @@ src/
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.5.3 Pantalla de Conciliación — Wireframe Descriptivo
+### 4.6.3 Pantalla de Conciliación — Wireframe Descriptivo
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -694,7 +719,7 @@ src/
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.5.4 Gestión de Créditos — Wireframe Descriptivo
+### 4.6.4 Gestión de Créditos — Wireframe Descriptivo
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -735,11 +760,11 @@ src/
 
 ---
 
-## 4.6 Diseño de Procesos
+## 4.7 Diseño de Procesos
 
 El diseño de procesos se aborda desde dos perspectivas complementarias. Por un lado, el **proceso de desarrollo del sistema** (véase *Figura 3.1* en el Capítulo III), el cual describe la secuencia metodológica del proyecto alineada al método científico, representada mediante un Diagrama de Actividades UML con swimlanes por actor (Investigador, Tutor, Propietaria). Por otro lado, los **procesos operativos del negocio** que el sistema debe automatizar, los cuales se detallan a continuación como diagramas de flujo.
 
-### 4.6.1 Flujo de Venta al Contado
+### 4.7.1 Flujo de Venta al Contado
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -834,7 +859,7 @@ El diseño de procesos se aborda desde dos perspectivas complementarias. Por un 
      │                      └─────────────────┘
 ```
 
-### 4.6.2 Flujo de Venta a Crédito
+### 4.7.2 Flujo de Venta a Crédito
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -925,7 +950,7 @@ El diseño de procesos se aborda desde dos perspectivas complementarias. Por un 
 └─────────────────┘
 ```
 
-### 4.6.3 Flujo de Cierre de Caja
+### 4.7.3 Flujo de Cierre de Caja
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -1009,7 +1034,7 @@ El diseño de procesos se aborda desde dos perspectivas complementarias. Por un 
 └─────────────────┘
 ```
 
-### 4.6.4 Flujo de Actualización de Tasa BCV
+### 4.7.4 Flujo de Actualización de Tasa BCV
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -1079,29 +1104,29 @@ El diseño de procesos se aborda desde dos perspectivas complementarias. Por un 
 
 ---
 
-## 4.7 Diagramas UML de Secuencia
+## 4.8 Diagramas UML de Secuencia
 
-Para complementar el diseño de procesos presentado en la sección 4.6, se modelaron los diagramas de secuencia UML de los escenarios más críticos del sistema. Cada diagrama describe la interacción temporal entre los actores, la interfaz de usuario (Next.js), las Server Actions y la base de datos (RPC de Supabase/PostgreSQL), evidenciando la validación de sesión y rol, la validación de esquemas con Zod y la atomicidad de las transacciones. Los diagramas se elaboraron con PlantUML y su fuente está disponible en [uml-secuencia.puml](diagrams/uml-secuencia.puml).
+Para complementar el diseño de procesos presentado en la sección 4.7, se modelaron los diagramas de secuencia UML de los escenarios más críticos del sistema. Cada diagrama describe la interacción temporal entre los actores, la interfaz de usuario (Next.js), las Server Actions y la base de datos (RPC de Supabase/PostgreSQL), evidenciando la validación de sesión y rol, la validación de esquemas con Zod y la atomicidad de las transacciones. Los diagramas se elaboraron con PlantUML y su fuente está disponible en [uml-secuencia.puml](diagrams/uml-secuencia.puml).
 
-### 4.7.1 Venta al Contado
+### 4.8.1 Venta al Contado
 
 Corresponde al caso de uso CU-02 (Vender al Contado). El operador busca el producto por nombre, la interfaz consulta el catálogo y el operador conforma el carrito seleccionando el método de pago y el banco receptor. Al confirmar, la Server Action `createSale` valida la sesión y el rol del usuario, valida los datos con el esquema `saleCreateSchema` y ejecuta la RPC transaccional `create_sale_with_movements`, que valida el stock disponible, descuenta el inventario y registra la venta, sus detalles, los pagos y los movimientos de inventario en una sola operación atómica. Ante stock insuficiente, la transacción se revierte y se informa el error a la interfaz; en caso de éxito se revalidan las rutas `/sales` y `/pos` y se muestra el ticket de venta.
 
 **Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
 
-### 4.7.2 Venta a Crédito
+### 4.8.2 Venta a Crédito
 
 Corresponde al caso de uso CU-09 (Vender a Crédito). El flujo es análogo al contado, pero el operador selecciona un cliente con crédito habilitado y envía su identificador en la venta. La RPC `create_sale_with_movements` verifica que el nuevo saldo del cliente no exceda su límite de crédito (`saldo_actual + total <= limite_credito`); si lo excede, la venta se rechaza con el mensaje "excede su límite de crédito". En caso contrario, la transacción descuenta stock, registra la venta con sus detalles y el pago (método crédito), y crea el registro en `creditos` con su `saldo_pendiente`.
 
 **Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
 
-### 4.7.3 Registro de Abono
+### 4.8.3 Registro de Abono
 
 Corresponde al caso de uso CU-10 (Registrar Abono a Crédito). El operador abre el diálogo `AbonoDialog` en `/credits` con el crédito seleccionado y su saldo pendiente visible; la interfaz valida previamente que el monto no supere el saldo. La Server Action `registerAbono` valida la sesión, el rol y el esquema `abonoSchema`, y ejecuta la RPC `register_abono`, que valida que el abono no exceda el saldo pendiente, actualiza el `saldo_pendiente`, inserta el registro en `abono_creditos` y marca el crédito como pagado cuando el saldo llega a cero. Al finalizar se revalida `/credits` y se muestra la confirmación "Abono registrado".
 
 **Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
 
-### 4.7.4 Cierre de Caja
+### 4.8.4 Cierre de Caja
 
 Corresponde a los casos de uso CU-12 (Ver Cierre de Caja) y CU-13 (Conciliar Cuentas). El administrador solicita el cierre de caja del día; la Server Action consulta las ventas y pagos de la jornada agrupados por método de pago y banco. Supabase devuelve los agregados (efectivo, pago móvil, transferencia, divisa y mixto por banco) y la interfaz presenta la conciliación, que el administrador valida antes de confirmar el cierre.
 
@@ -1109,19 +1134,19 @@ Corresponde a los casos de uso CU-12 (Ver Cierre de Caja) y CU-13 (Conciliar Cue
 
 ---
 
-## 4.8 Diagrama de Clases
+## 4.9 Diagrama de Clases
 
 El diagrama de clases expresa el modelo del sistema organizado en cuatro capas: **Presentación (Next.js)** con las páginas y componentes de la interfaz; **Aplicación (Server Actions)** con los servicios que orquestan los casos de uso y validan permisos y datos; **Dominio (Entidades)** con las entidades de negocio y sus reglas (venta, producto, cliente, crédito, abono, entre otras); e **Infraestructura (Supabase)** con el cliente, la base de datos PostgreSQL y la autenticación JWT. Las relaciones muestran la dependencia descendente entre capas, la composición de la venta por sus detalles y pagos, y la asociación del crédito con sus abonos y con la tasa de cambio. El diagrama fue elaborado con PlantUML y su fuente está disponible en [uml-clases.puml](diagrams/uml-clases.puml).
 
 ---
 
-## 4.9 Resumen del Capítulo
+## 4.10 Resumen del Capítulo
 
 Este capítulo documentó el análisis de requerimientos (5 funcionales, 5 no funcionales) y el diseño técnico del sistema: 15 casos de uso, modelo entidad-relación con 10 tablas, esquema DDL con constraints y RLS, arquitectura cliente-servidor con Next.js 16 + Supabase, estructura del proyecto, wireframes descriptivos, 4 flujos de proceso detallados, 4 diagramas de secuencia UML que cubren los escenarios de venta al contado, venta a crédito, registro de abono y cierre de caja, y un diagrama de clases UML que organiza el sistema en un modelo de cuatro capas (presentación, aplicación, dominio e infraestructura).
 
 ---
 
-## 4.10 Anexo: Catálogo de Productos de Ejemplo
+## 4.11 Anexo: Catálogo de Productos de Ejemplo
 
 | Código | Descripción | Tipo Unidad | Und Base | Precio USD | Stock Mín |
 |--------|-------------|-------------|----------|------------|-----------|
