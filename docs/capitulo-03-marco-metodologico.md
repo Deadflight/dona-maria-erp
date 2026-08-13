@@ -105,8 +105,8 @@ El proyecto presenta una relación de costo-beneficio altamente favorable, deter
 |---------|------|---------------|-------------|
 | Supabase (PostgreSQL + Auth) | Free Tier | $0 USD | $0 USD |
 | Vercel (Hosting) | Free Tier | $0 USD | $0 USD |
-| Dominio | Por definir | $0-15 USD | $0-15 USD |
-| **Total** | | **$0 USD** | **$0-15 USD** |
+| Dominio (subdominio Vercel) | Free Tier | $0 USD | $0 USD |
+| **Total** | | **$0 USD** | **$0 USD** |
 
 **Análisis Costo-Beneficio**:
 - Inversión inicial en desarrollo: asumida dentro de prácticas pre-profesionales
