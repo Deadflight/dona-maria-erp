@@ -209,6 +209,66 @@ Actualiza un producto existente. Usa el patrón `useActionState` con FormData.
 
 ---
 
+### `productos.getProductById`
+Obtiene un solo producto por su UUID. Cualquier rol autenticado (viewer+).
+
+**Parámetros:**
+```typescript
+{
+  id: string;  // UUID del producto
+}
+```
+
+**Respuesta:**
+```typescript
+{
+  data: ProductRow | null;
+  error: string | null;            // 'UNAUTHORIZED' | mensaje de error
+}
+```
+
+---
+
+### `productos.generateSku`
+Genera un SKU único con formato `PROD-YYYYMMDD-NNN` consultando el máximo SKU existente del día. Cualquier rol autenticado.
+
+**Parámetros:** Ninguno
+
+**Respuesta:**
+```typescript
+{
+  data: string | null;
+  error: string | null;            // 'UNAUTHORIZED' | mensaje de error
+}
+```
+
+---
+
+### `productos.toggleProductActive`
+Soft delete / restore de un producto (toggle `activo`). Usa el patrón `useActionState` con FormData. Solo admin y seller.
+
+**Parámetros (FormData):**
+```typescript
+{
+  id: string;           // UUID del producto (campo oculto)
+  activo: boolean;      // "true" / "false"
+}
+```
+
+**Validaciones:**
+- `id` requerido
+- Solo administradores y vendedores pueden cambiar el estado
+
+**Respuesta:**
+```typescript
+{
+  success: boolean;
+  message?: string;     // 'UNAUTHORIZED' | 'FORBIDDEN' | mensaje de error
+}
+```
+
+---
+
 ## Inventario
 
 ### `inventario.buscarProductos`
