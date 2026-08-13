@@ -19,7 +19,7 @@
 
 ## Estructura de Fases y Actividades
 
-> **Estado real al 25/06/2026**: Fases I-II ✅ Completas | Fase III ⚠️ En progreso (5/8 tareas) | Fases IV-V ⏳ Pendientes
+> **Estado real al 13/08/2026**: Fases I-II ✅ Completas | Fase III ⚠️ En progreso (7/8 tareas) | Fase IV ✅ Completa | Fase V ⚠️ En progreso (3/8 tareas)
 
 ### FASE I: Diagnóstico Operativo y Brechas de Control Financiero (Días 1–8) ✅
 **Color**: Azul (#1565C0)
@@ -58,47 +58,47 @@
 ### FASE III: Mitigación del Descontrol de Existencias (Días 17–24) ⚠️
 **Color**: Naranja (#E65100)
 **Correspondencia científica**: Experimentación
-**Hito**: Módulo de inventario operativo (Día 24) — ⏳ Pendiente (71% avanzado)
+**Hito**: Módulo de inventario operativo (Día 24) — ⚠️ Pendiente (7/8 tareas; falta solo la carga de datos históricos)
 
 | # | Actividad | Duración | Dependencia | Estado | Notas |
 |---|-----------|----------|-------------|--------|-------|
-| 17 | Construcción del panel de gestión administrativa de inventario | 1 día | Hito II (FI) | ⚠️ Parcial | CRUD productos, tabla movimientos. Falta dashboard consolidado |
+| 17 | Construcción del panel de gestión administrativa de inventario | 1 día | Hito II (FI) | ⚠️ Parcial | CRUD productos, tabla movimientos. Falta dashboard consolidado (issue #25) |
 | 18 | Desarrollo del sub-módulo de alertas de stock crítico | 1 día | 17 (FI) | ✅ | Alertas visuales en nav + filtro en tabla |
 | 19 | Implementación del algoritmo de actualización masiva de precios | 1 día | 18 (FI) | ✅ | Modal con % global de ajuste |
 | 20 | Desarrollo de interfaz para recepción y registro de mercancía | 1 día | 19 (FI) | ✅ | Listado + detalle + formulario creación (PR #53 mergeado) |
 | 21 | Programación de restricciones y validaciones del lado del servidor | 1 día | 20 (FI) | ✅ | Zod schemas, RLS, validaciones server-side |
-| 22 | Implementación del procesamiento numérico fraccionado | 1 día | 21 (FI) | ✅ | Migraciones + UI + docs. Scope extendido con tipo_unidad/unidad_base/factor_conversion |
-| 23 | Simulación de carga integral con datos históricos | 1 día | 22 (FI) | ❌ | Seed data para pruebas |
-| 24 | Documentación técnica de la arquitectura de stock | 1 día | 23 (FI) | ❌ | Docs de arquitectura |
-| **Hito III** | ◆ Módulo de control de inventarios operativo y validado | — | 24 (FI) | ⏳ |
+| 22 | Implementación del procesamiento numérico fraccionado | 1 día | 21 (FI) | ✅ | Migraciones + UI + docs. Scope extendido con tipo_unidad/unidad_base/factor_conversion (A22) |
+| 23 | Simulación de carga integral con datos históricos | 1 día | 22 (FI) | ⏳ | Seed data para pruebas (issue #64) |
+| 24 | Documentación técnica de la arquitectura de stock | 1 día | 23 (FI) | ✅ | Docs de arquitectura (A24: docs/inventory-architecture.md, database-schema.md) |
+| **Hito III** | ◆ Módulo de control de inventarios operativo y validado | — | 24 (FI) | ⚠️ | Pendiente solo la actividad 23 |
 
-### FASE IV: Optimización de Mostrador y Conciliación (Días 25–32) ⏳
+### FASE IV: Optimización de Mostrador y Conciliación (Días 25–32) ✅
 **Color**: Naranja (#FB8C00)
 **Correspondencia científica**: Experimentación (continuación)
-**Hito**: Motor transaccional estabilizado (Día 32)
+**Hito**: Motor transaccional estabilizado (Día 32) — ✅ Completado
 
 | # | Actividad | Duración | Dependencia | Estado |
 |---|-----------|----------|-------------|--------|
-| 25 | Maquetado de la terminal de ventas de alta velocidad | 1 día | Hito III (FI) | ⏳ |
-| 26 | Desarrollo del motor de búsqueda predictiva en mostrador | 1 día | 25 (FI) | ⏳ |
-| 27 | Automatización de venta express (perfil Consumidor Final) | 1 día | 26 (FI) | ⏳ |
-| 28 | Desarrollo del calculador síncrono de transacciones (carrito) | 1 día | 27 (FI) | ⏳ |
-| 29 | Programación del disparador transaccional (descuento de stock) | 1 día | 28 (FI) | ⏳ |
-| 30 | Desarrollo del módulo de cierre financiero automatizado | 1 día | 29 (FI) | ⏳ |
-| 31 | Integración del módulo de notas de venta en PDF | 1 día | 30 (FI) | ⏳ |
-| 32 | Pruebas de estrés y simulaciones de cierre entre turnos | 1 día | 31 (FI) | ⏳ |
-| **Hito IV** | ◆ Motor transaccional y conciliación express estabilizados | — | 32 (FI) | ⏳ |
+| 25 | Maquetado de la terminal de ventas de alta velocidad | 1 día | Hito III (FI) | ✅ |
+| 26 | Desarrollo del motor de búsqueda predictiva en mostrador | 1 día | 25 (FI) | ✅ |
+| 27 | Automatización de venta express (perfil Consumidor Final) | 1 día | 26 (FI) | ✅ |
+| 28 | Desarrollo del calculador síncrono de transacciones (carrito) | 1 día | 27 (FI) | ✅ |
+| 29 | Programación del disparador transaccional (descuento de stock) | 1 día | 28 (FI) | ✅ |
+| 30 | Desarrollo del módulo de cierre financiero automatizado | 1 día | 29 (FI) | ✅ |
+| 31 | Integración del módulo de notas de venta en PDF | 1 día | 30 (FI) | ✅ |
+| 32 | Pruebas de estrés y simulaciones de cierre entre turnos | 1 día | 31 (FI) | ✅ |
+| **Hito IV** | ◆ Motor transaccional y conciliación express estabilizados | — | 32 (FI) | ✅ |
 
-### FASE V: Validación en Campo, Implantación y Evaluación (Días 33–40) ⏳
+### FASE V: Validación en Campo, Implantación y Evaluación (Días 33–40) ⚠️
 **Color**: Púrpura (#6A1B9A)
 **Correspondencia científica**: Análisis → Conclusión
-**Hito**: Sistema implantado y acta firmada (Día 40)
+**Hito**: Sistema implantado y acta firmada (Día 40) — ⏳ Pendiente (3/8 tareas)
 
 | # | Actividad | Duración | Dependencia | Estado |
 |---|-----------|----------|-------------|--------|
-| 33 | Pruebas integrales de concurrencia (multidispositivo) | 1 día | Hito IV (FI) | ⏳ |
-| 34 | Construcción de la matriz de aceptación del sistema | 1 día | 33 (FI) | ⏳ |
-| 35 | Despliegue de la plataforma web en Vercel (producción) | 1 día | 34 (FI) | ⏳ |
+| 33 | Pruebas integrales de concurrencia (multidispositivo) | 1 día | Hito IV (FI) | ✅ |
+| 34 | Construcción de la matriz de aceptación del sistema | 1 día | 33 (FI) | ✅ |
+| 35 | Despliegue de la plataforma web en Vercel (producción) | 1 día | 34 (FI) | ✅ |
 | 36 | Carga masiva inicial e indexación de artículos | 1 día | 35 (FI) | ⏳ |
 | 37 | Instalación física y configuración de navegadores en terminales | 1 día | 36 (FI) | ⏳ |
 | 38 | Plan de inducción técnica y capacitación al personal | 1 día | 37 (FI) | ⏳ |
@@ -128,5 +128,6 @@
 ## Notas Adicionales
 
 - **Ruta crítica**: Todas las actividades están en secuencia lineal (cada una depende de la anterior), por lo tanto la ruta crítica comprende la totalidad del cronograma de 40 días.
+- **Desviación ejecutada**: La actividad 24 (documentación de stock) se completó sin esperar la 23 (carga de datos históricos), que quedó diferida como follow-up (issue #64). Al actualizar el Gantt, marcar la 24 como terminada y mantener la 23 pendiente sin reencadenarla.
 - **Impresión grande**: Para imprimir el diagrama en tamaño grande (ej. tabloide o A2), exportar desde GanttPRO con la opción de "Ajustar a página" desactivada y escalar al 100% para máxima legibilidad.
 - **Actualizaciones**: Si alguna actividad se reprograma durante la ejecución, actualizar el Gantt en GanttPRO y reexportar la imagen.
