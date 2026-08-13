@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.8.0...v1.9.0) (2026-08-13)
+
+### Features
+
+* **db:** complete seed data with suppliers, products and inventory movements ([#108](https://github.com/Deadflight/dona-maria-erp/issues/108)) ([b8189b7](https://github.com/Deadflight/dona-maria-erp/commit/b8189b7eb1c197e361ed887ec31232932081518d))
+
 ## [1.8.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.7.1...v1.8.0) (2026-08-13)
 
 ### Features
