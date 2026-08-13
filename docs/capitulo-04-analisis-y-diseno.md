@@ -575,7 +575,7 @@ src/
 
 ### 4.5.4 Arquitectura de Red del Establecimiento
 
-La solución se concibe como un sistema web hospedado en la nube, por lo que la infraestructura de red requerida en el local comercial es mínima: una conexión básica a Internet y una red local (LAN) en topología de estrella que interconecta las terminales de trabajo con el equipo de conectividad del proveedor de servicios. No se requiere servidor local, puesto que la aplicación y la base de datos residen en Vercel y Supabase respectivamente, lo que elimina la exposición del establecimiento a fallas eléctricas y pérdidas de datos (requerimiento no funcional RNF-01).
+La solución se concibe como un sistema web hospedado en la nube, por lo que la infraestructura de red requerida en el local comercial es mínima: el establecimiento ya dispone del router del proveedor Inter (fibra óptica), cuyos puertos LAN integrados conforman una red local (LAN) en topología de estrella donde se conectan directamente las terminales de trabajo. No se requiere servidor local ni switch adicional, puesto que la aplicación y la base de datos residen en Vercel y Supabase respectivamente, lo que elimina la exposición del establecimiento a fallas eléctricas y pérdidas de datos (requerimiento no funcional RNF-01).
 
 ```
                     ┌──────────────────────────────────────────────┐
@@ -596,15 +596,9 @@ La solución se concibe como un sistema web hospedado en la nube, por lo que la 
                             │ HTTPS/TLS (puerto 443)
                             │
                     ┌───────┴──────────────────────────────────────┐
-                    │        MODEM/ROUTER DEL PROVEEDOR (ISP)      │
-                    │        ADSL / Cable / Fibra / LTE            │
-                    │        (DHCP, NAT, Firewall)                 │
-                    └──────────────────────────────────────────────┘
-                                      │  Ethernet UTP Cat5e/Cat6
-                                      ▼
-                    ┌──────────────────────────────────────────────┐
-                    │          SWITCH DE RED LOCAL (LAN)           │
-                    │               10/100/1000 Mbps               │
+                    │   ROUTER DEL ISP (INTER) — FIBRA ÓPTICA       │
+                    │   Puertos LAN integrados (DHCP, NAT, Wi-Fi)   │
+                    │   Firewall (equipo residencial del proveedor) │
                     └──────────────────────────────────────────────┘
                           │                 │              │
             Ethernet UTP   │   Ethernet UTP  │   Ethernet UTP
@@ -612,7 +606,7 @@ La solución se concibe como un sistema web hospedado en la nube, por lo que la 
               ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
               │ TERMINAL 1       │ │ TERMINAL 2       │ │ IMPRESORA DE     │
               │ Mostrador (POS)  │ │ Administración   │ │ TICKETS TÉRMICA  │
-              │ Navegador Web    │ │ Navegador Web    │ │ (Opcional, LAN)  │
+              │ Navegador Web    │ │ Navegador Web    │ │ (Opcional)       │
               │ (Chrome/Edge)    │ │ Reportes/Invent. │ │                  │
               └──────────────────┘ └──────────────────┘ └──────────────────┘
 ```
@@ -621,8 +615,7 @@ Los componentes de red y su función se describen en la siguiente tabla:
 
 | Componente | Cantidad | Función | Conexión / Protocolo |
 |------------|----------|---------|----------------------|
-| Modem/router del proveedor (ISP) | 1 | Acceso a Internet, asignación de direcciones IP locales (DHCP) y traducción de direcciones (NAT) | ADSL/Cable/Fibra/LTE hacia la WAN |
-| Switch de red local | 1 | Interconexión de las terminales del local en topología de estrella | Ethernet UTP Cat5e/Cat6, 10/100/1000 Mbps |
+| Router del ISP (Inter) | 1 | Acceso a Internet por fibra óptica, asignación de direcciones IP locales (DHCP), traducción de direcciones (NAT) y firewall; sus puertos LAN integrados conectan directamente las terminales | Fibra óptica hacia la WAN; Ethernet UTP Cat5e/Cat6 hacia las terminales |
 | Terminal de mostrador (POS) | 1 | Atención de ventas con búsqueda predictiva, carrito y ticket | HTTPS/TLS (puerto 443) hacia Vercel y Supabase |
 | Terminal de administración | 1 (recomendado) | Gestión de inventario, clientes, créditos, conciliación y usuarios | HTTPS/TLS (puerto 443) hacia Vercel y Supabase |
 | Impresora de tickets térmica | 1 (opcional) | Impresión del comprobante de venta al cierre de la transacción | USB o red local (Ethernet/Wi-Fi) |
