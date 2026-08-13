@@ -19,7 +19,7 @@
 
 ## Estructura de Fases y Actividades
 
-> **Estado real al 13/08/2026**: Fases I-II ✅ Completas | Fase III ⚠️ En progreso (7/8 tareas) | Fase IV ✅ Completa | Fase V ⚠️ En progreso (3/8 tareas)
+> **Estado real al 13/08/2026**: Fases I-II ✅ Completas | Fase III ✅ Completa (8/8 tareas) | Fase IV ✅ Completa | Fase V ⚠️ En progreso (4/8 tareas)
 
 ### FASE I: Diagnóstico Operativo y Brechas de Control Financiero (Días 1–8) ✅
 **Color**: Azul (#1565C0)
@@ -55,10 +55,10 @@
 | 16 | Pruebas de integración y conectividad (Server Actions) | 1 día | 15 (FI) | ✅ |
 | **Hito II** | ◆ Arquitectura lógica y entorno tecnológico inicializado | — | 16 (FI) | ✅ |
 
-### FASE III: Mitigación del Descontrol de Existencias (Días 17–24) ⚠️
+### FASE III: Mitigación del Descontrol de Existencias (Días 17–24) ✅
 **Color**: Naranja (#E65100)
 **Correspondencia científica**: Experimentación
-**Hito**: Módulo de inventario operativo (Día 24) — ⚠️ Pendiente (7/8 tareas; falta solo la carga de datos históricos)
+**Hito**: Módulo de inventario operativo (Día 24) — ✅ Completado
 
 | # | Actividad | Duración | Dependencia | Estado | Notas |
 |---|-----------|----------|-------------|--------|-------|
@@ -68,9 +68,9 @@
 | 20 | Desarrollo de interfaz para recepción y registro de mercancía | 1 día | 19 (FI) | ✅ | Listado + detalle + formulario creación (PR #53 mergeado) |
 | 21 | Programación de restricciones y validaciones del lado del servidor | 1 día | 20 (FI) | ✅ | Zod schemas, RLS, validaciones server-side |
 | 22 | Implementación del procesamiento numérico fraccionado | 1 día | 21 (FI) | ✅ | Migraciones + UI + docs. Scope extendido con tipo_unidad/unidad_base/factor_conversion (A22) |
-| 23 | Simulación de carga integral con datos históricos | 1 día | 22 (FI) | ⏳ | Seed data para pruebas (issue #64) |
+| 23 | Simulación de carga integral con datos históricos | 1 día | 22 (FI) | ✅ | Seed data aplicado en producción (issue #64, PR #108 mergeado) |
 | 24 | Documentación técnica de la arquitectura de stock | 1 día | 23 (FI) | ✅ | Docs de arquitectura (A24: docs/inventory-architecture.md, database-schema.md) |
-| **Hito III** | ◆ Módulo de control de inventarios operativo y validado | — | 24 (FI) | ⚠️ | Pendiente solo la actividad 23 |
+| **Hito III** | ◆ Módulo de control de inventarios operativo y validado | — | 24 (FI) | ✅ | Módulo completo (actividad 23 resuelta vía issue #64) |
 
 ### FASE IV: Optimización de Mostrador y Conciliación (Días 25–32) ✅
 **Color**: Naranja (#FB8C00)
@@ -92,14 +92,14 @@
 ### FASE V: Validación en Campo, Implantación y Evaluación (Días 33–40) ⚠️
 **Color**: Púrpura (#6A1B9A)
 **Correspondencia científica**: Análisis → Conclusión
-**Hito**: Sistema implantado y acta firmada (Día 40) — ⏳ Pendiente (3/8 tareas)
+**Hito**: Sistema implantado y acta firmada (Día 40) — ⏳ Pendiente (4/8 tareas)
 
-| # | Actividad | Duración | Dependencia | Estado |
-|---|-----------|----------|-------------|--------|
-| 33 | Pruebas integrales de concurrencia (multidispositivo) | 1 día | Hito IV (FI) | ✅ |
-| 34 | Construcción de la matriz de aceptación del sistema | 1 día | 33 (FI) | ✅ |
-| 35 | Despliegue de la plataforma web en Vercel (producción) | 1 día | 34 (FI) | ✅ |
-| 36 | Carga masiva inicial e indexación de artículos | 1 día | 35 (FI) | ⏳ |
+| # | Actividad | Duración | Dependencia | Estado | Notas |
+|---|-----------|----------|-------------|--------|-------|
+| 33 | Pruebas integrales de concurrencia (multidispositivo) | 1 día | Hito IV (FI) | ✅ | |
+| 34 | Construcción de la matriz de aceptación del sistema | 1 día | 33 (FI) | ✅ | |
+| 35 | Despliegue de la plataforma web en Vercel (producción) | 1 día | 34 (FI) | ✅ | |
+| 36 | Carga masiva inicial e indexación de artículos | 1 día | 35 (FI) | ✅ | Carga de 30 productos + proveedores aplicada en la BD cloud (issue #64, seed) |
 | 37 | Instalación física y configuración de navegadores en terminales | 1 día | 36 (FI) | ⏳ |
 | 38 | Plan de inducción técnica y capacitación al personal | 1 día | 37 (FI) | ⏳ |
 | 39 | Capacitación en auditoría financiera a la propietaria | 1 día | 38 (FI) | ⏳ |
@@ -128,6 +128,6 @@
 ## Notas Adicionales
 
 - **Ruta crítica**: Todas las actividades están en secuencia lineal (cada una depende de la anterior), por lo tanto la ruta crítica comprende la totalidad del cronograma de 40 días.
-- **Desviación ejecutada**: La actividad 24 (documentación de stock) se completó sin esperar la 23 (carga de datos históricos), que quedó diferida como follow-up (issue #64). Al actualizar el Gantt, marcar la 24 como terminada y mantener la 23 pendiente sin reencadenarla.
+- **Desviación ejecutada**: La actividad 24 (documentación de stock) se completó sin esperar la 23 (carga de datos históricos), que quedó diferida como follow-up (issue #64) y fue resuelta posteriormente: el seed data se aplicó en la BD cloud de producción y su código se mergeó a `main` vía PR #108.
 - **Impresión grande**: Para imprimir el diagrama en tamaño grande (ej. tabloide o A2), exportar desde GanttPRO con la opción de "Ajustar a página" desactivada y escalar al 100% para máxima legibilidad.
 - **Actualizaciones**: Si alguna actividad se reprograma durante la ejecución, actualizar el Gantt en GanttPRO y reexportar la imagen.
