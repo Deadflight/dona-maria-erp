@@ -153,6 +153,24 @@ Esta ley establece el marco jurídico para la prevención, investigación y sanc
 
 La aplicación de esta normativa al presente proyecto es directa y práctica: el sistema de información debe incorporar **medidas técnicas de protección** que prevengan el acceso no autorizado a la base de datos, la manipulación indebida de los registros de inventario y ventas, y el robo de información confidencial de clientes. En el diseño del sistema, esto se aborda mediante la implementación de autenticación robusta con Supabase Auth, políticas de Row Level Security en cada tabla de la base de datos, y registro de auditoría de las operaciones críticas. Estas medidas no solo protegen el negocio, sino que también sitúan al sistema en cumplimiento con la legislación vigente en materia de delitos informáticos.
 
+**Ley Orgánica de Protección de Datos Personales (LOPDP) (Gaceta Oficial N° 6.180 Extraordinario, 26 de diciembre de 2018)**
+
+Esta ley regula el tratamiento de los datos personales en Venezuela, estableciendo los principios rectores que deben orientar su uso: licitud, finalidad, proporcionalidad, calidad de los datos, consentimiento del titular y deber de confidencialidad. Su objeto es garantizar la protección integral de los datos personales recabados por entes públicos o privados, incluyendo expresamente los tratamientos automatizados.
+
+La aplicación de esta normativa al sistema desarrollado es directa, pues la plataforma almacena datos personales de los clientes de la ferretería — nombres, números telefónicos, historial de compras y saldos de crédito —. En coherencia con estos principios, el sistema: (a) limita el **consentimiento y la finalidad**, restringiendo la captura de datos a los estrictamente necesarios para la operación comercial; (b) garantiza la **calidad de los datos** mediante la validación de entrada en el formulario de clientes; (c) protege la **confidencialidad** con cifrado en tránsito (HTTPS/TLS) y políticas de Row Level Security en la base de datos; y (d) permite la **trazabilidad** del tratamiento mediante el registro de auditoría de las operaciones críticas.
+
+**Ley de Infogobierno (Decreto N° 3.404, Gaceta Oficial N° 38.095, 28 de diciembre de 2004)**
+
+La Ley de Infogobierno establece la obligación de los órganos y entes del Poder Público de usar las tecnologías de información para mejorar la prestación de servicios a los ciudadanos, así como el deber de incorporar soluciones tecnológicas en la tramitación de sus procesos. Aunque su ámbito de aplicación primario es el sector público, sus principios orientan la adopción de tecnología en la gestión de información de cualquier organización.
+
+En el contexto de este proyecto, la Ley de Infogobierno fundamenta la **digitalización de los procesos administrativos** del comercio: la sustitución del registro manual en cuaderno por un sistema de información estructurado se alinea con el espíritu de la norma, que promueve la modernización de la gestión mediante herramientas tecnológicas, la transparencia en el registro de la información y la conservación de los datos en medios electrónicos confiables. Además, la propuesta es coherente con la formalización progresiva del establecimiento frente a los registros y trámites digitales del Estado venezolano.
+
+**Ley sobre Mensajes de Datos y Firmas Electrónicas (Gaceta Oficial N° 37.148, 28 de febrero de 2001)**
+
+Esta ley reconoce la validez jurídica y el valor probatorio de los mensajes de datos y de las firmas electrónicas, estableciendo que los datos generados, enviados, recibidos o almacenados por medios electrónicos tienen plena eficacia legal y pueden ser utilizados como medio de prueba en cualquier proceso judicial o administrativo, siempre que cumplan con los requisitos de integridad, inalterabilidad y conservación.
+
+Esta normativa es especialmente relevante para el sistema desarrollado porque el registro de ventas, los comprobantes emitidos al cierre de cada transacción y el historial de créditos y abonos se generan y almacenan íntegramente por medios electrónicos. El diseño del sistema garantiza la **integridad e inalterabilidad** de estos mensajes de datos mediante: (a) la persistencia de los registros de venta en la base de datos gestionada por Supabase/PostgreSQL, con protección ante pérdidas por fallas eléctricas; (b) el sellado temporal automático de cada transacción; y (c) el registro de auditoría que permite reconstruir la trazabilidad completa de las operaciones, otorgándoles valor probatorio ante eventuales discrepancias contables o reclamos de clientes.
+
 ---
 
 ## 2.4 Definición de Términos Básicos
