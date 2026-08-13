@@ -202,7 +202,7 @@ El cumplimiento de los objetivos específicos planteados en esta investigación 
 | 34 | Construcción de la Matriz de Aceptación del Sistema (documentación de casos de prueba) | 2h |
 | 35 | Despliegue de la Plataforma Web en Producción a través del servicio cloud de Vercel | 2h |
 | 36 | Carga Masiva Inicial e indexación de los 50 artículos de mayor rotación comercial del negocio | 2h |
-| 37 | Instalación Física de Terminales y configuración de navegadores locales en los equipos del comercio | 1h |
+| 37 | Instalación y configuración del sistema y del navegador local en el equipo del comercio | 1h |
 | 38 | Plan de Inducción Técnica y capacitación guiada al personal de mostrador | 2h |
 | 39 | Capacitación en Auditoría Financiera a la propietaria para la sustitución definitiva del cuaderno | 2h |
 | 40 | Evaluación de Impacto Real (tiempos de atención antes vs. después), recolección de firmas y cierre del informe | 3h |

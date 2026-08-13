@@ -573,6 +573,58 @@ src/
     └── globals.css                # Tailwind + variables
 ```
 
+### 4.5.4 Arquitectura de Red del Establecimiento
+
+La solución se concibe como un sistema web hospedado en la nube, por lo que la infraestructura de red requerida en el local comercial es mínima y ya existe: el establecimiento dispone del router del proveedor Inter (fibra óptica) y de una laptop que constituye la terminal de trabajo del sistema. El teléfono celular del personal se utiliza como dispositivo de apoyo (Pago Móvil, WhatsApp) y no ejecuta el sistema. No se requiere servidor local, switch, impresora de tickets ni equipos adicionales, puesto que la aplicación y la base de datos residen en Vercel y Supabase respectivamente, lo que elimina la exposición del establecimiento a fallas eléctricas y pérdidas de datos (requerimiento no funcional RNF-01).
+
+```
+                    ┌──────────────────────────────────────────────┐
+                    │            INTERNET (WAN)                    │
+                    └──────────────────────────────────────────────┘
+                                      ▲
+                                      │ HTTPS/TLS (puerto 443)
+                    ┌─────────────────┴─────────────────┐
+                    │                                   │
+              HTTPS │                            HTTPS  │
+                    ▼                                   ▼
+        ┌───────────────────────┐         ┌───────────────────────┐
+        │     VERCEL (Cloud)    │         │    SUPABASE (Cloud)   │
+        │  Next.js App (SSR)    │◄───────►│  PostgreSQL + Auth    │
+        │  Server Actions       │  HTTPS  │  Edge Functions       │
+        └───────────────────────┘         └───────────────────────┘
+                            ▲
+                            │ HTTPS/TLS (puerto 443)
+                            │
+                    ┌───────┴──────────────────────────────────────┐
+                    │   ROUTER DEL ISP (INTER) — FIBRA ÓPTICA       │
+                    │   Puertos LAN integrados (DHCP, NAT, Wi-Fi)   │
+                    │   Firewall (equipo residencial del proveedor) │
+                    └──────────────────────────────────────────────┘
+                          │                          │
+            Ethernet UTP   │                          │ Wi-Fi (IEEE 802.11)
+                          ▼                          ▼
+              ┌──────────────────┐        ┌──────────────────┐
+              │ LAPTOP (TERMINAL  │        │  TELÉFONO        │
+              │  DE TRABAJO)      │        │  CELULAR         │
+              │  Navegador Web    │        │  (Apoyo: Pago    │
+              │  (Chrome/Edge)    │        │  Móvil, WhatsApp)│
+              │  Roles: POS y     │        │  Fuera del       │
+              │  Administración   │        │  sistema         │
+              └──────────────────┘        └──────────────────┘
+```
+
+Los componentes de red y su función se describen en la siguiente tabla:
+
+| Componente | Cantidad | Función | Conexión / Protocolo |
+|------------|----------|---------|----------------------|
+| Router del ISP (Inter) | 1 | Acceso a Internet por fibra óptica, asignación de direcciones IP locales (DHCP), traducción de direcciones (NAT) y firewall | Fibra óptica hacia la WAN; puertos LAN integrados y Wi-Fi hacia los dispositivos |
+| Laptop (terminal de trabajo) | 1 | Única terminal del sistema: atención de ventas en mostrador (POS) y administración (inventario, clientes, créditos, conciliación, usuarios) según el rol de sesión | Ethernet UTP Cat5e/Cat6 o Wi-Fi; HTTPS/TLS (puerto 443) hacia Vercel y Supabase |
+| Teléfono celular (apoyo) | 1 | Dispositivo existente del personal: Pago Móvil, WhatsApp y respaldo de conectividad (datos móviles LTE) ante caída de la fibra; no ejecuta el sistema | Wi-Fi del router o datos móviles LTE; fuera del sistema |
+
+La comunicación entre la laptop y los servicios en la nube se realiza exclusivamente mediante el protocolo HTTPS sobre TLS, lo que garantiza la confidencialidad e integridad de los datos en tránsito: credenciales de acceso, montos de venta y datos de clientes. La base de datos reside en Supabase con políticas de seguridad a nivel de fila (RLS) y autenticación mediante JWT, de modo que un atacante que acceda a la red local no puede leer ni modificar la información sin una sesión válida. En caso de interrupción del servicio de fibra óptica, la laptop pierde la capacidad de registrar nuevas ventas, razón por la cual se recomienda como respaldo la compartición de datos móviles (LTE) del teléfono celular existente hacia la laptop o un plan de contingencia manual temporal, en consonancia con el requisito de disponibilidad RNF-01 (>= 99.5%).
+
+La arquitectura de red propuesta se justifica por tres criterios: (a) **económico**, al reutilizar la conexión a Internet existente del comercio sin adquirir servidores ni equipos especializados; (b) **operativo**, porque la administración de los servicios queda delegada a los proveedores cloud (Vercel y Supabase) sin personal técnico permanente en el local; y (c) **de resiliencia**, porque los datos se respaldan en infraestructura gestionada remota, protegida ante las fallas eléctricas recurrentes que afectan la zona.
+
 ---
 
 ## 4.6 Diseño de Interfaces
