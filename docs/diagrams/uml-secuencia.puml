@@ -1,0 +1,166 @@
+@startuml
+title Diagramas de Secuencia - Sistema El Imperio Dona Maria
+
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowColor #2C3E50
+skinparam sequenceActorBorderColor #2C3E50
+skinparam sequenceActorFontSize 12
+skinparam sequenceActorFontStyle bold
+skinparam sequenceParticipantBorderColor #34495E
+skinparam sequenceParticipantFontSize 11
+skinparam sequenceLifeLineBorderColor #34495E
+skinparam sequenceGroupBorderColor #2C3E50
+skinparam sequenceGroupFontSize 11
+skinparam noteBorderColor #2C3E50
+
+' =============================================
+' ESCENARIO A: VENTA AL CONTADO (CU-02)
+' =============================================
+actor "Operador de\nMostrador" as Operador
+participant "UI POS\n(Next.js)" as UI
+participant "Server Action" as SA
+participant "Supabase\n(PostgreSQL RPC)" as SUPABASE
+
+Operador -> UI : Busca producto por nombre
+activate UI
+UI -> SUPABASE : Consulta productos (read)
+activate SUPABASE
+SUPABASE --> UI : Resultados con precio y stock
+deactivate SUPABASE
+UI --> Operador : Muestra coincidencias en tiempo real
+
+Operador -> UI : Agrega items al carrito, selecciona\nmetodo de pago y banco
+Operador -> UI : Confirma venta al contado
+
+UI -> SA : createSale(items, metodo_pago, banco)
+activate SA
+SA -> SA : Valida sesion y rol (seller/admin)
+SA -> SA : Valida con Zod (saleCreateSchema)
+SA -> SUPABASE : RPC create_sale_with_movements\n(p_cliente_id, p_vendedor_id, p_metodo_pago,\np_subtotal, p_impuesto, p_total, p_items)
+activate SUPABASE
+SUPABASE -> SUPABASE : Transaccion: valida stock, descuenta,\nregistra venta + detalles_venta +\npagos_venta + inventory_movements
+
+alt Stock insuficiente
+  SUPABASE --> SA : Error "Stock insuficiente"
+  deactivate SUPABASE
+  SA --> UI : Error "Stock insuficiente"
+  deactivate SA
+  UI --> Operador : Muestra error "Stock insuficiente"
+else Exito
+  SUPABASE --> SA : venta_id + numero_factura
+  deactivate SUPABASE
+  SA -> SA : revalidatePath(/sales) y (/pos)
+  SA --> UI : venta_id + numero_factura
+  deactivate SA
+  UI --> Operador : Muestra ticket / nota de venta
+end
+deactivate UI
+
+' =============================================
+' ESCENARIO B: VENTA A CREDITO (CU-09)
+' =============================================
+newpage Escenario B: Venta a Credito (CU-09)
+
+actor "Operador de\nMostrador" as Operador
+participant "UI POS\n(Next.js)" as UI
+participant "Server Action" as SA
+participant "Supabase\n(PostgreSQL RPC)" as SUPABASE
+
+Operador -> UI : Busca producto y selecciona\ncliente con credito
+activate UI
+UI -> SUPABASE : Consulta productos y cliente (read)
+activate SUPABASE
+SUPABASE --> UI : Producto, cliente y saldo disponible
+deactivate SUPABASE
+Operador -> UI : Agrega items al carrito y\nconfirma venta a credito
+
+UI -> SA : createSale(items, cliente_id)
+activate SA
+SA -> SA : Valida sesion y rol (seller/admin)
+SA -> SA : Valida con Zod (saleCreateSchema)
+SA -> SUPABASE : RPC create_sale_with_movements\n(p_cliente_id, p_metodo_pago='credito')
+activate SUPABASE
+SUPABASE -> SUPABASE : Verifica limite de credito:\nsaldo_actual + total <= limite_credito
+
+alt Excede limite de credito
+  SUPABASE --> SA : Error "excede su limite de credito"
+  deactivate SUPABASE
+  SA --> UI : Error "excede su limite de credito"
+  deactivate SA
+  UI --> Operador : Muestra error de limite de credito
+else Exito
+  SUPABASE -> SUPABASE : Transaccion: descuenta stock, registra\nventa + detalles_venta + pago (credito)\ny crea registro en creditos con saldo_pendiente
+  SUPABASE --> SA : venta_id + numero_factura
+  deactivate SUPABASE
+  SA -> SA : revalidatePath(/sales) y (/pos)
+  SA --> UI : venta_id + numero_factura
+  deactivate SA
+  UI --> Operador : Confirma venta a credito
+end
+deactivate UI
+
+' =============================================
+' ESCENARIO C: REGISTRO DE ABONO (CU-10)
+' =============================================
+newpage Escenario C: Registro de Abono (CU-10)
+
+actor "Operador de\nMostrador" as Operador
+participant "UI /credits\n(Next.js)" as UI
+participant "Server Action" as SA
+participant "Supabase\n(PostgreSQL RPC)" as SUPABASE
+
+Operador -> UI : Abre AbonoDialog del credito seleccionado
+activate UI
+UI --> Operador : Muestra saldo_pendiente
+Operador -> UI : Ingresa monto, metodo de pago y referencia
+UI -> UI : Validacion previa: monto <= saldo_pendiente
+UI -> SA : registerAbono(credito_id, monto,\nmetodo_pago, referencia)
+activate SA
+SA -> SA : Valida sesion y rol (seller/admin)
+SA -> SA : Valida con Zod (abonoSchema)
+SA -> SUPABASE : RPC register_abono\n(p_credito_id, p_monto, p_metodo_pago, p_referencia)
+activate SUPABASE
+SUPABASE -> SUPABASE : Valida que el abono no exceda el saldo,\nactualiza saldo_pendiente, inserta\nabono_creditos y marca pagado si llega a 0
+
+alt Abono excede saldo pendiente
+  SUPABASE --> SA : Error "abono excede saldo pendiente"
+  deactivate SUPABASE
+  SA --> UI : Error
+  deactivate SA
+  UI --> Operador : Muestra error en el dialogo
+else Exito
+  SUPABASE --> SA : credito_id, saldo_pendiente,\nsaldo_actual, estado
+  deactivate SUPABASE
+  SA -> SA : revalidatePath(/credits)
+  SA --> UI : credito_id, saldo_pendiente,\nsaldo_actual, estado
+  deactivate SA
+  UI --> Operador : Toast "Abono registrado"
+end
+deactivate UI
+
+' =============================================
+' ESCENARIO D: CIERRE DE CAJA (CU-12/CU-13)
+' =============================================
+newpage Escenario D: Cierre de Caja y Conciliacion (CU-12/CU-13)
+
+actor "Administrador" as Admin
+participant "UI Conciliacion\n(Next.js)" as UI
+participant "Server Action" as SA
+participant "Supabase\n(PostgreSQL RPC)" as SUPABASE
+
+Admin -> UI : Solicita cierre de caja del dia
+activate UI
+UI -> SA : Solicita resumen de cierre del dia
+activate SA
+SA -> SUPABASE : Consulta ventas y pagos del dia\ngrupados por metodo de pago y banco
+activate SUPABASE
+SUPABASE --> SA : Agregados por metodo (efectivo, pago_movil,\ntransferencia, divisa, mixto) y banco
+deactivate SUPABASE
+SA --> UI : Agregados por metodo de pago y banco
+deactivate SA
+UI --> Admin : Muestra conciliacion del dia
+Admin -> UI : Valida la conciliacion
+Admin -> UI : Confirma cierre de caja
+deactivate UI
+
+@enduml

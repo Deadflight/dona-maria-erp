@@ -1079,13 +1079,49 @@ El diseño de procesos se aborda desde dos perspectivas complementarias. Por un 
 
 ---
 
-## 4.7 Resumen del Capítulo
+## 4.7 Diagramas UML de Secuencia
 
-Este capítulo documentó el análisis de requerimientos (5 funcionales, 5 no funcionales) y el diseño técnico del sistema: 15 casos de uso, modelo entidad-relación con 10 tablas, esquema DDL con constraints y RLS, arquitectura cliente-servidor con Next.js 16 + Supabase, estructura del proyecto, wireframes descriptivos y 4 flujos de proceso detallados.
+Para complementar el diseño de procesos presentado en la sección 4.6, se modelaron los diagramas de secuencia UML de los escenarios más críticos del sistema. Cada diagrama describe la interacción temporal entre los actores, la interfaz de usuario (Next.js), las Server Actions y la base de datos (RPC de Supabase/PostgreSQL), evidenciando la validación de sesión y rol, la validación de esquemas con Zod y la atomicidad de las transacciones. Los diagramas se elaboraron con PlantUML y su fuente está disponible en [uml-secuencia.puml](diagrams/uml-secuencia.puml).
+
+### 4.7.1 Venta al Contado
+
+Corresponde al caso de uso CU-02 (Vender al Contado). El operador busca el producto por nombre, la interfaz consulta el catálogo y el operador conforma el carrito seleccionando el método de pago y el banco receptor. Al confirmar, la Server Action `createSale` valida la sesión y el rol del usuario, valida los datos con el esquema `saleCreateSchema` y ejecuta la RPC transaccional `create_sale_with_movements`, que valida el stock disponible, descuenta el inventario y registra la venta, sus detalles, los pagos y los movimientos de inventario en una sola operación atómica. Ante stock insuficiente, la transacción se revierte y se informa el error a la interfaz; en caso de éxito se revalidan las rutas `/sales` y `/pos` y se muestra el ticket de venta.
+
+**Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
+
+### 4.7.2 Venta a Crédito
+
+Corresponde al caso de uso CU-09 (Vender a Crédito). El flujo es análogo al contado, pero el operador selecciona un cliente con crédito habilitado y envía su identificador en la venta. La RPC `create_sale_with_movements` verifica que el nuevo saldo del cliente no exceda su límite de crédito (`saldo_actual + total <= limite_credito`); si lo excede, la venta se rechaza con el mensaje "excede su límite de crédito". En caso contrario, la transacción descuenta stock, registra la venta con sus detalles y el pago (método crédito), y crea el registro en `creditos` con su `saldo_pendiente`.
+
+**Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
+
+### 4.7.3 Registro de Abono
+
+Corresponde al caso de uso CU-10 (Registrar Abono a Crédito). El operador abre el diálogo `AbonoDialog` en `/credits` con el crédito seleccionado y su saldo pendiente visible; la interfaz valida previamente que el monto no supere el saldo. La Server Action `registerAbono` valida la sesión, el rol y el esquema `abonoSchema`, y ejecuta la RPC `register_abono`, que valida que el abono no exceda el saldo pendiente, actualiza el `saldo_pendiente`, inserta el registro en `abono_creditos` y marca el crédito como pagado cuando el saldo llega a cero. Al finalizar se revalida `/credits` y se muestra la confirmación "Abono registrado".
+
+**Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
+
+### 4.7.4 Cierre de Caja
+
+Corresponde a los casos de uso CU-12 (Ver Cierre de Caja) y CU-13 (Conciliar Cuentas). El administrador solicita el cierre de caja del día; la Server Action consulta las ventas y pagos de la jornada agrupados por método de pago y banco. Supabase devuelve los agregados (efectivo, pago móvil, transferencia, divisa y mixto por banco) y la interfaz presenta la conciliación, que el administrador valida antes de confirmar el cierre.
+
+**Fuente:** [uml-secuencia.puml](diagrams/uml-secuencia.puml)
 
 ---
 
-## 4.8 Anexo: Catálogo de Productos de Ejemplo
+## 4.8 Diagrama de Clases
+
+El diagrama de clases expresa el modelo del sistema organizado en cuatro capas: **Presentación (Next.js)** con las páginas y componentes de la interfaz; **Aplicación (Server Actions)** con los servicios que orquestan los casos de uso y validan permisos y datos; **Dominio (Entidades)** con las entidades de negocio y sus reglas (venta, producto, cliente, crédito, abono, entre otras); e **Infraestructura (Supabase)** con el cliente, la base de datos PostgreSQL y la autenticación JWT. Las relaciones muestran la dependencia descendente entre capas, la composición de la venta por sus detalles y pagos, y la asociación del crédito con sus abonos y con la tasa de cambio. El diagrama fue elaborado con PlantUML y su fuente está disponible en [uml-clases.puml](diagrams/uml-clases.puml).
+
+---
+
+## 4.9 Resumen del Capítulo
+
+Este capítulo documentó el análisis de requerimientos (5 funcionales, 5 no funcionales) y el diseño técnico del sistema: 15 casos de uso, modelo entidad-relación con 10 tablas, esquema DDL con constraints y RLS, arquitectura cliente-servidor con Next.js 16 + Supabase, estructura del proyecto, wireframes descriptivos, 4 flujos de proceso detallados, 4 diagramas de secuencia UML que cubren los escenarios de venta al contado, venta a crédito, registro de abono y cierre de caja, y un diagrama de clases UML que organiza el sistema en un modelo de cuatro capas (presentación, aplicación, dominio e infraestructura).
+
+---
+
+## 4.10 Anexo: Catálogo de Productos de Ejemplo
 
 | Código | Descripción | Tipo Unidad | Und Base | Precio USD | Stock Mín |
 |--------|-------------|-------------|----------|------------|-----------|

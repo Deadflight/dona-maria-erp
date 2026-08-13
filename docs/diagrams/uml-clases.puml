@@ -1,0 +1,216 @@
+@startuml
+title Diagrama de Clases - Sistema El Imperio Dona Maria
+
+skinparam packageBorderColor #2C3E50
+skinparam packageFontSize 12
+skinparam packageFontStyle bold
+skinparam classBorderColor #34495E
+skinparam classFontSize 11
+skinparam classHeaderBackgroundColor #ECF0F1
+skinparam classFontStyle bold
+
+hide circle
+hide empty members
+
+' =============================================
+' CAPA DE PRESENTACION (Next.js)
+' =============================================
+package "Presentacion (Next.js)" {
+  class PaginaPOS {
+    carrito: CarritoVenta
+    metodo_pago: TEXT
+    banco: TEXT
+    cliente_seleccionado: Cliente
+    buscarProducto()
+    confirmarVenta()
+  }
+
+  class CarritoVenta {
+    items
+    subtotal_usd
+    total_ves
+    agregarItem()
+    eliminarItem()
+    confirmarVenta()
+  }
+
+  class PaginaCredits {
+    creditos: Credito[]
+    filtrarPorEstado()
+    abrirAbonoDialog()
+  }
+
+  class AbonoDialog {
+    credito: Credito
+    monto
+    metodo_pago
+    referencia
+    registrar()
+  }
+}
+
+' =============================================
+' CAPA DE APLICACION (Server Actions)
+' =============================================
+package "Aplicacion (Server Actions)" {
+  class VentasService {
+    createSale()
+    listSales()
+  }
+
+  class CreditosService {
+    listCreditos()
+    registerAbono()
+  }
+
+  class ComprasService {
+    createReceipt()
+  }
+
+  class AuthService {
+    getSession()
+    requireWriteRole()
+  }
+}
+
+' =============================================
+' CAPA DE DOMINIO (Entidades)
+' =============================================
+package "Dominio (Entidades)" {
+  class Venta {
+    id
+    numero_factura
+    subtotal
+    impuesto
+    total
+    metodo_pago
+    estado
+    calcularTotal()
+    validarStock()
+  }
+
+  class DetalleVenta {
+    cantidad
+    precio_unitario
+    descuento
+    subtotal
+  }
+
+  class PagoVenta {
+    monto
+    metodo_pago
+    banco
+    referencia
+  }
+
+  class Producto {
+    sku
+    nombre
+    precio_venta
+    stock_actual
+    stock_minimo
+    descontarStock()
+  }
+
+  class Cliente {
+    nombre
+    rif_cedula
+    limite_credito
+    saldo_actual
+    verificarLimiteCredito()
+  }
+
+  class Credito {
+    monto_original
+    saldo_pendiente
+    tasa_interes
+    cuotas
+    estado
+    registrarAbono()
+    marcarPagado()
+  }
+
+  class AbonoCredito {
+    monto
+    fecha_abono
+    metodo_pago
+  }
+
+  class InventarioMovimiento {
+    cantidad
+    tipo_movimiento
+    stock_resultante
+  }
+
+  class TasaCambio {
+    moneda_origen
+    moneda_destino
+    tasa
+    fuente
+    fecha
+  }
+}
+
+' =============================================
+' CAPA DE INFRAESTRUCTURA (Supabase)
+' =============================================
+package "Infraestructura (Supabase)" {
+  class SupabaseClient {
+    from(tabla)
+    rpc(nombre, params)
+  }
+
+  class PostgreSQL {
+    create_sale_with_movements()
+    register_abono()
+  }
+
+  class SupabaseAuth {
+    JWT
+    signIn()
+    getUserId()
+  }
+}
+
+note right of PostgreSQL
+  RPC create_sale_with_movements:
+  transaccional, valida stock, descuenta y
+  registra en una sola operacion atomica
+end note
+
+note bottom of PostgreSQL
+  RPC register_abono: se serializa, solo un
+  abono gana si excede el saldo pendiente
+end note
+
+' =============================================
+' RELACIONES ENTRE CAPAS
+' =============================================
+
+' --- Presentacion -> Aplicacion ---
+PaginaPOS --> VentasService
+CarritoVenta --> PaginaPOS
+PaginaCredits --> CreditosService
+AbonoDialog --> CreditosService
+
+' --- Aplicacion -> Dominio e Infraestructura ---
+VentasService --> Venta
+VentasService --> SupabaseClient
+CreditosService --> Credito
+CreditosService --> SupabaseClient
+
+' --- Composición y asociaciones en el Dominio ---
+Venta *-- DetalleVenta
+Venta *-- PagoVenta
+Venta --> Producto
+Venta --> Cliente
+Cliente --> Credito
+Credito *-- AbonoCredito
+Producto --> InventarioMovimiento
+Credito --> TasaCambio
+
+' --- Infraestructura ---
+SupabaseClient --> PostgreSQL
+SupabaseClient --> SupabaseAuth
+
+@enduml
