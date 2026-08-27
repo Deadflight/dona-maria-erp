@@ -46,6 +46,9 @@ describe("StockLevelTable", () => {
     stock_minimo: 10,
   }
 
+  const depletedProduct = { ...baseProduct, id: "3", stock_actual: 0 }
+  const anomalyProduct = { ...baseProduct, id: "4", stock_actual: -1 }
+
   it("renders table with product rows", () => {
     render(
       <StockLevelTable
@@ -89,14 +92,28 @@ describe("StockLevelTable", () => {
     expect(screen.queryByText("CRÍTICO")).not.toBeInTheDocument()
   })
 
+  it("shows accessible labels for every stock severity", () => {
+    render(
+      <StockLevelTable
+        initialData={[criticalProduct, depletedProduct, anomalyProduct, okProduct]}
+        error={null}
+      />,
+    )
+
+    expect(screen.getByText("CRÍTICO")).toBeInTheDocument()
+    expect(screen.getByText("AGOTADO")).toBeInTheDocument()
+    expect(screen.getByText("ANOMALÍA")).toBeInTheDocument()
+    expect(screen.getByText("NORMAL")).toBeInTheDocument()
+  })
+
   it("shows empty state when no alerts", () => {
     render(<StockLevelTable initialData={[]} error={null} />)
 
     expect(
-      screen.getByText("No hay productos con stock crítico"),
+      screen.getByText("No hay productos en el resumen de stock"),
     ).toBeInTheDocument()
     expect(
-      screen.getByText("Todos los productos tienen stock suficiente."),
+      screen.getByText("No hay productos activos para mostrar."),
     ).toBeInTheDocument()
   })
 

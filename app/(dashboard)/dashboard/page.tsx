@@ -2,14 +2,16 @@ import { redirect } from "next/navigation"
 import { getSession } from "@/actions/auth"
 import {
   getDashboardKPIs,
-  listStockAlerts,
+  listDashboardStock,
 } from "@/lib/supabase/actions/inventario"
+import { listReceipts } from "@/lib/supabase/actions/compras"
 import type { Database } from "@/types/database"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { KpiCards } from "./_components/kpi-cards"
 import { StockLevelTable } from "./_components/stock-level-table"
 import { QuickNav } from "./_components/quick-nav"
+import { RecentReceiptsPanel } from "./_components/recent-receipts-panel"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -29,35 +31,15 @@ export default async function DashboardPage() {
     redirect("/inventory")
   }
 
-  // Parallel fetch: KPIs + stock alerts (up to 10 critical items)
-  const [kpiResult, alertsResult] = await Promise.all([
+  // Parallel fetch: KPIs, recent receipts, and the stock overview.
+  const [kpiResult, receiptsResult, stockResult] = await Promise.all([
     getDashboardKPIs(),
-    listStockAlerts({ pageSize: 10 }),
+    listReceipts({ limit: 5 }),
+    listDashboardStock({ pageSize: 10 }),
   ])
 
-  // -- Error state -----------------------------------------------------------
-  if (kpiResult.error) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Resumen del inventario
-          </p>
-        </div>
-        <Alert variant="destructive">
-          <AlertCircle className="size-4" />
-          <AlertTitle>Error al cargar el dashboard</AlertTitle>
-          <AlertDescription>{kpiResult.error}</AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
-
-  const kpis = kpiResult.data!
-  const alerts = alertsResult.data
-    ? (alertsResult.data.rows as ProductRow[])
-    : []
+  const kpis = kpiResult.data
+  const stock = stockResult.data
 
   return (
     <div className="space-y-6">
@@ -68,16 +50,29 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <KpiCards
-        totalProductos={kpis.totalProductos}
-        alertasStock={kpis.alertasStock}
-        valorInventario={kpis.valorInventario}
-        ultimasRecepciones={kpis.ultimasRecepciones?.length ?? 0}
-      />
+      {kpiResult.error ? (
+        <Alert variant="destructive">
+          <AlertCircle className="size-4" />
+          <AlertTitle>Error al cargar indicadores</AlertTitle>
+          <AlertDescription>{kpiResult.error}</AlertDescription>
+        </Alert>
+      ) : kpis ? (
+        <KpiCards
+          totalProductos={kpis.totalProductos}
+          alertasStock={kpis.alertasStock}
+          valorInventario={kpis.valorInventario}
+          ultimasRecepciones={receiptsResult.data?.length ?? 0}
+        />
+      ) : null}
 
       <StockLevelTable
-        initialData={alerts}
-        error={alertsResult.error}
+        initialData={(stock?.rows ?? []) as ProductRow[]}
+        error={stockResult.error}
+      />
+
+      <RecentReceiptsPanel
+        receipts={receiptsResult.data}
+        error={receiptsResult.error}
       />
 
       <QuickNav />

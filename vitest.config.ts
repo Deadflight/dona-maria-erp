@@ -7,6 +7,7 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
+    maxWorkers: 4,
     coverage: {
       provider: "v8",
       include: ["actions/**", "lib/auth/**", "lib/supabase/**", "proxy.ts", "app/login/**"],
