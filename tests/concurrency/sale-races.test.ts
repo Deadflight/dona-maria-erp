@@ -4,7 +4,6 @@ import { Client } from "pg"
 import {
   describeConcurrent,
   seedProduct,
-  cleanupProduct,
   withConnection,
   DB_URL,
 } from "./helper"

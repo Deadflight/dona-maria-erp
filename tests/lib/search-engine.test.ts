@@ -75,7 +75,6 @@ describe("rankResults", () => {
   describe("case insensitivity", () => {
     it("matches case-insensitively", () => {
       const ranked = rankResults("tornillo", products)
-      const exactMatch = ranked.find((r) => r._rank === "exact")
       // No exact match since "tornillo" != "Tornillo 1/4", but startsWith should match
       expect(ranked[0]._rank).toBe("startsWith")
     })
