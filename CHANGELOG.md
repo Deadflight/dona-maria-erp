@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.9.0...v1.10.0) (2026-08-27)
+
+### Features
+
+* **dashboard:** complete inventory administration view ([29e34cc](https://github.com/Deadflight/dona-maria-erp/commit/29e34cc46054d730e229d0774c33ea2c18077789))
+
 ## [1.9.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.8.0...v1.9.0) (2026-08-13)
 
 ### Features
