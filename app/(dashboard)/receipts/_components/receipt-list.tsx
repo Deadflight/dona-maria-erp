@@ -122,22 +122,17 @@ export function ReceiptList({
   // --- Detail dialog state ---
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptListItem | null>(null)
   const [detailData, setDetailData] = useState<ReceiptDetailResult["data"] | null>(null)
-  const [detailLoading, setDetailLoading] = useState(false)
-  const [detailError, setDetailError] = useState<string | null>(null)
 
   const handleRowClick = useCallback(async (receipt: ReceiptListItem) => {
     setSelectedReceipt(receipt)
-    setDetailLoading(true)
-    setDetailError(null)
 
     const { data, error } = await getReceiptById(receipt.id)
 
     if (error) {
-      setDetailError(error)
+      setDetailData(null)
     } else {
       setDetailData(data)
     }
-    setDetailLoading(false)
   }, [])
 
   // --- Pagination ---
@@ -354,7 +349,6 @@ export function ReceiptList({
           if (!open) {
             setSelectedReceipt(null)
             setDetailData(null)
-            setDetailError(null)
           }
         }}
       />

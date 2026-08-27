@@ -30,18 +30,6 @@ const pesoProduct: CartProduct = {
   categoria: "Electricidad",
 }
 
-const longitudProduct: CartProduct = {
-  id: "prod-3",
-  nombre: "Manguera 1/2",
-  sku: "MAN-001",
-  precio_venta: 10.0,
-  stock_actual: 30,
-  tipo_unidad: "longitud",
-  unidad_base: "m",
-  factor_conversion: 1,
-  categoria: "Plomería",
-}
-
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------

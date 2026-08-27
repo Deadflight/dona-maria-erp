@@ -10,7 +10,6 @@ import {
   ReceiptText,
   AlertCircle,
   RotateCcw,
-  Eye,
 } from "lucide-react"
 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
@@ -42,14 +41,6 @@ import { SaleDetailDialog } from "./sale-detail-dialog"
 // Types
 // ---------------------------------------------------------------------------
 
-type Session = {
-  id: string
-  email: string
-  role: string
-  fullName: string | null
-  isActive: boolean
-} | null
-
 interface PageData {
   rows: SaleListItem[]
   total: number
@@ -61,7 +52,6 @@ interface SalesTableProps {
   initialData: PageData | null
   error: string | null
   searchParams: Record<string, string>
-  session: Session
 }
 
 // ---------------------------------------------------------------------------
@@ -107,7 +97,6 @@ export function SalesTable({
   initialData,
   error,
   searchParams,
-  session,
 }: SalesTableProps) {
   const router = useRouter()
 

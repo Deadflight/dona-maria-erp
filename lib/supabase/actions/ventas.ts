@@ -7,8 +7,6 @@ import { saleCreateSchema, listSalesSchema } from "@/lib/validations/ventas"
 import type { SaleCreateInput, ListSalesParams } from "@/lib/validations/ventas"
 import type { Database } from "@/types/database"
 
-type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

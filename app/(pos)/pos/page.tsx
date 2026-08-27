@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { ShoppingCart } from "lucide-react"
 import { toast } from "sonner"
 
@@ -41,7 +41,6 @@ export default function POSPage() {
   const [receipt, setReceipt] = useState<ReceiptState | null>(null)
   const [sellerName, setSellerName] = useState<string>("Vendedor")
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
-  const cartRef = useRef<HTMLDivElement>(null)
 
   // Get seller name from session (runs once)
   useEffect(() => {
@@ -69,12 +68,13 @@ export default function POSPage() {
     totals,
     clearCart,
   } = cart
+  const { addItem } = cart
 
   const handleAddProduct = useCallback(
     (product: CartProduct) => {
-      cart.addItem(product)
+      addItem(product)
     },
-    [cart.addItem],
+    [addItem],
   )
 
   const handleConfirmSale = useCallback(async () => {

@@ -1,10 +1,9 @@
 // @vitest-environment node
-import { describe, it, expect } from "vitest"
+import { it, expect } from "vitest"
 import { Client } from "pg"
 import {
   describeConcurrent,
   seedProduct,
-  withConnection,
   DB_URL,
 } from "./helper"
 

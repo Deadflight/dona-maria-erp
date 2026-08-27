@@ -34,10 +34,6 @@ const UUIDs = Array.from({ length: 100 }, (_, i) => {
 // Friendly fixture IDs
 const PROD_1 = UUIDs[0]
 const PROD_2 = UUIDs[1]
-const PROD_3 = UUIDs[2]
-const PROD_4 = UUIDs[3]
-const PROD_5 = UUIDs[4]
-const CLIENT_1 = UUIDs[50]
 
 // ---------------------------------------------------------------------------
 // Shared mock chain for Supabase "from" queries
@@ -173,7 +169,7 @@ describe("A32: POS Stress Tests", () => {
       )
 
       expect(results).toHaveLength(50)
-      results.forEach((r, i) => {
+      results.forEach((r) => {
         expect(r.error).toBeNull()
         expect(r.data).not.toBeNull()
       })

@@ -9,9 +9,6 @@ import { DailySummary } from "./_components/daily-summary"
 import { CashCounting } from "./_components/cash-counting"
 
 export default function DailyClosePage() {
-  const [session, setSession] = useState<{
-    role: string
-  } | null>(null)
   const [summary, setSummary] = useState<Awaited<
     ReturnType<typeof getDailySummary>
   >["data"]>(null)
@@ -27,8 +24,6 @@ export default function DailyClosePage() {
       if (data.role !== "admin") {
         redirect("/dashboard")
       }
-      setSession(data)
-
       const today = new Date().toISOString().split("T")[0]
       const result = await getDailySummary(today)
       if (result.error) {

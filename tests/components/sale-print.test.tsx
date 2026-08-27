@@ -277,7 +277,6 @@ describe("SalePrint", () => {
     // The discount row should not render
     // Check that Descuento label is NOT present in the totals section
     // (it's fine if it appears in items table header as "Dto.")
-    const discountLabels = screen.queryAllByText("Descuento")
     // Descuento appears in totals section table header (Dto.), not "Descuento"
     // Actually "Descuento" might appear from other contexts — clarify:
     // The table section has "Dto." for item discount column, not "Descuento"

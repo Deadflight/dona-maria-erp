@@ -48,7 +48,6 @@ export function ProductSearch({
   const [results, setResults] = useState<RankedProduct<CartProduct>[]>([])
   const [recentSearches, setRecentSearches] = useState<string[]>(() => getRecentSearches())
   const [loading, setLoading] = useState(false)
-  const [open, setOpen] = useState(true)
   const [inputFocused, setInputFocused] = useState(false)
   const [hideOutOfStock, setHideOutOfStock] = useState(() => {
     if (typeof window === "undefined") return false
@@ -79,7 +78,6 @@ export function ProductSearch({
       if (e.key === "F1") {
         e.preventDefault()
         inputRef.current?.focus()
-        setOpen(true)
       }
     }
     window.addEventListener("keydown", handleKeyDown)
