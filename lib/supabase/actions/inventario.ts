@@ -5,8 +5,7 @@ import { getSession } from "@/actions/auth"
 import { bulkUpdatePricesSchema } from "@/lib/validations/productos"
 import { initialStockSchema } from "@/lib/validations/inventario"
 import type { Database } from "@/types/database"
-import { listReceipts } from "@/lib/supabase/actions/compras"
-import type { ReceiptListResult } from "@/lib/supabase/actions/compras"
+import { listProducts } from "@/lib/supabase/actions/productos"
 
 type InventoryMovement = Database["public"]["Tables"]["inventory_movements"]["Row"]
 
@@ -389,7 +388,6 @@ export type DashboardKPIs = {
   totalProductos: number
   alertasStock: number
   valorInventario: number
-  ultimasRecepciones: ReceiptListResult["data"]
 }
 
 export type DashboardResult = {
@@ -397,11 +395,26 @@ export type DashboardResult = {
   error: string | null
 }
 
+export async function listDashboardStock(
+  params: Parameters<typeof listProducts>[0],
+): Promise<Awaited<ReturnType<typeof listProducts>>> {
+  const session = await getSession()
+  if (!session.data) {
+    return { data: null, error: "UNAUTHORIZED" }
+  }
+
+  if (session.data.role !== "admin") {
+    return { data: null, error: "FORBIDDEN" }
+  }
+
+  return listProducts({ ...params, activo: true })
+}
+
 /**
- * Returns aggregate inventory KPIs for the admin dashboard. Runs 4 parallel
- * queries: active product count, stock alert count, inventory value via
- * SUM(stock_actual * COALESCE(precio_compra, 0)), and the 5 most recent
- * purchase receipts. Admin-only gate via session role check.
+ * Returns aggregate inventory KPIs for the admin dashboard. Runs 3 parallel
+ * queries: active product count, stock alert count, and inventory value via
+ * SUM(stock_actual * COALESCE(precio_compra, 0)). Admin-only gate via session
+ * role check.
  */
 export async function getDashboardKPIs(): Promise<DashboardResult> {
   const session = await getSession()
@@ -416,8 +429,7 @@ export async function getDashboardKPIs(): Promise<DashboardResult> {
   const supabase = await createClient()
 
   // -- Parallel queries -------------------------------------------------------
-  const [countResult, valueResult, alertCount, recentReceipts] =
-    await Promise.all([
+  const [countResult, valueResult, alertCount] = await Promise.all([
       supabase
         .from("productos")
         .select("*", { count: "exact", head: true })
@@ -427,7 +439,6 @@ export async function getDashboardKPIs(): Promise<DashboardResult> {
         .select("stock_actual, precio_compra")
         .eq("activo", true),
       getStockAlertCount(),
-      listReceipts({ limit: 5 }),
     ])
 
   // -- Error checks -----------------------------------------------------------
@@ -441,10 +452,6 @@ export async function getDashboardKPIs(): Promise<DashboardResult> {
 
   if (alertCount.error) {
     return { data: null, error: alertCount.error }
-  }
-
-  if (recentReceipts.error) {
-    return { data: null, error: recentReceipts.error }
   }
 
   // -- Aggregate --------------------------------------------------------------
@@ -463,7 +470,6 @@ export async function getDashboardKPIs(): Promise<DashboardResult> {
       totalProductos: countResult.count ?? 0,
       alertasStock: alertCount.data ?? 0,
       valorInventario,
-      ultimasRecepciones: recentReceipts.data ?? [],
     },
     error: null,
   }

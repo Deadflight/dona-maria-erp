@@ -134,6 +134,25 @@ describe("DashboardLayout", () => {
     expect(screen.getByRole("link", { name: "Terminal de ventas" })).toHaveAttribute("href", "/pos")
   })
 
+  it("allows the main content to shrink within the viewport", async () => {
+    mockGetSession.mockResolvedValue({
+      data: {
+        id: "user-1",
+        email: "admin@donamaria.com",
+        role: "admin",
+        fullName: "Admin",
+        isActive: true,
+      },
+    })
+
+    const result = (await DashboardLayout({
+      children: <div>Content</div>,
+    })) as unknown as React.ReactElement
+    const { container } = render(result)
+
+    expect(container.querySelector("main")).toHaveClass("min-w-0")
+  })
+
   it("should render the Créditos nav link for any role", async () => {
     mockGetSession.mockResolvedValue({
       data: {

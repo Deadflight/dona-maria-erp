@@ -8,13 +8,12 @@ vi.mock("@/actions/auth", () => ({
   getSession: vi.fn(),
 }))
 
-vi.mock("@/lib/supabase/actions/compras", () => ({
-  listReceipts: vi.fn(),
+vi.mock("@/lib/supabase/actions/productos", () => ({
+  listProducts: vi.fn(),
 }))
 
 import { getSession } from "@/actions/auth"
-import { listReceipts } from "@/lib/supabase/actions/compras"
-import type { ReceiptListResult } from "@/lib/supabase/actions/compras"
+import { listProducts } from "@/lib/supabase/actions/productos"
 import {
   listMovementsByProduct,
   getMovementsByReference,
@@ -22,6 +21,7 @@ import {
   bulkUpdatePrices,
   getStockAlertCount,
   getDashboardKPIs,
+  listDashboardStock,
   loadInitialStock,
 } from "@/lib/supabase/actions/inventario"
 
@@ -134,17 +134,6 @@ function mockSession(role: "admin" | "seller" | "viewer" = "admin") {
 
 function mockNoSession() {
   vi.mocked(getSession).mockResolvedValue({ data: null })
-}
-
-function createReceiptListResult(
-  data: ReceiptListResult["data"],
-  total = data?.length ?? 0,
-): ReceiptListResult {
-  return {
-    data,
-    total,
-    error: null,
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -555,23 +544,6 @@ describe("inventario Server Actions", () => {
         ],
         error: null,
       }
-      const mockReceipts = [
-        {
-          id: "rec-1",
-          numero_recepcion: "REC-001",
-          proveedor_id: "prov-1",
-          created_by: "user-1",
-          created_at: "2026-06-10T00:00:00Z",
-          observaciones: null,
-          proveedores: { nombre: "Proveedor A", ruc: null },
-          created_by_profiles: { full_name: "Test User" },
-          receipt_items: [{ count: 2 }],
-        },
-      ] satisfies NonNullable<ReceiptListResult["data"]>
-      vi.mocked(listReceipts).mockResolvedValue(
-        createReceiptListResult(mockReceipts, 1),
-      )
-
       const result = await getDashboardKPIs()
 
       expect(result.error).toBeNull()
@@ -579,7 +551,7 @@ describe("inventario Server Actions", () => {
       expect(result.data?.totalProductos).toBe(10)
       expect(result.data?.alertasStock).toBe(3)
       expect(result.data?.valorInventario).toBe(650) // 5*100 + 3*50
-      expect(result.data?.ultimasRecepciones).toEqual(mockReceipts)
+      expect(result.data).not.toHaveProperty("ultimasRecepciones")
     })
 
     it("handles NULL precio_compra via COALESCE to 0", async () => {
@@ -593,8 +565,6 @@ describe("inventario Server Actions", () => {
         ],
         error: null,
       }
-      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
-
       const result = await getDashboardKPIs()
 
       expect(result.error).toBeNull()
@@ -606,15 +576,12 @@ describe("inventario Server Actions", () => {
       rpcResolveValue = { data: 0, error: null }
       productosCountResolve = { count: 0, data: null, error: null }
       productosDataResolve = { data: [], error: null }
-      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
-
       const result = await getDashboardKPIs()
 
       expect(result.error).toBeNull()
       expect(result.data?.totalProductos).toBe(0)
       expect(result.data?.alertasStock).toBe(0)
       expect(result.data?.valorInventario).toBe(0)
-      expect(result.data?.ultimasRecepciones).toEqual([])
     })
 
     it("returns error when count query fails", async () => {
@@ -626,8 +593,6 @@ describe("inventario Server Actions", () => {
         error: { message: "Count query failed" },
       }
       productosDataResolve = { data: [], error: null }
-      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
-
       const result = await getDashboardKPIs()
 
       expect(result).toEqual({ data: null, error: "Count query failed" })
@@ -641,11 +606,54 @@ describe("inventario Server Actions", () => {
         data: null,
         error: { message: "Value query failed" },
       }
-      vi.mocked(listReceipts).mockResolvedValue(createReceiptListResult([]))
-
       const result = await getDashboardKPIs()
 
       expect(result).toEqual({ data: null, error: "Value query failed" })
+    })
+  })
+
+  describe("listDashboardStock", () => {
+    it("returns UNAUTHORIZED when no session", async () => {
+      mockNoSession()
+
+      const result = await listDashboardStock({ pageSize: 10 })
+
+      expect(result).toEqual({ data: null, error: "UNAUTHORIZED" })
+      expect(listProducts).not.toHaveBeenCalled()
+    })
+
+    it("returns FORBIDDEN for non-admin roles", async () => {
+      mockSession("seller")
+
+      const result = await listDashboardStock({ pageSize: 10 })
+
+      expect(result).toEqual({ data: null, error: "FORBIDDEN" })
+      expect(listProducts).not.toHaveBeenCalled()
+    })
+
+    it("delegates active stock listing for admins", async () => {
+      mockSession("admin")
+      vi.mocked(listProducts).mockResolvedValue({
+        data: { rows: [], total: 0, page: 1, pageSize: 10 },
+        error: null,
+      })
+
+      const result = await listDashboardStock({ pageSize: 10 })
+
+      expect(result.error).toBeNull()
+      expect(listProducts).toHaveBeenCalledWith({ activo: true, pageSize: 10 })
+    })
+
+    it("always forces active products when callers pass activo=false", async () => {
+      mockSession("admin")
+      vi.mocked(listProducts).mockResolvedValue({
+        data: { rows: [], total: 0, page: 1, pageSize: 10 },
+        error: null,
+      })
+
+      await listDashboardStock({ activo: false, pageSize: 10 })
+
+      expect(listProducts).toHaveBeenCalledWith({ activo: true, pageSize: 10 })
     })
   })
 
