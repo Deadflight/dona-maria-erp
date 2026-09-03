@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatCurrency as formatVES } from "@/lib/money"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -142,6 +143,20 @@ export function SaleDetailDialog({
               <div>
                 <span className="font-medium text-muted-foreground">Total: </span>
                 <span className="font-semibold">{formatCurrency(sale.total)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Total VES: </span>
+                <span className="font-semibold">
+                  {sale.total_ves !== null ? formatVES(sale.total_ves) : "Sin tasa histórica"}
+                </span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Tasa aplicada: </span>
+                <span className="font-semibold">
+                  {sale.tasa_cambio_usd_a_ves !== null
+                    ? `${formatVES(sale.tasa_cambio_usd_a_ves)} / USD`
+                    : "Sin tasa histórica"}
+                </span>
               </div>
             </div>
 

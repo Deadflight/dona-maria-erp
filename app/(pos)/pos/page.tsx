@@ -12,7 +12,9 @@ import { ClientSelector } from "./_components/client-selector"
 import { ReceiptPreview } from "./_components/receipt-preview"
 import { useCart, type CartProduct } from "./_hooks/use-cart"
 import { createSale } from "@/lib/supabase/actions/ventas"
+import { getCurrentExchangeRateDisplay } from "@/lib/supabase/actions/tasas"
 import { UNIDAD_CONFIG } from "@/lib/constants/unidad-config"
+import { ExchangeRateIndicator } from "@/components/exchange-rate-indicator"
 
 // ---------------------------------------------------------------------------
 // Receipt state
@@ -40,6 +42,14 @@ export default function POSPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [receipt, setReceipt] = useState<ReceiptState | null>(null)
   const [sellerName, setSellerName] = useState<string>("Vendedor")
+  const [exchangeRate, setExchangeRate] = useState<Awaited<
+    ReturnType<typeof getCurrentExchangeRateDisplay>
+  >["data"]>({
+    tasa: null,
+    fuente: null,
+    createdAt: null,
+    status: "unavailable",
+  })
   const [selectedIndex, setSelectedIndex] = useState<number>(0)
 
   // Get seller name from session (runs once)
@@ -55,6 +65,10 @@ export default function POSPage() {
       }
     }
     fetchSession()
+  }, [])
+
+  useEffect(() => {
+    getCurrentExchangeRateDisplay().then(({ data }) => setExchangeRate(data))
   }, [])
 
   const {
@@ -283,6 +297,9 @@ export default function POSPage() {
 
         {/* Right: Client + Payment */}
         <div className="flex w-80 flex-col border-l">
+          <div className="border-b p-4">
+            <ExchangeRateIndicator rate={exchangeRate} />
+          </div>
           {/* Client selector */}
           <div className="border-b p-4">
             <p className="mb-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">

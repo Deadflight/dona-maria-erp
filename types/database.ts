@@ -640,7 +640,9 @@ export type Database = {
           numero_factura: string
           observaciones: string | null
           subtotal: number
+          tasa_cambio_usd_a_ves: number | null
           total: number
+          total_ves: number | null
           vendedor_id: string | null
         }
         Insert: {
@@ -653,7 +655,9 @@ export type Database = {
           numero_factura: string
           observaciones?: string | null
           subtotal?: number
+          tasa_cambio_usd_a_ves?: number | null
           total: number
+          total_ves?: number | null
           vendedor_id?: string | null
         }
         Update: {
@@ -666,7 +670,9 @@ export type Database = {
           numero_factura?: string
           observaciones?: string | null
           subtotal?: number
+          tasa_cambio_usd_a_ves?: number | null
           total?: number
+          total_ves?: number | null
           vendedor_id?: string | null
         }
         Relationships: [
