@@ -8,6 +8,7 @@ import { roundToDecimals } from "@/lib/numeric"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { UNIDAD_CONFIG, type TipoUnidad } from "@/lib/constants/unidad-config"
+import { formatCurrency } from "@/lib/money"
 import type { CartItem as CartItemType, DescuentoTipo } from "../_hooks/use-cart"
 
 // ---------------------------------------------------------------------------
@@ -17,6 +18,7 @@ import type { CartItem as CartItemType, DescuentoTipo } from "../_hooks/use-cart
 type CartProps = {
   items: CartItemType[]
   totals: { subtotal: number; descuentoTotal: number; impuesto: number; total: number }
+  exchangeRate?: number | null
   onUpdateQuantity: (productId: string, cantidad: number) => void
   onUpdateQuantityByStep: (productId: string, step: number) => void
   onRemoveItem: (productId: string) => void
@@ -34,6 +36,7 @@ type CartProps = {
 export function Cart({
   items,
   totals,
+  exchangeRate = null,
   onUpdateQuantity,
   onUpdateQuantityByStep,
   onRemoveItem,
@@ -201,8 +204,16 @@ export function Cart({
           <span className="tabular-nums">${totals.impuesto.toFixed(2)}</span>
         </div>
         <div className="flex items-center justify-between text-base font-bold">
-          <span>Total</span>
+          <span>Total USD</span>
           <span className="tabular-nums">${totals.total.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm font-semibold">
+          <span>Total VES</span>
+          <span className="tabular-nums">
+            {exchangeRate === null
+              ? "Sin tasa disponible"
+              : formatCurrency(totals.total * exchangeRate)}
+          </span>
         </div>
       </div>
 
