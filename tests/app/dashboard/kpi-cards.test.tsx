@@ -8,6 +8,7 @@ describe("KpiCards", () => {
     alertasStock: 12,
     valorInventario: 450_000.5,
     ultimasRecepciones: 5,
+    exchangeRate: 36.5,
   }
 
   it("renders all 4 KPI cards with titles", () => {
@@ -26,8 +27,8 @@ describe("KpiCards", () => {
     expect(screen.getByText("150")).toBeInTheDocument()
     // formatNumber(12) → "12" (es-MX)
     expect(screen.getByText("12")).toBeInTheDocument()
-    // formatCurrency(450000.50) → "$450,000.50" (es-MX, MXN)
-    expect(screen.getByText("$450,000.50")).toBeInTheDocument()
+    expect(screen.getByText("$450,000.50 USD")).toBeInTheDocument()
+    expect(screen.getByText("Bs. 16.425.018,25 VES")).toBeInTheDocument()
     // formatNumber(5) → "5" (es-MX)
     expect(screen.getByText("5")).toBeInTheDocument()
   })
@@ -39,13 +40,13 @@ describe("KpiCards", () => {
         alertasStock={0}
         valorInventario={1_234_567.89}
         ultimasRecepciones={0}
+        exchangeRate={36.5}
       />,
     )
 
     // formatNumber(2500) → "2,500" (es-MX)
     expect(screen.getByText("2,500")).toBeInTheDocument()
-    // formatCurrency(1234567.89) → "$1,234,567.89" (es-MX, MXN)
-    expect(screen.getByText("$1,234,567.89")).toBeInTheDocument()
+    expect(screen.getByText("$1,234,567.89 USD")).toBeInTheDocument()
   })
 
   it("handles zero values gracefully", () => {
@@ -55,6 +56,7 @@ describe("KpiCards", () => {
         alertasStock={0}
         valorInventario={0}
         ultimasRecepciones={0}
+        exchangeRate={null}
       />,
     )
 
@@ -62,8 +64,7 @@ describe("KpiCards", () => {
     const zeroTexts = screen.getAllByText("0")
     expect(zeroTexts.length).toBeGreaterThanOrEqual(3)
 
-    // Currency card shows "$0.00"
-    expect(screen.getByText("$0.00")).toBeInTheDocument()
+    expect(screen.getByText("$0.00 USD")).toBeInTheDocument()
   })
 
   it("renders an icon inside each card", () => {

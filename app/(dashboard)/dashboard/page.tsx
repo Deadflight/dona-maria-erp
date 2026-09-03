@@ -5,6 +5,7 @@ import {
   listDashboardStock,
 } from "@/lib/supabase/actions/inventario"
 import { listReceipts } from "@/lib/supabase/actions/compras"
+import { getCurrentExchangeRateDisplay } from "@/lib/supabase/actions/tasas"
 import type { Database } from "@/types/database"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
@@ -32,10 +33,11 @@ export default async function DashboardPage() {
   }
 
   // Parallel fetch: KPIs, recent receipts, and the stock overview.
-  const [kpiResult, receiptsResult, stockResult] = await Promise.all([
+  const [kpiResult, receiptsResult, stockResult, rateResult] = await Promise.all([
     getDashboardKPIs(),
     listReceipts({ limit: 5 }),
     listDashboardStock({ pageSize: 10 }),
+    getCurrentExchangeRateDisplay(),
   ])
 
   const kpis = kpiResult.data
@@ -62,6 +64,7 @@ export default async function DashboardPage() {
           alertasStock={kpis.alertasStock}
           valorInventario={kpis.valorInventario}
           ultimasRecepciones={receiptsResult.data?.length ?? 0}
+          exchangeRate={rateResult.data.status === "current" ? rateResult.data.tasa : null}
         />
       ) : null}
 

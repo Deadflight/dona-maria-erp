@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/table"
 import { BulkPriceDialog } from "./bulk-price-dialog"
 import { InitialStockDialog } from "./initial-stock-dialog"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -62,6 +63,7 @@ interface StockAlertTableProps {
   error: string | null
   searchParams: Record<string, string>
   session: Session
+  exchangeRate: number | null
 }
 
 // ---------------------------------------------------------------------------
@@ -84,14 +86,6 @@ const ITEMS_PER_PAGE = 10
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(value)
-}
-
 // ---------------------------------------------------------------------------
 // Stock Alert Table
 // ---------------------------------------------------------------------------
@@ -101,6 +95,7 @@ export function StockAlertTable({
   error,
   searchParams,
   session,
+  exchangeRate,
 }: StockAlertTableProps) {
   const router = useRouter()
   const isAdminOrSeller =
@@ -403,7 +398,7 @@ export function StockAlertTable({
                         {Number(product.stock_minimo).toFixed(2)}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatCurrency(product.precio_venta)}
+                        <PriceWithExchangeRate amount={product.precio_venta} exchangeRate={exchangeRate} />
                       </TableCell>
                       <TableCell>
                         {(() => {

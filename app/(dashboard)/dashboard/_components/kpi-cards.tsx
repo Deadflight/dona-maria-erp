@@ -5,6 +5,8 @@
 // ---------------------------------------------------------------------------
 
 import { Package, TriangleAlert, DollarSign, Truck } from "lucide-react"
+import type { ReactNode } from "react"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
 
 import {
   Card,
@@ -21,14 +23,6 @@ function formatNumber(value: number): string {
   return new Intl.NumberFormat("es-MX").format(value)
 }
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(value)
-}
-
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
@@ -38,6 +32,7 @@ interface KpiCardsProps {
   alertasStock: number
   valorInventario: number
   ultimasRecepciones: number
+  exchangeRate?: number | null
 }
 
 // ---------------------------------------------------------------------------
@@ -49,8 +44,9 @@ export function KpiCards({
   alertasStock,
   valorInventario,
   ultimasRecepciones,
+  exchangeRate = null,
 }: KpiCardsProps) {
-  const cards = [
+  const cards: Array<{ title: string; value: ReactNode; icon: typeof Package; iconClass: string }> = [
     {
       title: "Total Productos",
       value: formatNumber(totalProductos),
@@ -65,7 +61,7 @@ export function KpiCards({
     },
     {
       title: "Valor del Inventario",
-      value: formatCurrency(valorInventario),
+      value: <PriceWithExchangeRate amount={valorInventario} exchangeRate={exchangeRate} />,
       icon: DollarSign,
       iconClass: "text-muted-foreground",
     },
@@ -90,7 +86,7 @@ export function KpiCards({
               <Icon className={`size-5 ${card.iconClass}`} />
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold tabular-nums">{card.value}</p>
+              <div className="text-2xl font-bold tabular-nums">{card.value}</div>
             </CardContent>
           </Card>
         )
