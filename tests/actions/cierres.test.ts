@@ -112,6 +112,8 @@ describe("getDailySummary", () => {
     expect(result.error).toBeNull()
     expect(result.data).not.toBeNull()
     expect(result.data!.systemTotal).toBe(0)
+    expect(result.data!.totalVES).toBeNull()
+    expect(result.data!.rateContext).toBeNull()
     expect(result.data!.totalTransactions).toBe(0)
     expect(result.data!.averageTicket).toBe(0)
     expect(result.data!.methods).toEqual([])
@@ -158,8 +160,8 @@ describe("getDailySummary", () => {
 
     const result = await getDailySummary("2026-01-15")
 
-    expect(result.data?.totalVES).toBe(0)
-    expect(result.data?.rateContext).toBeNull()
+    expect(result.data?.totalVES).toBeNull()
+    expect(result.data?.rateContext).toBe("incomplete")
   })
 })
 

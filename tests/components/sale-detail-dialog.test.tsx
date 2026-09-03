@@ -39,6 +39,7 @@ describe("SaleDetailDialog exchange-rate context", () => {
     expect(screen.getByText("Tasa aplicada:")).toBeInTheDocument()
     expect(screen.getAllByText(/Bs\. 3\.650,00/).length).toBeGreaterThan(0)
     expect(screen.getAllByText(/Bs\. 36,50 \/ USD/).length).toBeGreaterThan(0)
+    expect(screen.getByText("Total USD:")).toBeInTheDocument()
   })
 
   it("marks legacy sales without conversion as unavailable", () => {

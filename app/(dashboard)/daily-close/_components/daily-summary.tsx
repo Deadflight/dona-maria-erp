@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { DailySummary as DailySummaryType } from "@/lib/supabase/actions/cierres"
-import { formatCurrency } from "@/lib/money"
+import { formatCurrency, formatUsd } from "@/lib/money"
 
 const methodLabels: Record<string, string> = {
   efectivo: "Efectivo",
@@ -29,12 +29,12 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
         <Card>
           <CardHeader>
             <CardTitle className="text-xs text-muted-foreground">
-              Total Ventas
+              Total Ventas (USD)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">
-              {formatCurrency(summary.systemTotal)}
+              {formatUsd(summary.systemTotal)}
             </p>
           </CardContent>
         </Card>
@@ -44,7 +44,9 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
             <CardTitle className="text-xs text-muted-foreground">Total en VES</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold">{formatCurrency(summary.totalVES)}</p>
+            <p className="text-2xl font-semibold">
+              {summary.totalVES === null ? "Sin total VES completo" : formatCurrency(summary.totalVES)}
+            </p>
           </CardContent>
         </Card>
 
@@ -62,12 +64,12 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
         <Card>
           <CardHeader>
             <CardTitle className="text-xs text-muted-foreground">
-              Ticket Promedio
+              Ticket Promedio (USD)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">
-              {formatCurrency(summary.averageTicket)}
+              {formatUsd(summary.averageTicket)}
             </p>
           </CardContent>
         </Card>
@@ -106,7 +108,7 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
                     </TableCell>
                     <TableCell className="text-right">{m.count}</TableCell>
                     <TableCell className="text-right font-medium">
-                      {formatCurrency(m.total)}
+                      {formatUsd(m.total)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -119,6 +121,8 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
       <p className="text-sm text-muted-foreground">
         Tasa del día: {summary.rateContext === "mixed"
           ? "Tasas mixtas"
+          : summary.rateContext === "incomplete"
+            ? "Conversión VES incompleta"
           : summary.rateContext === null
             ? "Sin tasa histórica"
             : `${formatCurrency(summary.rateContext)} / USD`}

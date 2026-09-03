@@ -21,3 +21,13 @@ const ES_VE_NUMBER = new Intl.NumberFormat("es-VE", {
 export function formatCurrency(amount: number): string {
   return `Bs. ${ES_VE_NUMBER.format(amount)}`
 }
+
+const USD_NUMBER = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+})
+
+export function formatUsd(amount: number): string {
+  return USD_NUMBER.format(amount)
+}

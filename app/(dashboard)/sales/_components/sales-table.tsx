@@ -36,6 +36,7 @@ import type { SaleListItem } from "@/lib/supabase/actions/ventas"
 import { getSaleById } from "@/lib/supabase/actions/ventas"
 import type { SaleDetail } from "@/lib/supabase/actions/ventas"
 import { SaleDetailDialog } from "./sale-detail-dialog"
+import { formatUsd } from "@/lib/money"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -64,14 +65,6 @@ function formatDate(dateStr: string | null): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(dateStr))
-}
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(value)
 }
 
 const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -358,7 +351,7 @@ export function SalesTable({
                         {sale.clientes?.nombre ?? "Sin cliente"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums font-medium">
-                        {formatCurrency(sale.total)}
+                        {formatUsd(sale.total)}
                       </TableCell>
                       <TableCell>
                         {PAYMENT_METHOD_LABELS[sale.metodo_pago] ?? sale.metodo_pago}

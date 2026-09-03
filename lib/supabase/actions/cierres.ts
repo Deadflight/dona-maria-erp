@@ -16,8 +16,8 @@ export type DailySummary = {
   methods: Array<{ metodo_pago: string; total: number; count: number }>
   cancelled: { total: number; count: number }
   systemTotal: number
-  totalVES: number
-  rateContext: number | "mixed" | null
+  totalVES: number | null
+  rateContext: number | "mixed" | "incomplete" | null
   totalTransactions: number
   averageTicket: number
 }
@@ -135,10 +135,12 @@ export async function getDailySummary(
   const cancelledCount = (cancelledRows ?? []).length
 
   const systemTotal = methods.reduce((sum, m) => sum + m.total, 0)
-  const totalVES = (completedRows ?? []).reduce(
-    (sum, row) => sum + Number(row.total_ves ?? 0),
-    0,
+  const hasMissingConversion = (completedRows ?? []).some(
+    (row) => row.total_ves === null || row.tasa_cambio_usd_a_ves === null,
   )
+  const totalVES = completedRows?.length === 0 || hasMissingConversion
+    ? null
+    : (completedRows ?? []).reduce((sum, row) => sum + Number(row.total_ves), 0)
   const rates = Array.from(
     new Set(
       (completedRows ?? [])
@@ -146,7 +148,13 @@ export async function getDailySummary(
         .filter((rate): rate is number => rate !== null),
     ),
   )
-  const rateContext = rates.length === 1 ? rates[0] : rates.length > 1 ? "mixed" : null
+  const rateContext = hasMissingConversion
+    ? "incomplete"
+    : rates.length === 1
+      ? rates[0]
+      : rates.length > 1
+        ? "mixed"
+        : null
   const totalTransactions = methods.reduce((sum, m) => sum + m.count, 0)
   const averageTicket =
     totalTransactions > 0
@@ -162,7 +170,7 @@ export async function getDailySummary(
         count: cancelledCount,
       },
       systemTotal: Math.round(systemTotal * 100) / 100,
-      totalVES: Math.round(totalVES * 100) / 100,
+      totalVES: totalVES === null ? null : Math.round(totalVES * 100) / 100,
       rateContext,
       totalTransactions,
       averageTicket,
