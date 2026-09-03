@@ -279,6 +279,25 @@ describe("PaymentPanel", () => {
 
       expect(screen.getByText(/Confirmar venta.*\$150\.75/)).toBeInTheDocument()
     })
+
+    it("shows the VES equivalent when an exchange rate is available", () => {
+      render(
+        <PaymentPanel
+          {...defaultProps}
+          total={125}
+          exchangeRate={36.5}
+        />,
+      )
+
+      expect(screen.getByText("Total USD")).toBeInTheDocument()
+      expect(screen.getByText("Bs. 4.562,50")).toBeInTheDocument()
+    })
+
+    it("does not show a converted total when the rate is unavailable", () => {
+      render(<PaymentPanel {...defaultProps} exchangeRate={null} />)
+
+      expect(screen.getByText("Sin tasa disponible")).toBeInTheDocument()
+    })
   })
 
   // ---------------------------------------------------------------------------

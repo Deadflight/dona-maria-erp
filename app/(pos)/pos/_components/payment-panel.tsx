@@ -5,7 +5,7 @@ import { Banknote, CreditCard, ArrowRightLeft, DollarSign } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { formatCurrency } from "@/lib/money"
+import { formatCurrency, formatUsd } from "@/lib/money"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,6 +25,7 @@ const PAYMENT_METHODS: { value: PaymentMethod; label: string; icon: typeof Bankn
 
 type PaymentPanelProps = {
   total: number
+  exchangeRate?: number | null
   paymentMethod: PaymentMethod | null
   clienteNombre: string | null
   clienteLimiteCredito: number | null
@@ -48,6 +49,7 @@ type PaymentPanelProps = {
 
 export function PaymentPanel({
   total,
+  exchangeRate = null,
   paymentMethod,
   clienteNombre,
   clienteLimiteCredito,
@@ -73,6 +75,21 @@ export function PaymentPanel({
 
   return (
     <div className={cn("flex flex-col gap-3", className)}>
+      <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-muted-foreground">Total USD</span>
+          <span className="font-semibold tabular-nums">{formatUsd(total)}</span>
+        </div>
+        <div className="mt-1 flex items-center justify-between">
+          <span className="text-muted-foreground">Total VES</span>
+          <span className="font-semibold tabular-nums">
+            {exchangeRate === null
+              ? "Sin tasa disponible"
+              : formatCurrency(total * exchangeRate)}
+          </span>
+        </div>
+      </div>
+
       {/* Payment method selector */}
       <div>
         <p className="mb-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide">

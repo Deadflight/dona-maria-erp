@@ -83,6 +83,8 @@ export default function POSPage() {
     clearCart,
   } = cart
   const { addItem } = cart
+  const usableExchangeRate =
+    exchangeRate.status === "current" ? exchangeRate.tasa : null
 
   const handleAddProduct = useCallback(
     (product: CartProduct) => {
@@ -284,6 +286,7 @@ export default function POSPage() {
             <Cart
               items={cart.items}
               totals={cart.totals}
+              exchangeRate={usableExchangeRate}
               onUpdateQuantity={cart.updateQuantity}
               onUpdateQuantityByStep={cart.updateQuantityByStep}
               onRemoveItem={cart.removeItem}
@@ -316,6 +319,7 @@ export default function POSPage() {
           <div className="flex-1 p-4">
             <PaymentPanel
               total={cart.totals.total}
+              exchangeRate={usableExchangeRate}
               paymentMethod={cart.paymentMethod}
               clienteNombre={cart.clienteNombre}
               clienteLimiteCredito={cart.clienteLimiteCredito}
