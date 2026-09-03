@@ -1,3 +1,9 @@
+## [1.12.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.12.0...v1.12.1) (2026-09-03)
+
+### Bug Fixes
+
+* **currency:** label USD totals and incomplete VES data ([da95ccb](https://github.com/Deadflight/dona-maria-erp/commit/da95ccb94960ee339ba9e2bdb286a8852f935f59))
+
 ## [1.12.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.11.0...v1.12.0) (2026-09-03)
 
 ### Features
