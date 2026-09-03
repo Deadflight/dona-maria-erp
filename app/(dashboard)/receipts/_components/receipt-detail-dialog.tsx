@@ -7,6 +7,8 @@
 import { PackageSearch } from "lucide-react"
 
 import type { ReceiptDetailResult } from "@/lib/supabase/actions/compras"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
+import { formatCurrency as formatVES, formatUsd } from "@/lib/money"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -47,14 +49,6 @@ function formatDate(dateStr: string | null): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(dateStr))
-}
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(value)
 }
 
 function calculateSubtotal(item: ReceiptDetail["receipt_items"][number]): number {
@@ -141,8 +135,8 @@ export function ReceiptDetailDialog({
                       <TableHead>Producto</TableHead>
                       <TableHead>SKU</TableHead>
                       <TableHead className="text-right">Cantidad</TableHead>
-                      <TableHead className="text-right">Precio Compra</TableHead>
-                      <TableHead className="text-right">Subtotal</TableHead>
+                      <TableHead className="text-right">Precio Compra (USD)</TableHead>
+                      <TableHead className="text-right">Subtotal (USD)</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -158,10 +152,16 @@ export function ReceiptDetailDialog({
                           {item.cantidad_recibida}
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {formatCurrency(item.precio_compra)}
+                          <PriceWithExchangeRate
+                            amount={item.precio_compra}
+                            exchangeRate={receipt.tasa_cambio_usd_a_ves}
+                          />
                         </TableCell>
                         <TableCell className="text-right tabular-nums font-medium">
-                          {formatCurrency(calculateSubtotal(item))}
+                          <PriceWithExchangeRate
+                            amount={calculateSubtotal(item)}
+                            exchangeRate={receipt.tasa_cambio_usd_a_ves}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -175,14 +175,24 @@ export function ReceiptDetailDialog({
           {receipt.receipt_items.length > 0 && (
             <div className="flex justify-end">
               <div className="flex items-center gap-4 rounded-lg border bg-muted/30 px-6 py-3">
-                <span className="text-sm font-medium">Total:</span>
-                <span className="text-lg font-semibold tabular-nums">
-                  {formatCurrency(total)}
+                <span className="text-sm font-medium">Total USD:</span>
+                <span className="text-lg font-semibold tabular-nums">{formatUsd(total)}</span>
+                <span className="text-sm text-muted-foreground">
+                  Total VES: {receipt.tasa_cambio_usd_a_ves === null
+                    ? "no disponible"
+                    : formatVES(total * receipt.tasa_cambio_usd_a_ves)}
                 </span>
               </div>
             </div>
           )}
         </div>
+
+        <p className="text-sm text-muted-foreground">
+          Tasa aplicada: {receipt.tasa_cambio_usd_a_ves === null
+            ? "no disponible"
+            : `${formatVES(receipt.tasa_cambio_usd_a_ves)} / USD`}
+          {receipt.fuente_tasa ? ` · Fuente: ${receipt.fuente_tasa}` : ""}
+        </p>
 
         {/* ---- Close Button ---- */}
         <div className="flex justify-end">

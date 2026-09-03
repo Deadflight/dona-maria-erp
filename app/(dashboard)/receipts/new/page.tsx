@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { getSession } from "@/actions/auth"
 import { listProveedores, generateReceiptNumber } from "@/lib/supabase/actions/compras"
 import { ReceiptForm } from "../_components/receipt-form"
+import { getCurrentExchangeRateDisplay } from "@/lib/supabase/actions/tasas"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,9 +26,10 @@ export default async function NewReceiptPage(_props: PageProps) {
   }
 
   // -- Parallel fetch --------------------------------------------------------
-  const [proveedoresResult, receiptNumberResult] = await Promise.all([
+  const [proveedoresResult, receiptNumberResult, rateResult] = await Promise.all([
     listProveedores(),
     generateReceiptNumber(),
+    getCurrentExchangeRateDisplay(),
   ])
 
   const suppliers = proveedoresResult.data ?? []
@@ -37,6 +39,7 @@ export default async function NewReceiptPage(_props: PageProps) {
     <ReceiptForm
       suppliers={suppliers}
       receiptNumber={numero_recepcion}
+      exchangeRate={rateResult.data.status === "current" ? rateResult.data.tasa : null}
     />
   )
 }

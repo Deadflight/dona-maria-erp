@@ -28,6 +28,8 @@ const receiptDetail = {
   observaciones: null,
   created_by: "user-1",
   created_at: "2026-06-10T12:00:00Z",
+  tasa_cambio_usd_a_ves: 36.5,
+  fuente_tasa: "api_bcv",
   proveedores: baseSupplier,
   receipt_items: [
     {
@@ -59,6 +61,8 @@ const receiptDetailEmptyItems = {
   observaciones: null,
   created_by: "user-1",
   created_at: "2026-06-10T14:00:00Z",
+  tasa_cambio_usd_a_ves: null,
+  fuente_tasa: null,
   proveedores: {
     ...baseSupplier,
     id: "prov-2",
@@ -108,9 +112,9 @@ describe("ReceiptDetailDialog", () => {
     expect(screen.getByText("TUE-001")).toBeInTheDocument()
 
     // Item 1 subtotal: 10 × $25.50 = $255.00
-    expect(screen.getByText("$255.00")).toBeInTheDocument()
+    expect(screen.getByText("$255.00 USD")).toBeInTheDocument()
     // Item 2 subtotal: 5 × $30.00 = $150.00
-    expect(screen.getByText("$150.00")).toBeInTheDocument()
+    expect(screen.getByText("$150.00 USD")).toBeInTheDocument()
   })
 
   it("shows total of all items", () => {

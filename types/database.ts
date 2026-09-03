@@ -391,26 +391,32 @@ export type Database = {
         Row: {
           created_at: string | null
           created_by: string
+          fuente_tasa: string | null
           id: string
           numero_recepcion: string
           observaciones: string | null
           proveedor_id: string
+          tasa_cambio_usd_a_ves: number | null
         }
         Insert: {
           created_at?: string | null
           created_by: string
+          fuente_tasa?: string | null
           id?: string
           numero_recepcion: string
           observaciones?: string | null
           proveedor_id: string
+          tasa_cambio_usd_a_ves?: number | null
         }
         Update: {
           created_at?: string | null
           created_by?: string
+          fuente_tasa?: string | null
           id?: string
           numero_recepcion?: string
           observaciones?: string | null
           proveedor_id?: string
+          tasa_cambio_usd_a_ves?: number | null
         }
         Relationships: [
           {

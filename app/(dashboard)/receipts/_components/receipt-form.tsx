@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation"
 import { PackageOpen, Plus, Trash2, AlertCircle, SearchIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
+import { formatCurrency as formatVES, formatUsd } from "@/lib/money"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -69,6 +71,7 @@ type ReceiptFormItem = {
 type ReceiptFormProps = {
   suppliers: Supplier[]
   receiptNumber: string
+  exchangeRate?: number | null
 }
 
 // ---------------------------------------------------------------------------
@@ -88,10 +91,6 @@ function createEmptyItem(): ReceiptFormItem {
     cantidad_recibida: 0,
     precio_compra: 0,
   }
-}
-
-function formatCurrency(n: number): string {
-  return `Gs\u00A0${n.toLocaleString("es-PY")}`
 }
 
 /** Parses dot-notation field errors like "items.0.precio_compra" into a map
@@ -218,6 +217,7 @@ function ProductCombobox({
 export function ReceiptForm({
   suppliers,
   receiptNumber,
+  exchangeRate = null,
 }: ReceiptFormProps) {
   const router = useRouter()
   const [state, formAction, isPending] = useActionState<
@@ -418,8 +418,8 @@ export function ReceiptForm({
                     <tr className="border-b text-left text-xs font-medium text-muted-foreground">
                       <th className="w-[35%] pb-2 pr-2">Producto</th>
                       <th className="w-[18%] pb-2 pr-2">Cantidad</th>
-                      <th className="w-[18%] pb-2 pr-2">Precio Compra</th>
-                      <th className="w-[15%] pb-2 pr-2">Subtotal</th>
+                      <th className="w-[18%] pb-2 pr-2">Precio Compra (USD)</th>
+                      <th className="w-[15%] pb-2 pr-2">Subtotal (USD)</th>
                       <th className="w-[10%] pb-2" />
                     </tr>
                   </thead>
@@ -528,7 +528,7 @@ export function ReceiptForm({
                             />
                           </td>
                           <td className="py-2 pr-2 text-right tabular-nums text-sm font-medium">
-                            {formatCurrency(subtotal)}
+                            <PriceWithExchangeRate amount={subtotal} exchangeRate={exchangeRate} />
                           </td>
                           <td className="py-2 text-center">
                             <Button
@@ -555,8 +555,11 @@ export function ReceiptForm({
         {/* ---- Total + Actions ---- */}
         <div className="flex items-center justify-between">
           <div className="text-lg font-semibold tabular-nums">
-            Total:{" "}
-            <span className="text-primary">{formatCurrency(total)}</span>
+            Total USD:{" "}
+            <span className="text-primary">{formatUsd(total)}</span>
+            <span className="ml-2 text-sm text-muted-foreground">
+              Total VES: {exchangeRate === null ? "no disponible" : formatVES(total * exchangeRate)}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Button
