@@ -138,7 +138,7 @@ beforeEach(() => {
   vi.mocked(getSession).mockResolvedValue(adminSession)
   ventasResolveValue = { data: [], error: null, count: 0 }
   clientesResolveValue = { data: [], error: null, count: 0 }
-  tasasResolveValue = { data: { created_at: new Date().toISOString() }, error: null }
+  tasasResolveValue = { data: { created_at: new Date().toISOString(), tasa: 36.5 }, error: null }
 })
 
 // ---------------------------------------------------------------------------
@@ -257,6 +257,7 @@ describe("ventas Server Actions", () => {
         p_subtotal: 100,
         p_impuesto: 0,
         p_total: 100,
+        p_tasa_cambio_usd_a_ves: 36.5,
         p_items: [
           { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50, descuento: 0, descuento_tipo: "%" },
         ],
@@ -361,6 +362,7 @@ describe("ventas Server Actions", () => {
         p_subtotal: 100,
         p_impuesto: 16,
         p_total: 116,
+        p_tasa_cambio_usd_a_ves: 36.5,
         p_items: [
           { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50, descuento: 0, descuento_tipo: "%" },
         ],
@@ -406,6 +408,7 @@ describe("ventas Server Actions", () => {
         p_subtotal: 90,
         p_impuesto: 14.4,
         p_total: 104.4,
+        p_tasa_cambio_usd_a_ves: 36.5,
         p_items: [
           { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 1, precio_venta: 100, descuento: 10, descuento_tipo: "%" },
         ],

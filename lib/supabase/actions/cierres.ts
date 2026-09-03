@@ -16,6 +16,8 @@ export type DailySummary = {
   methods: Array<{ metodo_pago: string; total: number; count: number }>
   cancelled: { total: number; count: number }
   systemTotal: number
+  totalVES: number
+  rateContext: number | "mixed" | null
   totalTransactions: number
   averageTicket: number
 }
@@ -90,7 +92,7 @@ export async function getDailySummary(
   // Fetch completed sales (exclude anulada)
   const { data: completedRows, error: completedError } = await supabase
     .from("ventas")
-    .select("metodo_pago, total")
+    .select("metodo_pago, total, total_ves, tasa_cambio_usd_a_ves")
     .eq("estado", "completada")
     .gte("created_at", `${fecha}T00:00:00.000Z`)
     .lt("created_at", `${fecha}T23:59:59.999Z`)
@@ -133,6 +135,18 @@ export async function getDailySummary(
   const cancelledCount = (cancelledRows ?? []).length
 
   const systemTotal = methods.reduce((sum, m) => sum + m.total, 0)
+  const totalVES = (completedRows ?? []).reduce(
+    (sum, row) => sum + Number(row.total_ves ?? 0),
+    0,
+  )
+  const rates = Array.from(
+    new Set(
+      (completedRows ?? [])
+        .map((row) => row.tasa_cambio_usd_a_ves)
+        .filter((rate): rate is number => rate !== null),
+    ),
+  )
+  const rateContext = rates.length === 1 ? rates[0] : rates.length > 1 ? "mixed" : null
   const totalTransactions = methods.reduce((sum, m) => sum + m.count, 0)
   const averageTicket =
     totalTransactions > 0
@@ -148,6 +162,8 @@ export async function getDailySummary(
         count: cancelledCount,
       },
       systemTotal: Math.round(systemTotal * 100) / 100,
+      totalVES: Math.round(totalVES * 100) / 100,
+      rateContext,
       totalTransactions,
       averageTicket,
     },

@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { DailySummary as DailySummaryType } from "@/lib/supabase/actions/cierres"
+import { formatCurrency } from "@/lib/money"
 
 const methodLabels: Record<string, string> = {
   efectivo: "Efectivo",
@@ -33,8 +34,17 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">
-              ${summary.systemTotal.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+              {formatCurrency(summary.systemTotal)}
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xs text-muted-foreground">Total en VES</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-semibold">{formatCurrency(summary.totalVES)}</p>
           </CardContent>
         </Card>
 
@@ -57,7 +67,7 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">
-              ${summary.averageTicket.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+              {formatCurrency(summary.averageTicket)}
             </p>
           </CardContent>
         </Card>
@@ -96,7 +106,7 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
                     </TableCell>
                     <TableCell className="text-right">{m.count}</TableCell>
                     <TableCell className="text-right font-medium">
-                      ${m.total.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+                      {formatCurrency(m.total)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -105,6 +115,14 @@ export function DailySummary({ summary }: { summary: DailySummaryType }) {
           </CardContent>
         </Card>
       )}
+
+      <p className="text-sm text-muted-foreground">
+        Tasa del día: {summary.rateContext === "mixed"
+          ? "Tasas mixtas"
+          : summary.rateContext === null
+            ? "Sin tasa histórica"
+            : `${formatCurrency(summary.rateContext)} / USD`}
+      </p>
     </div>
   )
 }

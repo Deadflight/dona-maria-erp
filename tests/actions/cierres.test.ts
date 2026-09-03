@@ -133,6 +133,34 @@ describe("getDailySummary", () => {
     const result = await getDailySummary("2026-01-15")
     expect(result.error).toBeNull() // sellers can view
   })
+
+  it("aggregates persisted VES totals and reports mixed rates", async () => {
+    ventasResolveValue = {
+      data: [
+        { metodo_pago: "efectivo", total: 100, total_ves: 3650, tasa_cambio_usd_a_ves: 36.5 },
+        { metodo_pago: "transferencia", total: 50, total_ves: 1850, tasa_cambio_usd_a_ves: 37 },
+      ],
+      error: null,
+    }
+
+    const result = await getDailySummary("2026-01-15")
+
+    expect(result.error).toBeNull()
+    expect(result.data?.totalVES).toBe(5500)
+    expect(result.data?.rateContext).toBe("mixed")
+  })
+
+  it("does not invent a historical conversion when fields are absent", async () => {
+    ventasResolveValue = {
+      data: [{ metodo_pago: "efectivo", total: 100, total_ves: null, tasa_cambio_usd_a_ves: null }],
+      error: null,
+    }
+
+    const result = await getDailySummary("2026-01-15")
+
+    expect(result.data?.totalVES).toBe(0)
+    expect(result.data?.rateContext).toBeNull()
+  })
 })
 
 describe("closeDay", () => {

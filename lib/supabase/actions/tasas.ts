@@ -3,6 +3,14 @@
 import { createClient } from "@/lib/supabase/server"
 import { getSession } from "@/actions/auth"
 import type { Database } from "@/types/database"
+import { isExchangeRateStale } from "@/lib/exchange-rate"
+
+export type ExchangeRateDisplay = {
+  tasa: number | null
+  fuente: string | null
+  createdAt: string | null
+  status: "current" | "stale" | "unavailable"
+}
 
 type ExchangeRateRow = Database["public"]["Tables"]["tasas_cambio"]["Row"]
 
@@ -60,6 +68,29 @@ export async function getCurrentExchangeRate(): Promise<{
   }
 
   return { data, error: null }
+}
+
+export async function getCurrentExchangeRateDisplay(): Promise<{
+  data: ExchangeRateDisplay
+  error: string | null
+}> {
+  const result = await getCurrentExchangeRate()
+  if (result.error || !result.data) {
+    return {
+      data: { tasa: null, fuente: null, createdAt: null, status: "unavailable" },
+      error: result.error,
+    }
+  }
+
+  return {
+    data: {
+      tasa: result.data.tasa,
+      fuente: result.data.fuente,
+      createdAt: result.data.created_at,
+      status: isExchangeRateStale(result.data.created_at) ? "stale" : "current",
+    },
+    error: null,
+  }
 }
 
 export async function getExchangeRateHistory(

@@ -94,7 +94,7 @@ export async function createSale(
 
   const { data: currentRate, error: rateError } = await supabase
     .from("tasas_cambio")
-    .select("created_at")
+    .select("created_at, tasa")
     .eq("activa", true)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -123,6 +123,7 @@ export async function createSale(
     p_subtotal: data.subtotal,
     p_impuesto: data.impuesto,
     p_total: data.total,
+    p_tasa_cambio_usd_a_ves: currentRate.tasa,
     p_items: data.items,
   })
 

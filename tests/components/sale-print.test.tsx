@@ -30,7 +30,9 @@ const fullSale = {
   numero_factura: "VT-20260715-0001",
   observaciones: null,
   subtotal: 390,
+  tasa_cambio_usd_a_ves: null,
   total: 452.4,
+  total_ves: null,
   vendedor_id: "user-1",
   clientes: {
     id: "cliente-1",
