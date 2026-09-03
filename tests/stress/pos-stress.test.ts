@@ -59,8 +59,20 @@ const mockVentasChain: Record<string, unknown> = {
   then: (resolve: (v: unknown) => void) => resolve(ventasResolveValue),
 }
 
+const mockTasasChain: Record<string, unknown> = {
+  select: vi.fn(() => mockTasasChain),
+  eq: vi.fn(() => mockTasasChain),
+  order: vi.fn(() => mockTasasChain),
+  limit: vi.fn(() => mockTasasChain),
+  maybeSingle: vi.fn(() =>
+    Promise.resolve({ data: { created_at: new Date().toISOString() }, error: null }),
+  ),
+}
+
 const mockRpc = vi.fn()
-const mockFrom = vi.fn(() => mockVentasChain)
+const mockFrom = vi.fn((table: string) =>
+  table === "tasas_cambio" ? mockTasasChain : mockVentasChain,
+)
 
 const mockSupabase = {
   from: mockFrom,
