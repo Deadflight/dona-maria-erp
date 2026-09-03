@@ -26,19 +26,19 @@ export function ExchangeRateIndicator({
   const state = {
     current: {
       label: "Vigente",
-      title: "Tasa BCV",
+      title: "Tasa USD/VES",
       Icon: CheckCircle2,
       color: "text-status-success",
     },
     stale: {
       label: "Tasa vencida",
-      title: "Tasa BCV",
+      title: "Tasa USD/VES",
       Icon: AlertTriangle,
       color: "text-destructive",
     },
     unavailable: {
       label: "Tasa no disponible",
-      title: "Tasa BCV",
+      title: "Tasa USD/VES",
       Icon: HelpCircle,
       color: "text-muted-foreground",
     },
