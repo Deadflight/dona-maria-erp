@@ -1,6 +1,6 @@
 # Production Deployment
 
-Production deployment is managed by `.github/workflows/deploy-production.yml` after a push to `main` or by manual dispatch.
+Production promotion is managed by Vercel Deployment Checks after a push to `main`. `.github/workflows/deploy-production.yml` applies migrations before Vercel promotes the Git deployment to production domains.
 
 ## Required GitHub Configuration
 
@@ -11,15 +11,14 @@ Configure these environment secrets:
 - `SUPABASE_ACCESS_TOKEN`
 - `SUPABASE_DB_PASSWORD`
 - `SUPABASE_PROJECT_REF`
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
 
 Secrets must not be committed to the repository, workflow files, or logs.
 
 ## Vercel Configuration
 
-Disable automatic production deployments from the Vercel Git integration before enabling this workflow. Otherwise Vercel can deploy the `main` commit concurrently with the migration job.
+Keep the Vercel Git integration and automatic production aliasing enabled. In the Vercel project, open **Settings > Build and Deployment > Deployment Checks**, select **Add Checks > GitHub**, and require the GitHub Actions job named **Apply Supabase migrations before production promotion**.
+
+Vercel can build the `main` commit immediately, but it will not promote that deployment to production domains until the required migration check passes.
 
 Preview deployments may remain enabled.
 
@@ -30,18 +29,16 @@ The workflow uses one non-cancelable production concurrency group and runs these
 1. Link the Supabase project.
 2. Apply pending migrations with `supabase db push --linked`.
 3. Verify the migration list.
-4. Link the Vercel project and pull production environment variables.
-5. Build and deploy the prebuilt Vercel artifact.
-6. Request the deployed URL and run a smoke test against `/login`.
+4. Vercel promotes the Git deployment only after the migration check succeeds.
 
-The Vercel job cannot start when the migration job fails.
+The production deployment is not promoted when the migration job fails.
 
 ## Rollback and Recovery
 
 There is no generic automatic SQL rollback. For a failed migration or deployment:
 
 - Keep the failed workflow run and inspect the migration error.
-- Restore application availability using the previous Vercel deployment when appropriate.
+- Use Vercel's deployment rollback when a previously promoted deployment must be restored.
 - Create and review a corrective migration; do not edit an already-applied migration.
 - Re-run the workflow after the corrective migration and application changes are reviewed.
 
@@ -50,8 +47,9 @@ Migrations should be backward-compatible with the previous application version w
 ## First Run Checklist
 
 - [ ] `Production` Environment exists and has the intended protection rules.
-- [ ] All six secrets are configured and scoped to `Production`.
-- [ ] Vercel production Git auto-deploy is disabled.
+- [ ] The three Supabase secrets are configured and scoped to `Production`.
+- [ ] Vercel Git integration and automatic production aliasing are enabled.
+- [ ] The Vercel Deployment Check requires `Apply Supabase migrations before production promotion`.
 - [ ] The linked Supabase project reference is verified.
 - [ ] A manual workflow dispatch succeeds in a controlled window.
-- [ ] Supabase migration state and the `/login` smoke test are successful.
+- [ ] Supabase migration state is successful and Vercel promotes the deployment after the check passes.
