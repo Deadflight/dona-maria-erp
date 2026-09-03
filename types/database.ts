@@ -44,29 +44,35 @@ export type Database = {
         Row: {
           created_at: string | null
           credito_id: string
+          fuente_tasa: string | null
           fecha_abono: string
           id: string
           metodo_pago: string
           monto: number
           referencia: string | null
+          tasa_cambio_usd_a_ves: number | null
         }
         Insert: {
           created_at?: string | null
           credito_id: string
+          fuente_tasa?: string | null
           fecha_abono?: string
           id?: string
           metodo_pago: string
           monto: number
           referencia?: string | null
+          tasa_cambio_usd_a_ves?: number | null
         }
         Update: {
           created_at?: string | null
           credito_id?: string
+          fuente_tasa?: string | null
           fecha_abono?: string
           id?: string
           metodo_pago?: string
           monto?: number
           referencia?: string | null
+          tasa_cambio_usd_a_ves?: number | null
         }
         Relationships: [
           {
