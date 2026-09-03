@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.14.0...v1.15.0) (2026-09-03)
+
+### Features
+
+* **inventory:** show VES product equivalence ([50b64e7](https://github.com/Deadflight/dona-maria-erp/commit/50b64e7669a615ccef5ee249e1afe0d817a191aa))
+
 ## [1.14.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.13.1...v1.14.0) (2026-09-03)
 
 ### Features
