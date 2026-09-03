@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatCurrency as formatVES } from "@/lib/money"
+import { formatUsd } from "@/lib/money"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -141,8 +142,8 @@ export function SaleDetailDialog({
                 <span>{PAYMENT_METHOD_LABELS[sale.metodo_pago] ?? sale.metodo_pago}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Total: </span>
-                <span className="font-semibold">{formatCurrency(sale.total)}</span>
+                <span className="font-medium text-muted-foreground">Total USD: </span>
+                <span className="font-semibold">{formatUsd(sale.total)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Total VES: </span>
