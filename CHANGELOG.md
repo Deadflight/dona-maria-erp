@@ -1,3 +1,9 @@
+## [1.13.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.13.0...v1.13.1) (2026-09-03)
+
+### Bug Fixes
+
+* **rates:** use neutral exchange rate label ([d365a1d](https://github.com/Deadflight/dona-maria-erp/commit/d365a1d14be448ddb7149f96da83731c2244d646))
+
 ## [1.13.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.12.1...v1.13.0) (2026-09-03)
 
 ### Features
