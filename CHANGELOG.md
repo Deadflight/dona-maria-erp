@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.10.0...v1.11.0) (2026-09-03)
+
+### Features
+
+* integrate resilient exchange rate sync ([b260cbc](https://github.com/Deadflight/dona-maria-erp/commit/b260cbc526737566b3584a1c10a030cd24c4e642))
+
 ## [1.10.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.9.0...v1.10.0) (2026-08-27)
 
 ### Features
