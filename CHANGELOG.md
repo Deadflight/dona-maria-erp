@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.16.0...v1.17.0) (2026-09-03)
+
+### Features
+
+* **credits:** show USD and VES balances ([f60e987](https://github.com/Deadflight/dona-maria-erp/commit/f60e987aeecf14232b8550818488e8ee52f102c6))
+
 ## [1.16.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.15.0...v1.16.0) (2026-09-03)
 
 ### Features
