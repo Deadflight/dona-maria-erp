@@ -1,3 +1,9 @@
+## [1.14.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.13.1...v1.14.0) (2026-09-03)
+
+### Features
+
+* **sales:** add rate context to printed receipt ([275e2f4](https://github.com/Deadflight/dona-maria-erp/commit/275e2f4c549a3609fc9b3aa31b9575f972782c04))
+
 ## [1.13.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.13.0...v1.13.1) (2026-09-03)
 
 ### Bug Fixes
