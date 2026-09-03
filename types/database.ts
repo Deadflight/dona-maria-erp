@@ -641,6 +641,7 @@ export type Database = {
           observaciones: string | null
           subtotal: number
           tasa_cambio_usd_a_ves: number | null
+          fuente_tasa: string | null
           total: number
           total_ves: number | null
           vendedor_id: string | null
@@ -656,6 +657,7 @@ export type Database = {
           observaciones?: string | null
           subtotal?: number
           tasa_cambio_usd_a_ves?: number | null
+          fuente_tasa?: string | null
           total: number
           total_ves?: number | null
           vendedor_id?: string | null
@@ -671,6 +673,7 @@ export type Database = {
           observaciones?: string | null
           subtotal?: number
           tasa_cambio_usd_a_ves?: number | null
+          fuente_tasa?: string | null
           total?: number
           total_ves?: number | null
           vendedor_id?: string | null

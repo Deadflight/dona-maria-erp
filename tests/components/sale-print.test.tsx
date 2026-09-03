@@ -30,9 +30,10 @@ const fullSale = {
   numero_factura: "VT-20260715-0001",
   observaciones: null,
   subtotal: 390,
-  tasa_cambio_usd_a_ves: null,
+  tasa_cambio_usd_a_ves: 36.5,
+  fuente_tasa: "api_bcv",
   total: 452.4,
-  total_ves: null,
+  total_ves: 16512.6,
   vendedor_id: "user-1",
   clientes: {
     id: "cliente-1",
@@ -166,6 +167,24 @@ describe("formatBs", () => {
 // ---------------------------------------------------------------------------
 
 describe("SalePrint", () => {
+  it("renders historical USD/VES conversion context", () => {
+    render(<SalePrint sale={fullSale} />)
+
+    expect(screen.getByText("TOTAL USD:")).toBeInTheDocument()
+    expect(screen.getByText("Total VES:")).toBeInTheDocument()
+    expect(screen.getByText("Tasa aplicada:")).toBeInTheDocument()
+    expect(screen.getByText("Fuente de tasa:")).toBeInTheDocument()
+    expect(screen.getByText("Bs. 16,512.60")).toBeInTheDocument()
+    expect(screen.getByText("Bs. 36.50 / USD")).toBeInTheDocument()
+  })
+
+  it("marks legacy conversion as unavailable", () => {
+    render(<SalePrint sale={{ ...fullSale, tasa_cambio_usd_a_ves: null, total_ves: null }} />)
+
+    expect(screen.getByText("Conversión VES no disponible")).toBeInTheDocument()
+    expect(screen.getByText("Tasa no disponible")).toBeInTheDocument()
+  })
+
   it("renders store header with name and subtitle", () => {
     render(<SalePrint sale={fullSale} />)
 
@@ -210,24 +229,24 @@ describe("SalePrint", () => {
     expect(qtyCells5.length).toBeGreaterThanOrEqual(1)
   })
 
-  it("renders unit prices in Bs.", () => {
+  it("renders unit prices in USD", () => {
     render(<SalePrint sale={fullSale} />)
 
-    expect(screen.getByText("Bs. 25.50")).toBeInTheDocument()
-    expect(screen.getByText("Bs. 30.00")).toBeInTheDocument()
+    expect(screen.getByText("$25.50")).toBeInTheDocument()
+    expect(screen.getByText("$30.00")).toBeInTheDocument()
   })
 
   it("renders persisted net item subtotals instead of recomputing gross totals", () => {
     const { container } = render(<SalePrint sale={saleWithDiscountItems} />)
 
-    expect(container.querySelector(".sp-td-total")).toHaveTextContent("Bs. 190.00")
-    expect(container.querySelector(".sp-td-total")).not.toHaveTextContent("Bs. 200.00")
+    expect(container.querySelector(".sp-td-total")).toHaveTextContent("$190.00")
+    expect(container.querySelector(".sp-td-total")).not.toHaveTextContent("$200.00")
   })
 
   it("renders discount amounts for items with discount", () => {
     render(<SalePrint sale={saleWithDiscountItems} />)
 
-    expect(screen.getByText("Bs. 10.00")).toBeInTheDocument()
+    expect(screen.getByText("$10.00")).toBeInTheDocument()
   })
 
   it("renders payments section with method and amount", () => {
@@ -235,8 +254,8 @@ describe("SalePrint", () => {
 
     expect(screen.getByText("Efectivo")).toBeInTheDocument()
     expect(screen.getByText("Pago Móvil")).toBeInTheDocument()
-    expect(screen.getByText("Bs. 252.40")).toBeInTheDocument()
-    expect(screen.getByText("Bs. 200.00")).toBeInTheDocument()
+    expect(screen.getByText("$252.40")).toBeInTheDocument()
+    expect(screen.getByText("$200.00")).toBeInTheDocument()
   })
 
   it("renders payment references", () => {
@@ -245,31 +264,31 @@ describe("SalePrint", () => {
     expect(screen.getByText("REF-123456")).toBeInTheDocument()
   })
 
-  it("renders subtotal in Bs.", () => {
+  it("renders subtotal in USD", () => {
     render(<SalePrint sale={fullSale} />)
 
     // subtotal of fullSale is 390
-    expect(screen.getByText("Bs. 390.00")).toBeInTheDocument()
+    expect(screen.getByText("$390.00")).toBeInTheDocument()
   })
 
-  it("renders IVA (16%) amount in Bs.", () => {
+  it("renders IVA (16%) amount in USD", () => {
     render(<SalePrint sale={fullSale} />)
 
     // impuesto = 62.4
-    expect(screen.getByText("Bs. 62.40")).toBeInTheDocument()
+    expect(screen.getByText("$62.40")).toBeInTheDocument()
   })
 
-  it("renders total in Bs.", () => {
+  it("renders total in USD", () => {
     render(<SalePrint sale={fullSale} />)
 
-    expect(screen.getByText("Bs. 452.40")).toBeInTheDocument()
+    expect(screen.getByText("$452.40")).toBeInTheDocument()
   })
 
   it("renders total discount row when discount > 0", () => {
     render(<SalePrint sale={saleWithDiscountItems} />)
 
     // descuento on the single item is 10 → formatBs(-10) = "Bs. -10.00"
-    expect(screen.getByText("Bs. -10.00")).toBeInTheDocument()
+    expect(screen.getByText("-$10.00")).toBeInTheDocument()
   })
 
   it("does NOT render discount row when no discounts", () => {
@@ -286,8 +305,8 @@ describe("SalePrint", () => {
     // In fullSale both items have descuento = 0, so totalDescuento = 0
     // The "Descuento:" label should not appear
     // But "Dto." header is rendered — OK
-    // Let's just verify the negative Bs. -15.00 or similar is NOT shown
-    expect(screen.queryByText("Bs. -0.00")).not.toBeInTheDocument()
+    // The zero discount is not printed.
+    expect(screen.queryByText("$-0.00")).not.toBeInTheDocument()
   })
 
   it("renders footer message", () => {
@@ -302,15 +321,15 @@ describe("SalePrint", () => {
     expect(window.print).toHaveBeenCalledTimes(1)
   })
 
-  it("renders all monetary values with Bs. prefix", () => {
+  it("renders all base monetary values with USD prefix", () => {
     render(<SalePrint sale={fullSale} />)
 
     // Check key values
-    const bsValues = screen.getAllByText(/^Bs\.\s/)
+    const usdValues = screen.getAllByText(/^\$/)
     // At minimum: subtotal (390.00), unit prices (25.50, 30.00),
     // item totals (255.00, 150.00), IVA (62.40), total (452.40),
     // payments (252.40, 200.00)
-    expect(bsValues.length).toBeGreaterThanOrEqual(7)
+    expect(usdValues.length).toBeGreaterThanOrEqual(7)
   })
 
   it("renders items table with correct column headers", () => {
@@ -333,16 +352,16 @@ describe("SalePrint data consistency", () => {
     render(<SalePrint sale={fullSale} />)
 
     // fullSale: 10 × 25.50 = 255, 5 × 30 = 150, sum = 390 = sale.subtotal
-    // subtotal should render as Bs. 390.00
+    // subtotal should render as $390.00
     // We already check this, but let's be explicit:
-    expect(screen.getByText("Bs. 390.00")).toBeInTheDocument()
+    expect(screen.getByText("$390.00")).toBeInTheDocument()
   })
 
   it("payments sum equals sale.total", () => {
     render(<SalePrint sale={fullSale} />)
 
     // fullSale: 252.40 + 200 = 452.40 = sale.total
-    expect(screen.getByText("Bs. 452.40")).toBeInTheDocument()
+    expect(screen.getByText("$452.40")).toBeInTheDocument()
   })
 })
 
@@ -357,7 +376,7 @@ describe("SalePrint error state", () => {
     // All essential data still renders
     expect(screen.getByText("N/A")).toBeInTheDocument()
     expect(screen.getByText("VT-20260715-0001")).toBeInTheDocument()
-    expect(screen.getByText("Bs. 452.40")).toBeInTheDocument()
+    expect(screen.getByText("$452.40")).toBeInTheDocument()
   })
 
   it("does not call window.print when no sale data is passed (not rendered)", () => {
