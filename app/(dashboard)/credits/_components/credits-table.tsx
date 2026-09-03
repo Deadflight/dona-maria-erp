@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { AbonoDialog } from "./abono-dialog"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
 
 type Session = {
   id: string
@@ -31,6 +32,7 @@ type Props = {
   data: CreditListItem[] | null
   error: string | null
   session: Session
+  exchangeRate?: number | null
 }
 
 // The `vencido` state is derived server-side by listCreditos (decision 5,
@@ -56,7 +58,7 @@ const formatDate = (iso: string) => {
   }).format(new Date(year, month - 1, day))
 }
 
-export function CreditsTable({ data, error, session }: Props) {
+export function CreditsTable({ data, error, session, exchangeRate = null }: Props) {
   const canWrite = session?.role === "admin" || session?.role === "seller"
   const [abonoCredit, setAbonoCredit] = useState<CreditListItem | null>(null)
 
@@ -109,10 +111,10 @@ export function CreditsTable({ data, error, session }: Props) {
                         {credit.clientes?.nombre ?? "-"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatCurrency(credit.monto_original)}
+                        <PriceWithExchangeRate amount={credit.monto_original} exchangeRate={exchangeRate} />
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {formatCurrency(credit.saldo_pendiente)}
+                        <PriceWithExchangeRate amount={credit.saldo_pendiente} exchangeRate={exchangeRate} />
                       </TableCell>
                       <TableCell>{formatDate(credit.fecha_vencimiento)}</TableCell>
                       <TableCell>
@@ -139,7 +141,7 @@ export function CreditsTable({ data, error, session }: Props) {
       )}
 
       {abonoCredit && (
-        <AbonoDialog credit={abonoCredit} onClose={() => setAbonoCredit(null)} />
+        <AbonoDialog credit={abonoCredit} exchangeRate={exchangeRate} onClose={() => setAbonoCredit(null)} />
       )}
     </div>
   )

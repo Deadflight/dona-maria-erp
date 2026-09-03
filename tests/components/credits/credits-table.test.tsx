@@ -70,8 +70,8 @@ describe("CreditsTable", () => {
     )
 
     expect(screen.getByText("María Pérez")).toBeInTheDocument()
-    expect(screen.getByText("Bs. 1.234,50")).toBeInTheDocument() // monto_original
-    expect(screen.getByText("Bs. 800,00")).toBeInTheDocument() // saldo_pendiente
+    expect(screen.getByText("$1,234.50 USD")).toBeInTheDocument() // monto_original
+    expect(screen.getByText("$800.00 USD")).toBeInTheDocument() // saldo_pendiente
     expect(screen.getByText(formatDate("2026-08-15"))).toBeInTheDocument()
     expect(screen.getByText("Vencido")).toBeInTheDocument()
   })

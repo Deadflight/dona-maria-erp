@@ -8,6 +8,7 @@ import {
   type CreditListItem,
 } from "@/lib/supabase/actions/creditos"
 import { formatCurrency } from "@/lib/money"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -29,7 +30,7 @@ const METODO_PAGO_OPTIONS = [
   { value: "mixto", label: "Mixto" },
 ]
 
-type Props = { credit: CreditListItem; onClose: () => void }
+type Props = { credit: CreditListItem; exchangeRate?: number | null; onClose: () => void }
 
 function FieldError({
   field,
@@ -46,13 +47,14 @@ function FieldError({
   ) : null
 }
 
-export function AbonoDialog({ credit, onClose }: Props) {
+export function AbonoDialog({ credit, exchangeRate = null, onClose }: Props) {
   const [state, formAction, isPending] = useActionState<
     AbonoFormState,
     FormData
   >(registerAbono, {})
   const [open, setOpen] = useState(true)
   const [overpaymentError, setOverpaymentError] = useState<string | null>(null)
+  const [amount, setAmount] = useState("")
 
   useEffect(() => {
     if (state.success) {
@@ -106,7 +108,7 @@ export function AbonoDialog({ credit, onClose }: Props) {
         <form action={formAction} onSubmit={handleSubmit} className="space-y-4">
           <input type="hidden" name="credito_id" value={credit.id} />
           <div className="space-y-1.5">
-            <Label htmlFor="monto">Monto</Label>
+            <Label htmlFor="monto">Monto (USD)</Label>
             <Input
               id="monto"
               name="monto"
@@ -114,9 +116,14 @@ export function AbonoDialog({ credit, onClose }: Props) {
               min="0.01"
               step="0.01"
               required
+              value={amount}
+              onChange={(event) => setAmount(event.target.value)}
               {...fieldProps("monto")}
             />
             <FieldError field="monto" errors={state.errors} />
+            {amount && Number(amount) > 0 && (
+              <PriceWithExchangeRate amount={Number(amount)} exchangeRate={exchangeRate} />
+            )}
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="metodo_pago">Método de pago</Label>

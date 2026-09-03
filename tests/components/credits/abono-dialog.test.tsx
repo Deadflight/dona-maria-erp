@@ -40,7 +40,7 @@ describe("AbonoDialog", () => {
     const user = userEvent.setup()
     render(<AbonoDialog credit={credit} onClose={vi.fn()} />)
 
-    await user.type(screen.getByLabelText("Monto"), "500")
+    await user.type(screen.getByLabelText("Monto (USD)"), "500")
     await user.click(screen.getByRole("button", { name: "Registrar abono" }))
 
     expect(screen.getByRole("alert")).toHaveTextContent(
@@ -64,7 +64,7 @@ describe("AbonoDialog", () => {
 
     render(<AbonoDialog credit={credit} onClose={onClose} />)
 
-    await user.type(screen.getByLabelText("Monto"), "300")
+    await user.type(screen.getByLabelText("Monto (USD)"), "300")
     await user.click(screen.getByRole("button", { name: "Registrar abono" }))
 
     await waitFor(() => expect(mockRegisterAbono).toHaveBeenCalledTimes(1))
