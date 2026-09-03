@@ -1,3 +1,9 @@
+## [1.17.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.17.0...v1.17.1) (2026-09-03)
+
+### Bug Fixes
+
+* **deployment:** match production environment name ([48ea862](https://github.com/Deadflight/dona-maria-erp/commit/48ea86269e75ebc127bc073d5638786dba4fe093))
+
 ## [1.17.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.16.0...v1.17.0) (2026-09-03)
 
 ### Features
