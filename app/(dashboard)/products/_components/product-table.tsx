@@ -56,6 +56,7 @@ import {
 import { toggleProductActive } from "@/lib/supabase/actions/productos"
 import type { ProductFormState } from "@/lib/supabase/actions/productos"
 import { ProductFormDialog } from "./product-form-dialog"
+import { PriceWithExchangeRate } from "@/components/price-with-exchange-rate"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -83,19 +84,12 @@ interface ProductTableProps {
   searchParams: Record<string, string>
   session: Session
   categorias?: Array<{ id: string; nombre: string }>
+  exchangeRate: number | null
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 2,
-  }).format(value)
-}
 
 // ---------------------------------------------------------------------------
 // Product Table
@@ -107,6 +101,7 @@ export function ProductTable({
   searchParams,
   session,
   categorias = [],
+  exchangeRate,
 }: ProductTableProps) {
   const router = useRouter()
   const isAdminOrSeller =
@@ -384,7 +379,7 @@ export function ProductTable({
                     </TableCell>
                     <TableCell>{product.categoria}</TableCell>
                     <TableCell className="text-right tabular-nums">
-                      {formatCurrency(product.precio_venta)}
+                      <PriceWithExchangeRate amount={product.precio_venta} exchangeRate={exchangeRate} />
                     </TableCell>
                     <TableCell
                       className={cn(

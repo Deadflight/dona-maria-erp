@@ -2,6 +2,7 @@ import { getSession } from "@/actions/auth"
 import { listProducts } from "@/lib/supabase/actions/productos"
 import { listCategorias } from "@/lib/supabase/actions/categorias"
 import { ProductTable } from "./_components/product-table"
+import { getCurrentExchangeRateDisplay } from "@/lib/supabase/actions/tasas"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -25,7 +26,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const { data: session } = await getSession()
 
-  const [result, categoriasResult] = await Promise.all([
+  const [result, categoriasResult, rateResult] = await Promise.all([
     listProducts({
       search: sp.search,
       categoria: sp.categoria,
@@ -34,6 +35,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       activo: sp.incluirInactivos === "true" ? false : undefined,
     }),
     listCategorias(),
+    getCurrentExchangeRateDisplay(),
   ])
 
   return (
@@ -43,6 +45,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
       searchParams={sp}
       session={session}
       categorias={categoriasResult.data?.map((c) => ({ id: c.id, nombre: c.nombre })) ?? []}
+      exchangeRate={rateResult.data.status === "current" ? rateResult.data.tasa : null}
     />
   )
 }

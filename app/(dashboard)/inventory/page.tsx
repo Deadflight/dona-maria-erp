@@ -2,6 +2,7 @@ import { getSession } from "@/actions/auth"
 import { listStockAlerts } from "@/lib/supabase/actions/inventario"
 import type { Database } from "@/types/database"
 import { StockAlertTable } from "./_components/stock-alert-table"
+import { getCurrentExchangeRateDisplay } from "@/lib/supabase/actions/tasas"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -26,12 +27,15 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const { data: session } = await getSession()
 
-  const result = await listStockAlerts({
-    search: sp.search,
-    categoria: sp.categoria,
-    page: sp.page ? parseInt(sp.page, 10) : 1,
-    pageSize: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
-  })
+  const [result, rateResult] = await Promise.all([
+    listStockAlerts({
+      search: sp.search,
+      categoria: sp.categoria,
+      page: sp.page ? parseInt(sp.page, 10) : 1,
+      pageSize: sp.pageSize ? parseInt(sp.pageSize, 10) : 10,
+    }),
+    getCurrentExchangeRateDisplay(),
+  ])
 
   return (
     <StockAlertTable
@@ -41,6 +45,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
       error={result.error}
       searchParams={sp}
       session={session}
+      exchangeRate={rateResult.data.status === "current" ? rateResult.data.tasa : null}
     />
   )
 }

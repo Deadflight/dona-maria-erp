@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getDashboardKPIs: vi.fn(),
   listDashboardStock: vi.fn(),
   listReceipts: vi.fn(),
+  getCurrentExchangeRateDisplay: vi.fn(),
   redirect: vi.fn(),
 }))
 
@@ -16,6 +17,9 @@ vi.mock("@/lib/supabase/actions/inventario", () => ({
 }))
 vi.mock("@/lib/supabase/actions/compras", () => ({
   listReceipts: mocks.listReceipts,
+}))
+vi.mock("@/lib/supabase/actions/tasas", () => ({
+  getCurrentExchangeRateDisplay: mocks.getCurrentExchangeRateDisplay,
 }))
 vi.mock("next/navigation", () => ({
   redirect: mocks.redirect,
@@ -58,6 +62,10 @@ beforeEach(() => {
     error: null,
   })
   mocks.listReceipts.mockResolvedValue({ data: [receipt], total: 1, error: null })
+  mocks.getCurrentExchangeRateDisplay.mockResolvedValue({
+    data: { tasa: 36.5, fuente: "api_bcv", createdAt: null, status: "current" },
+    error: null,
+  })
 })
 
 describe("DashboardPage", () => {
