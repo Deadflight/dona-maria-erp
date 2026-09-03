@@ -16,7 +16,7 @@ Secrets must not be committed to the repository, workflow files, or logs.
 
 ## Vercel Configuration
 
-Keep the Vercel Git integration and automatic production aliasing enabled. In the Vercel project, open **Settings > Build and Deployment > Deployment Checks**, select **Add Checks > GitHub**, and require the GitHub Actions job named **Apply Supabase migrations before production promotion**.
+Keep the Vercel Git integration and automatic production aliasing enabled. In the Vercel project, open **Settings > Build and Deployment > Deployment Checks**, select **Add Checks > GitHub**, and require the check named **Vercel - dona-maria-erp: supabase-migrations**.
 
 Vercel can build the `main` commit immediately, but it will not promote that deployment to production domains until the required migration check passes.
 
@@ -49,7 +49,7 @@ Migrations should be backward-compatible with the previous application version w
 - [ ] `Production` Environment exists and has the intended protection rules.
 - [ ] The three Supabase secrets are configured and scoped to `Production`.
 - [ ] Vercel Git integration and automatic production aliasing are enabled.
-- [ ] The Vercel Deployment Check requires `Apply Supabase migrations before production promotion`.
+- [ ] The Vercel Deployment Check requires `Vercel - dona-maria-erp: supabase-migrations`.
 - [ ] The linked Supabase project reference is verified.
 - [ ] A manual workflow dispatch succeeds in a controlled window.
 - [ ] Supabase migration state is successful and Vercel promotes the deployment after the check passes.

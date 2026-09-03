@@ -39,3 +39,8 @@ jobs:
 
       - name: Verify migration state
         run: supabase migration list
+
+      - name: Notify Vercel deployment check
+        uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: Vercel - dona-maria-erp: supabase-migrations
