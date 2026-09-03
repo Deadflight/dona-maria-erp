@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.15.0...v1.16.0) (2026-09-03)
+
+### Features
+
+* **purchases:** show VES receipt equivalence ([8c7f572](https://github.com/Deadflight/dona-maria-erp/commit/8c7f57288a5f27d025b9623745a3b2068e2a3c03))
+
 ## [1.15.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.14.0...v1.15.0) (2026-09-03)
 
 ### Features
