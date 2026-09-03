@@ -7,6 +7,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 const mockGetSession = vi.fn()
 const mockListProveedores = vi.fn()
 const mockGenerateReceiptNumber = vi.fn()
+const mockGetCurrentExchangeRateDisplay = vi.fn()
 const mockRedirect = vi.fn()
 
 vi.mock("@/actions/auth", () => ({
@@ -16,6 +17,9 @@ vi.mock("@/actions/auth", () => ({
 vi.mock("@/lib/supabase/actions/compras", () => ({
   listProveedores: () => mockListProveedores(),
   generateReceiptNumber: () => mockGenerateReceiptNumber(),
+}))
+vi.mock("@/lib/supabase/actions/tasas", () => ({
+  getCurrentExchangeRateDisplay: () => mockGetCurrentExchangeRateDisplay(),
 }))
 
 vi.mock("next/navigation", () => ({
@@ -35,6 +39,10 @@ import { default as NewReceiptPage } from "@/app/(dashboard)/receipts/new/page"
 describe("NewReceiptPage (RSC data-flow)", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetCurrentExchangeRateDisplay.mockResolvedValue({
+      data: { tasa: null, fuente: null, createdAt: null, status: "unavailable" },
+      error: null,
+    })
   })
 
   // -------------------------------------------------------------------
