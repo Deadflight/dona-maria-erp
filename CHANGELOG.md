@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.12.1...v1.13.0) (2026-09-03)
+
+### Features
+
+* **pos:** show USD and VES totals ([f075da8](https://github.com/Deadflight/dona-maria-erp/commit/f075da8cf1ed0c6a749928eaf8ca2a3e4bc8725b))
+
 ## [1.12.1](https://github.com/Deadflight/dona-maria-erp/compare/v1.12.0...v1.12.1) (2026-09-03)
 
 ### Bug Fixes
