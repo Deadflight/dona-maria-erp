@@ -8,6 +8,7 @@ import { useEffect } from "react"
 
 import type { SaleDetail } from "@/lib/supabase/actions/ventas"
 import { formatBs } from "./sale-print-utils"
+import { formatUsd } from "@/lib/money"
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -44,6 +45,13 @@ function formatDate(dateStr: string | null): string {
 
 function paymentLabel(method: string): string {
   return PAYMENT_METHOD_LABELS[method] ?? method
+}
+
+const rateSourceLabels: Record<string, string> = {
+  api_bcv: "API BCV",
+  api_dolarapi: "API DolarAPI",
+  manual: "Manual",
+  fallida: "Fallida",
 }
 
 // ---------------------------------------------------------------------------
@@ -111,14 +119,14 @@ export function SalePrint({ sale }: SalePrintProps) {
               <tr key={item.id}>
                 <td className="sp-td sp-td-name">{item.productos?.nombre ?? "—"}</td>
                 <td className="sp-td sp-td-qty">{item.cantidad}</td>
-                <td className="sp-td sp-td-amount">{formatBs(item.precio_unitario)}</td>
+                <td className="sp-td sp-td-amount">{formatUsd(item.precio_unitario)}</td>
                 <td className="sp-td sp-td-amount">
                   {item.descuento && item.descuento > 0
-                    ? formatBs(item.descuento)
+                    ? formatUsd(item.descuento)
                     : "—"}
                 </td>
                 <td className="sp-td sp-td-amount sp-td-total">
-                  {formatBs(item.subtotal)}
+                  {formatUsd(item.subtotal)}
                 </td>
               </tr>
             ))}
@@ -142,7 +150,7 @@ export function SalePrint({ sale }: SalePrintProps) {
               {sale.pagos_venta.map((pago) => (
                 <tr key={pago.id}>
                   <td className="sp-td">{paymentLabel(pago.metodo_pago)}</td>
-                  <td className="sp-td sp-td-amount">{formatBs(pago.monto)}</td>
+                  <td className="sp-td sp-td-amount">{formatUsd(pago.monto)}</td>
                   <td className="sp-td sp-td-ref">
                     {pago.referencia ?? pago.banco ?? "—"}
                   </td>
@@ -158,22 +166,42 @@ export function SalePrint({ sale }: SalePrintProps) {
         <table className="sp-totals-table">
           <tbody>
             <tr>
-              <td className="sp-total-label">Subtotal:</td>
-              <td className="sp-total-amount">{formatBs(sale.subtotal)}</td>
+              <td className="sp-total-label">Subtotal USD:</td>
+              <td className="sp-total-amount">{formatUsd(sale.subtotal)}</td>
             </tr>
             {totalDescuento > 0 && (
               <tr>
                 <td className="sp-total-label">Descuento:</td>
-                <td className="sp-total-amount">{formatBs(-totalDescuento)}</td>
+                <td className="sp-total-amount">{formatUsd(-totalDescuento)}</td>
               </tr>
             )}
             <tr>
-              <td className="sp-total-label">IVA (16%):</td>
-              <td className="sp-total-amount">{formatBs(sale.impuesto)}</td>
+              <td className="sp-total-label">IVA (16%) USD:</td>
+              <td className="sp-total-amount">{formatUsd(sale.impuesto)}</td>
             </tr>
             <tr className="sp-total-row">
-              <td className="sp-total-label sp-total-grand">TOTAL:</td>
-              <td className="sp-total-amount sp-total-grand">{formatBs(sale.total)}</td>
+              <td className="sp-total-label sp-total-grand">TOTAL USD:</td>
+              <td className="sp-total-amount sp-total-grand">{formatUsd(sale.total)}</td>
+            </tr>
+            <tr>
+              <td className="sp-total-label">Total VES:</td>
+              <td className="sp-total-amount">
+                {sale.total_ves !== null ? formatBs(sale.total_ves) : "Conversión VES no disponible"}
+              </td>
+            </tr>
+            <tr>
+              <td className="sp-total-label">Tasa aplicada:</td>
+              <td className="sp-total-amount">
+                {sale.tasa_cambio_usd_a_ves !== null
+                  ? `${formatBs(sale.tasa_cambio_usd_a_ves)} / USD`
+                  : "Tasa no disponible"}
+              </td>
+            </tr>
+            <tr>
+              <td className="sp-total-label">Fuente de tasa:</td>
+              <td className="sp-total-amount">
+                {sale.fuente_tasa ? rateSourceLabels[sale.fuente_tasa] ?? sale.fuente_tasa : "No registrada"}
+              </td>
             </tr>
           </tbody>
         </table>

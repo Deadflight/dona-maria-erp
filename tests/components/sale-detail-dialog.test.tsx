@@ -17,6 +17,7 @@ function makeSale(conversion: Pick<SaleDetail, "tasa_cambio_usd_a_ves" | "total_
     subtotal: 100,
     total: 100,
     vendedor_id: null,
+    fuente_tasa: null,
     clientes: null,
     profiles: { full_name: "Seller" },
     detalles_venta: [],
