@@ -1,3 +1,9 @@
+## [1.12.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.11.0...v1.12.0) (2026-09-03)
+
+### Features
+
+* **exchange-rate:** display VES rate in operational views ([b81405a](https://github.com/Deadflight/dona-maria-erp/commit/b81405a247b5f026d32034282609d2420b9cd410))
+
 ## [1.11.0](https://github.com/Deadflight/dona-maria-erp/compare/v1.10.0...v1.11.0) (2026-09-03)
 
 ### Features
