@@ -4,7 +4,7 @@ Production deployment is managed by `.github/workflows/deploy-production.yml` af
 
 ## Required GitHub Configuration
 
-Create a protected GitHub Environment named `production`. Add an approval rule when production changes require explicit authorization.
+Create a protected GitHub Environment named `Production`. Add an approval rule when production changes require explicit authorization.
 
 Configure these environment secrets:
 
@@ -49,8 +49,8 @@ Migrations should be backward-compatible with the previous application version w
 
 ## First Run Checklist
 
-- [ ] Production Environment exists and has the intended protection rules.
-- [ ] All six secrets are configured and scoped to `production`.
+- [ ] `Production` Environment exists and has the intended protection rules.
+- [ ] All six secrets are configured and scoped to `Production`.
 - [ ] Vercel production Git auto-deploy is disabled.
 - [ ] The linked Supabase project reference is verified.
 - [ ] A manual workflow dispatch succeeds in a controlled window.
