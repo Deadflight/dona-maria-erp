@@ -104,7 +104,11 @@ export default function POSPage() {
       })
 
       if (result.error) {
-        toast.error(result.error)
+        toast.error(
+          result.error === "TASA_OBSOLETA"
+            ? "La tasa de cambio está vencida. Actualízala antes de registrar ventas."
+            : result.error,
+        )
         return
       }
 

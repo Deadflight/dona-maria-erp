@@ -54,6 +54,10 @@ let clientesResolveValue: { data: unknown; error: unknown; count?: number } = {
   error: null,
   count: 0,
 }
+let tasasResolveValue: { data: unknown; error: unknown } = {
+  data: { created_at: new Date().toISOString() },
+  error: null,
+}
 const mockClientesSingle = vi.fn()
 const mockClientesChain: Record<string, unknown> = {
   select: vi.fn(() => mockClientesChain),
@@ -65,11 +69,20 @@ const mockClientesChain: Record<string, unknown> = {
   then: (resolve: (v: unknown) => void) => resolve(clientesResolveValue),
 }
 
+const mockTasasChain: Record<string, unknown> = {
+  select: vi.fn(() => mockTasasChain),
+  eq: vi.fn(() => mockTasasChain),
+  order: vi.fn(() => mockTasasChain),
+  limit: vi.fn(() => mockTasasChain),
+  maybeSingle: vi.fn(() => Promise.resolve(tasasResolveValue)),
+}
+
 // RPC mock
 const mockRpc = vi.fn()
 
 const mockFrom = vi.fn((table: string) => {
   if (table === "clientes") return mockClientesChain
+  if (table === "tasas_cambio") return mockTasasChain
   return mockVentasChain
 })
 
@@ -125,6 +138,7 @@ beforeEach(() => {
   vi.mocked(getSession).mockResolvedValue(adminSession)
   ventasResolveValue = { data: [], error: null, count: 0 }
   clientesResolveValue = { data: [], error: null, count: 0 }
+  tasasResolveValue = { data: { created_at: new Date().toISOString() }, error: null }
 })
 
 // ---------------------------------------------------------------------------
@@ -136,6 +150,26 @@ describe("ventas Server Actions", () => {
   // createSale
   // ---------------------------------------------------------------------------
   describe("createSale", () => {
+    it("blocks a sale when the exchange rate is stale", async () => {
+      tasasResolveValue = {
+        data: { created_at: "2026-09-01T00:00:00.000Z" },
+        error: null,
+      }
+
+      const result = await createSale({
+        metodo_pago: "efectivo",
+        subtotal: 100,
+        impuesto: 0,
+        total: 100,
+        items: [
+          { producto_id: "550e8400-e29b-41d4-a716-446655440001", cantidad: 2, precio_venta: 50 },
+        ],
+      })
+
+      expect(result).toEqual({ data: null, error: "TASA_OBSOLETA" })
+      expect(mockRpc).not.toHaveBeenCalled()
+    })
+
     it("returns UNAUTHORIZED when no user is authenticated", async () => {
       vi.mocked(getSession).mockResolvedValue({ data: null })
 

@@ -14,6 +14,7 @@ const navItems = [
   { label: "Créditos", href: "/credits" },
   { label: "Recepción", href: "/receipts", icon: Package },
   { label: "Inventario", href: "/inventory" },
+  { label: "Tasa BCV", href: "/rates", adminOnly: true },
   { label: "Cierre diario", href: "/daily-close", adminOnly: true },
 ]
 

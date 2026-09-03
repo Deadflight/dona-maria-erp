@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { saleCreateSchema, listSalesSchema } from "@/lib/validations/ventas"
 import type { SaleCreateInput, ListSalesParams } from "@/lib/validations/ventas"
 import type { Database } from "@/types/database"
+import { isExchangeRateStale } from "@/lib/exchange-rate"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -90,6 +91,22 @@ export async function createSale(
 
   // -- RPC call -------------------------------------------------------------
   const supabase = await createClient()
+
+  const { data: currentRate, error: rateError } = await supabase
+    .from("tasas_cambio")
+    .select("created_at")
+    .eq("activa", true)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (rateError) {
+    return { data: null, error: rateError.message }
+  }
+
+  if (!currentRate || isExchangeRateStale(currentRate.created_at)) {
+    return { data: null, error: "TASA_OBSOLETA" }
+  }
 
   // RPC functions will be typed after migration — cast for now
   const { data: rpcResult, error: rpcError } = await (
